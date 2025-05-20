@@ -1,5 +1,5 @@
 {
-  "name": "telasyasmin",
+  "name": "cangup",
   "version": "1.0.0",
   "main": "index.ts",
   "scripts": {
@@ -12,11 +12,7 @@
     "expo": "~53.0.9",
     "expo-status-bar": "~2.2.3",
     "react": "19.0.0",
-    "react-native": "0.79.2",
-    "react-native-elements": "^3.4.3",
-    "react-dom": "19.0.0",
-    "react-native-web": "^0.20.0",
-    "@expo/metro-runtime": "~5.0.4"
+    "react-native": "0.79.2"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
