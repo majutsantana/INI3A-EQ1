@@ -12,11 +12,14 @@ import {
 import { Picker } from '@react-native-picker/picker';
 import * as Font from 'expo-font';
 import { useEffect, useState } from 'react';
+import { useNavigation } from '@react-navigation/native';
+import { MaterialIcons } from '@expo/vector-icons';
 
 export default function CadastroAluno() {
   const [fontsLoaded, setFontsLoaded] = useState(false);
   const [sexo, setSexo] = useState('');
   const [instituicao, setInstituicao] = useState('');
+  const navigation = useNavigation();
 
   const loadFonts = async () => {
     await Font.loadAsync({
@@ -45,6 +48,9 @@ export default function CadastroAluno() {
 
       <View style={styles.content}>
         <View style={styles.formContainer}>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+        <MaterialIcons name="arrow-back" size={28} color="#000" />
+        </TouchableOpacity>
           <ScrollView
             contentContainerStyle={styles.scrollContent}
             keyboardShouldPersistTaps="handled"
@@ -199,4 +205,10 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontFamily: 'PoppinsBold',
   },
+  seta:{
+    height:'15%',
+  },
+  backButton: {
+    alignSelf: 'flex-start',
+  }
 });
