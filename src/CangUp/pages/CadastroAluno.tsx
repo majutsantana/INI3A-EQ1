@@ -74,12 +74,16 @@ export default function CadastroAluno() {
                 <Picker
                   selectedValue={sexo}
                   onValueChange={(itemValue) => setSexo(itemValue)}
-                  style={styles.picker}
+                  style={[
+                    styles.picker,
+                    { color: sexo === '' ? '#888' : '#000' } // preto para placeholder, cinza para os demais
+                  ]}
                 >
                   <Picker.Item label="Selecione o sexo" value="" />
                   <Picker.Item label="Masculino" value="Masculino" />
                   <Picker.Item label="Feminino" value="Feminino" />
-                  <Picker.Item label="Outro" value="Outro" />
+                  <Picker.Item label="Neutro" value="Neutro" />
+                  <Picker.Item label="Prefiro não informar" value="Prefiro não informar" />
                 </Picker>
               </View>
             </View>
@@ -88,10 +92,13 @@ export default function CadastroAluno() {
             <View style={styles.inputGroup}>
               <Text style={styles.label}>Instituição:</Text>
               <View style={styles.pickerWrapper}>
-                <Picker
+                  <Picker
                   selectedValue={instituicao}
                   onValueChange={(itemValue) => setInstituicao(itemValue)}
-                  style={styles.picker}
+                  style={[
+                    styles.picker,
+                    { color: instituicao === '' ? '#888' : '#000' } // preto para placeholder, cinza para os demais
+                  ]}
                 >
                   <Picker.Item label="Selecione a instituição" value="" />
                   <Picker.Item label="Instituto Federal" value="IF" />
@@ -183,7 +190,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     borderWidth: 0,
     backgroundColor: '#d9d9d9',
-    color: '#888',
   },
   button: {
     backgroundColor: '#FFC222',
