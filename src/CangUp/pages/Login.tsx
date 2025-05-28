@@ -43,8 +43,8 @@ export default function Login() {
       {/*BODY*/}
       <View style={styles.body}> 
         <Text style={styles.title}>Bem-vindo de volta!</Text>
-        <TextInput style={styles.input} placeholder="Email / CPF / CNPJ" /> 
-        <TextInput style={styles.input} placeholder="Senha" secureTextEntry />
+        <TextInput style={styles.input} placeholder="Email / CPF / CNPJ" placeholderTextColor="#888" /> 
+        <TextInput style={styles.input} placeholder="Senha" secureTextEntry placeholderTextColor="#888" />
 
         <TouchableOpacity style={styles.button}>
           <Text style={styles.buttonText}>Login</Text>
@@ -110,7 +110,14 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     paddingLeft: 20,
     fontFamily: 'PoppinsRegular',
-    color:'#999',
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 3,
+    },
+    shadowOpacity: 0.27,
+    shadowRadius: 4.65,
+    elevation: 6,
   },
   button: {
     backgroundColor: '#FFBE31',
