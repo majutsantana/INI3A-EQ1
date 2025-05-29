@@ -177,14 +177,7 @@ const styles = StyleSheet.create({
     paddingVertical: '5%',
     fontSize: 16,
     fontFamily: 'PoppinsRegular',
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 3,
-    },
-    shadowOpacity: 0.3,
-    shadowRadius: 10.65,
-    elevation: 3,
+    
   },
   pickerWrapper: {
     alignItems: 'center',
@@ -195,14 +188,7 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     overflow: 'hidden',
     backgroundColor: '#d9d9d9',
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 1,
-    },
-    shadowOpacity: 0.3,
-    shadowRadius: 4.65,
-    elevation: 3,
+    
   },
   picker: {
     width:'100%',
