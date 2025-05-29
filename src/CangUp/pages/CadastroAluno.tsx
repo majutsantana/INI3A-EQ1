@@ -110,7 +110,8 @@ export default function CadastroAluno() {
           </ScrollView>
         </View>
 
-        <TouchableOpacity style={styles.button}>
+        <TouchableOpacity style={styles.button}
+          onPress={() => navigation.navigate('PerfilInstituicao')}>
           <Text style={styles.buttonText}>Cadastrar</Text>
         </TouchableOpacity>
       </View>
@@ -160,9 +161,11 @@ const styles = StyleSheet.create({
   scrollContent: {
     flexGrow: 1,
     paddingBottom: '2%',
+    margin: '5%',
   },
   inputGroup: {
-    marginBottom: '5%',
+    padding:'1%',
+    marginBottom:'2%',
   },
   label: {
     fontWeight: 'bold',
@@ -177,24 +180,38 @@ const styles = StyleSheet.create({
     paddingVertical: '5%',
     fontSize: 16,
     fontFamily: 'PoppinsRegular',
-    
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 3,
+    },
+    shadowOpacity: 0.27,
+    shadowRadius: 4.65,
+    elevation: 6,
   },
   pickerWrapper: {
     alignItems: 'center',
     justifyContent:'center',
-    paddingHorizontal:'5%',
-    height: undefined,
-    minHeight: 48,
+    paddingHorizontal: '5%',
+    paddingVertical: '5%',
     borderRadius: 25,
     overflow: 'hidden',
     backgroundColor: '#d9d9d9',
-    
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 3,
+    },
+    shadowOpacity: 0.27,
+    shadowRadius: 4.65,
+    elevation: 6,
   },
   picker: {
     width:'100%',
     fontSize: 16,
     fontFamily: 'PoppinsRegular',
     backgroundColor: '#d9d9d9',
+    borderWidth:0,
   },
   button: {
     backgroundColor: '#FFBE31',

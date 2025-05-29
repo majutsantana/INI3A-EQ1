@@ -56,7 +56,7 @@ export default function OpUsuario() {
 
           <TouchableOpacity
             style={styles.button}
-            onPress={() => navigation.navigate('CadastroAluno')}> {/*arrumar direcionamento*/}
+            onPress={() => navigation.navigate('CadastroAluno')}>
             <Text style={styles.buttonText}>Aluno</Text>
           </TouchableOpacity>
 
