@@ -17,7 +17,12 @@ import { MaterialIcons } from '@expo/vector-icons';
 
 export default function CadastroAluno({navigation}) { //Não é erro, é só o vscode dando trabalho
   const [fontsLoaded, setFontsLoaded] = useState(false);
-  const [sexo, setSexo] = useState('');
+  const [nome, setNome] = useState('');
+  const [cpf, setCpf] = useState('');
+  const [ra, setRa] = useState('');
+  const [email, setEmail] = useState('');
+  const [endereco, setEndereco] = useState('');
+  const [sexo, setSexo] = useState('');  
   const [instituicao, setInstituicao] = useState('');
 
   const loadFonts = async () => {
@@ -31,6 +36,19 @@ export default function CadastroAluno({navigation}) { //Não é erro, é só o v
   useEffect(() => {
     loadFonts();
   }, []);
+
+  async function getDados(){
+      let r = await fetch("http://localhost:8000/cadastrar", {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ nome, ra, email, endereco, sexo, instituicao }),
+      });
+      
+      let dados =  await r.json();
+      alert(dados.Hello);
+    }
 
   if (!fontsLoaded) {
     return (
@@ -127,15 +145,11 @@ const styles = StyleSheet.create({
   },
   header: {
     backgroundColor: '#B9A6DA',
-    height: '15%',
-    borderBottomLeftRadius: 20,
-    borderBottomRightRadius: 20,
+    height: '10%',
   },
   footer: {
     backgroundColor: '#B9A6DA',
     height: '8%',
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
   },
   content: {
     flex: 1,

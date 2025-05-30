@@ -1,18 +1,13 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AlunoController;
 
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "web" middleware group. Make something great!
-|
-*/
+Route::get('/', [AlunoController::class, 'index']);
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/abcd', [AlunoController::class, 'index']);
+
+
+Route::post('/cadastrar',
+['as' => 'cadastrar',
+'uses'=>'App\Http\Controllers\AlunoController@cadastrar']);

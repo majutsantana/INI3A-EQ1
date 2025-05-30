@@ -1,13 +1,12 @@
-import { Image, StyleSheet, Text, TextInput, View, TouchableOpacity, ActivityIndicator} from 'react-native';
+import { Image, StyleSheet, Text, TextInput, View, TouchableOpacity, ActivityIndicator, Alert} from 'react-native';
 import * as Font from 'expo-font';
 import { useEffect, useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 
-export default function Login() {
+export default function Login({navigation}) {
   function handleLinkPress(arg0: string): void {
     throw new Error('Function not implemented.');
   }
-  const navigation = useNavigation();
   const [fontsLoaded, setFontsLoaded] = useState(false);
   
     const loadFonts = async () => {
@@ -20,7 +19,16 @@ export default function Login() {
   
     useEffect(() => {
       loadFonts();
+      fetch("http://127.0.0.1:8000/")
+        .then(r=> r.json())
+        .then(r=> {alert(r.Hello); Alert.alert(r.Hello)})
     }, []);
+
+    async function getDados(){
+      let r = await fetch("http://localhost:8000/cadastrar");
+      let dados =  await r.json();
+      alert(dados.Hello);
+    }
   
     if (!fontsLoaded) {
       return (
@@ -50,7 +58,7 @@ export default function Login() {
           <Text style={styles.buttonText}>Login</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity onPress={() => handleLinkPress('')}>
+        <TouchableOpacity onPress={getDados}>
           <Text style={styles.linkText}>Esqueci minha senha</Text>
         </TouchableOpacity>
 
@@ -58,7 +66,7 @@ export default function Login() {
           Não tem uma conta? 
         </Text>
 
-        <TouchableOpacity onPress={() => navigation.navigate('OpUsuario')}>
+        <TouchableOpacity onPress={() => navigation.navigate('TipoCadastro')}>
             <Text style={styles.linkText}> Criar conta</Text>
           </TouchableOpacity>
       </View>
@@ -80,8 +88,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#BEACDE',
     alignItems: 'center',
     justifyContent: 'center',
-    borderBottomLeftRadius: 20,
-    borderBottomRightRadius: 20,
   },
   body: {
     flex:1,
@@ -158,8 +164,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     padding: '5%',
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
   },
   image:{
     width: '80%',

@@ -1,7 +1,7 @@
 import {NavigationContainer } from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import Login from './pages/Login';
-import OpUsuario from './pages/OpUsuario';
+import TipoCadastro from './pages/TipoCadastro';
 import CadastroAluno from './pages/CadastroAluno';
 import PerfilInstituicao from './pages/PerfilInstituicao';
 import PerfilAluno from './pages/PerfilAluno';
@@ -18,13 +18,18 @@ export default function App() {
           options={{ headerShown: false }} 
         />
         <Stack.Screen
-            name="OpUsuario" 
-            component={OpUsuario}
+            name="TipoCadastro" 
+            component={TipoCadastro}
             options={{ headerShown: false }}
           />
         <Stack.Screen
           name="CadastroAluno"
           component={CadastroAluno}
+          options={{ headerShown: false }} // MUDAR DIRECIONAMENTO
+        />
+        <Stack.Screen
+          name="PerfilInstituicao"
+          component={PerfilInstituicao}
           options={{ headerShown: false }}
         />
         <Stack.Screen

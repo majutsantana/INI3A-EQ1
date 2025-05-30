@@ -1,4 +1,4 @@
-// Yasmin 
+//Yasmin
 import { useNavigation } from '@react-navigation/core';
 import React, { useEffect, useState } from 'react';
 import {
@@ -79,7 +79,7 @@ export default function PerfilInstituicao() {
                     style={styles.input}
                     placeholderTextColor="#000"
                 />
-
+                
             </View>
 
             {/* Rodapé */}
@@ -99,6 +99,10 @@ export default function PerfilInstituicao() {
 }
 
 const styles = StyleSheet.create({
+    p0:{
+        backgroundColor: '#FFBE31',
+        width: '100%',
+    },
     safeArea: {
         flex: 1,
         backgroundColor: '#FCD28D',
