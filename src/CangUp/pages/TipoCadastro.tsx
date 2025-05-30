@@ -88,8 +88,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#beacde',
     alignItems: 'center',
     justifyContent: 'center',
-    borderBottomLeftRadius: 20,
-    borderBottomRightRadius: 20,
   },
   image: {
     width: '80%',
@@ -145,7 +143,5 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     height: '8%',
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
   },
 });

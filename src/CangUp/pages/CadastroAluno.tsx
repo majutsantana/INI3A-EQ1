@@ -146,15 +146,11 @@ const styles = StyleSheet.create({
   },
   header: {
     backgroundColor: '#B9A6DA',
-    height: '15%',
-    borderBottomLeftRadius: 20,
-    borderBottomRightRadius: 20,
+    height: '10%',
   },
   footer: {
     backgroundColor: '#B9A6DA',
     height: '8%',
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
   },
   content: {
     flex: 1,

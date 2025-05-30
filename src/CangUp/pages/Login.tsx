@@ -88,8 +88,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#BEACDE',
     alignItems: 'center',
     justifyContent: 'center',
-    borderBottomLeftRadius: 20,
-    borderBottomRightRadius: 20,
   },
   body: {
     flex:1,
@@ -166,8 +164,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     padding: '5%',
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
   },
   image:{
     width: '80%',
