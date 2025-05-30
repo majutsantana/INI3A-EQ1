@@ -58,7 +58,7 @@ export default function Login() {
           Não tem uma conta? 
         </Text>
 
-        <TouchableOpacity onPress={() => navigation.navigate('OpUsuario')}>
+        <TouchableOpacity onPress={() => navigation.navigate('TipoCadastro')}>
             <Text style={styles.linkText}> Criar conta</Text>
           </TouchableOpacity>
       </View>
