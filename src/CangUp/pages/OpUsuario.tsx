@@ -1,13 +1,10 @@
 import React from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, Image,  ActivityIndicator } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
 import { MaterialIcons } from '@expo/vector-icons'; // use isso com Expo
-import Login from './Login';
 import { useEffect, useState } from 'react';
 import * as Font from 'expo-font';
 
-export default function OpUsuario() {
-  const navigation = useNavigation();
+export default function OpUsuario({navigation}) { //Vai ficar dando "erro" por conta do vscode, o código está certo!
 
   const [fontsLoaded, setFontsLoaded] = useState(false);
 

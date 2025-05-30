@@ -15,11 +15,10 @@ import { useEffect, useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import { MaterialIcons } from '@expo/vector-icons';
 
-export default function CadastroAluno() {
+export default function CadastroAluno({navigation}) { //Não é erro, é só o vscode dando trabalho
   const [fontsLoaded, setFontsLoaded] = useState(false);
   const [sexo, setSexo] = useState('');
   const [instituicao, setInstituicao] = useState('');
-  const navigation = useNavigation();
 
   const loadFonts = async () => {
     await Font.loadAsync({
