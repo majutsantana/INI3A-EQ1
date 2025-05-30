@@ -17,7 +17,7 @@ export default function App() {
           options={{ headerShown: false }}
         />
         <Stack.Screen
-            name="OpUsuario" 
+            name="TipoCadastro" 
             component={TipoCadastro}
             options={{ headerShown: false }}
           />

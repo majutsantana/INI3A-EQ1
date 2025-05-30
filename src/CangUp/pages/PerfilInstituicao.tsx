@@ -39,21 +39,25 @@ export default function PerfilInstituicao() {
 
     return (
         <SafeAreaView style={styles.safeArea}>
-            {/* Cabeçalho */}
             <View style={styles.header} />
-
+            
             {/* Parte de cima com nome, foto e editar */}
-            <View style={styles.profileTop}>
-                <Text style={styles.institutionName}>Nome da Instituição</Text>
-                <View style={styles.profilePic}>
-                    <Text style={{ fontFamily: 'PoppinsRegular', fontSize: 12 }}>Foto de Perfil</Text>
+            <View style={styles.p0}>
+                {/* Cabeçalho */}
+            
+                
+                <View style={styles.profileTop}>
+                    <Text style={styles.institutionName}>Nome da Instituição</Text>
+                    <View style={styles.profilePic}>
+                        <Text style={{ fontFamily: 'PoppinsRegular', fontSize: 12 }}>Foto de Perfil</Text>
+                    </View>
+                    <TouchableOpacity
+                        style={styles.editBtn}
+                        onPress={() => Alert.alert("Função de edição ainda será implementada.")}
+                    >
+                        <Text style={{ fontFamily: 'PoppinsRegular', fontSize: 16 }}>Editar perfil</Text>
+                    </TouchableOpacity>
                 </View>
-                <TouchableOpacity
-                    style={styles.editBtn}
-                    onPress={() => Alert.alert("Função de edição ainda será implementada.")}
-                >
-                    <Text style={{ fontFamily: 'PoppinsRegular', fontSize: 16 }}>Editar perfil</Text>
-                </TouchableOpacity>
             </View>
 
             {/* Formulário */}
@@ -78,7 +82,6 @@ export default function PerfilInstituicao() {
                     style={styles.input}
                     placeholderTextColor="#000"
                 />
-
             </View>
 
             {/* Rodapé */}
@@ -98,15 +101,18 @@ export default function PerfilInstituicao() {
 }
 
 const styles = StyleSheet.create({
+    p0:{
+        backgroundColor: '#FFBE31',
+        width: '100%',
+    },
     safeArea: {
         flex: 1,
         backgroundColor: '#FCD28D',
+        height: '100%',
     },
     header: {
-        height: '15%',
+        height: '10%',
         backgroundColor: '#BEACDE',
-        borderBottomLeftRadius: 20,
-        borderBottomRightRadius: 20,
     },
     profileTop: {
         backgroundColor: '#FFBE31',
@@ -146,10 +152,11 @@ const styles = StyleSheet.create({
         elevation: 6,
         },
     formFields: {
+        display: 'flex',
         flex: 1,
         gap:'8%',
         alignItems:'center',
-        justifyContent:'center',
+        justifyContent: 'center',
     },
     input: {
         width:'80%',
@@ -175,7 +182,5 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-around',
         alignItems: 'center',
-        borderTopLeftRadius: 20,
-        borderTopRightRadius: 20,
     },
 });
