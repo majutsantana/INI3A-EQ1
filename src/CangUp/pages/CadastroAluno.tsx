@@ -17,7 +17,12 @@ import { MaterialIcons } from '@expo/vector-icons';
 
 export default function CadastroAluno() {
   const [fontsLoaded, setFontsLoaded] = useState(false);
-  const [sexo, setSexo] = useState('');
+  const [nome, setNome] = useState('');
+  const [cpf, setCpf] = useState('');
+  const [ra, setRa] = useState('');
+  const [email, setEmail] = useState('');
+  const [endereco, setEndereco] = useState('');
+  const [sexo, setSexo] = useState('');  
   const [instituicao, setInstituicao] = useState('');
   const navigation = useNavigation();
 
@@ -32,6 +37,19 @@ export default function CadastroAluno() {
   useEffect(() => {
     loadFonts();
   }, []);
+
+  async function getDados(){
+      let r = await fetch("http://localhost:8000/cadastrar", {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ nome, ra, email, endereco, sexo, instituicao }),
+      });
+      
+      let dados =  await r.json();
+      alert(dados.Hello);
+    }
 
   if (!fontsLoaded) {
     return (
@@ -111,7 +129,7 @@ export default function CadastroAluno() {
         </View>
 
         <TouchableOpacity style={styles.button}
-          onPress={() => navigation.navigate('PerfilInstituicao')}>
+          onPress={getDados}>
           <Text style={styles.buttonText}>Cadastrar</Text>
         </TouchableOpacity>
       </View>

@@ -5,6 +5,9 @@ use App\Http\Controllers\AlunoController;
 
 Route::get('/', [AlunoController::class, 'index']);
 
-Route::post('/salvar',
-['as' => 'salvar',
-'uses'=>'App\Http\Controllers\AlunoController@salvar']);
+Route::get('/abcd', [AlunoController::class, 'index']);
+
+
+Route::post('/cadastrar',
+['as' => 'cadastrar',
+'uses'=>'App\Http\Controllers\AlunoController@cadastrar']);

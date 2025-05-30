@@ -5,9 +5,7 @@ import { MaterialIcons } from '@expo/vector-icons'; // use isso com Expo
 import { useEffect, useState } from 'react';
 import * as Font from 'expo-font';
 
-export default function OpUsuario() {
-  const navigation = useNavigation();
-
+export default function OpUsuario({navigation}) {
   const [fontsLoaded, setFontsLoaded] = useState(false);
 
   const loadFonts = async () => {

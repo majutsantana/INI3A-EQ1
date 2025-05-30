@@ -7,10 +7,10 @@ use Illuminate\Http\Request;
 
 class AlunoController extends Controller
 {
-    public function salvar(Request $req){
+    public function cadastrar(Request $req){
         $dados = $req->all();
 
         Aluno::create($dados);
-        return redirect()->route('admin.salvar');
+        return redirect()->route('admin.cadastrar');
     }
 }
