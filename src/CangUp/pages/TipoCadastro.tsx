@@ -64,7 +64,7 @@ export default function OpUsuario({navigation}) {
         
       </View>
 
-      {/*FOOTER*/}
+      {/*FOOTERr*/}
       <View style={styles.footer}></View> 
     </View>
   );
