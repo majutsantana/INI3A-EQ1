@@ -15,14 +15,14 @@ import { useEffect, useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import { MaterialIcons } from '@expo/vector-icons';
 
-export default function CadastroAluno({navigation}) { //Não é erro, é só o vscode dando trabalho
+export default function CadastroAluno({navigation}) {
   const [fontsLoaded, setFontsLoaded] = useState(false);
   const [nome, setNome] = useState('');
   const [cpf, setCpf] = useState('');
   const [ra, setRa] = useState('');
   const [email, setEmail] = useState('');
   const [endereco, setEndereco] = useState('');
-  const [sexo, setSexo] = useState('');  
+  const [sexo, setSexo] = useState('');
   const [instituicao, setInstituicao] = useState('');
 
   const loadFonts = async () => {
@@ -38,17 +38,29 @@ export default function CadastroAluno({navigation}) { //Não é erro, é só o v
   }, []);
 
   async function getDados(){
-      let r = await fetch("http://localhost:8000/cadastrar", {
-          method: 'POST',
-          headers: {
+    try{
+      const r = await fetch("http://localhost:8000/cadastrar", {
+        method: 'POST',
+        headers: {
             'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ nome, ra, email, endereco, sexo, instituicao }),
+        },
+        body: JSON.stringify({ nome, ra, email, endereco, sexo, instituicao }),
       });
-      
-      let dados =  await r.json();
-      alert(dados.Hello);
+
+      const dados = await r.json();
+
+      if (r.ok) {
+        setNome('');
+        setRa('');
+        setEmail('');
+        setEndereco('');
+        setSexo('');
+        setInstituicao('');
+      }
+    } catch (error) {
+      console.error('Erro na requisição: ', error);
     }
+  }
 
   if (!fontsLoaded) {
     return (
@@ -65,35 +77,74 @@ export default function CadastroAluno({navigation}) { //Não é erro, é só o v
 
       <View style={styles.content}>
         <View style={styles.formContainer}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-        <MaterialIcons name="arrow-back" size={28} color="#000" />
-        </TouchableOpacity>
+          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+            <MaterialIcons name="arrow-back" size={28} color="#000" />
+          </TouchableOpacity>
           <ScrollView
             contentContainerStyle={styles.scrollContent}
             keyboardShouldPersistTaps="handled"
             showsVerticalScrollIndicator={false}
           >
-            {['Nome', 'CPF', 'RA', 'Email', 'Endereço'].map((label, index) => (
-              <View key={index} style={styles.inputGroup}>
-                <Text style={styles.label}>{label}:</Text>
-                <TextInput
-                  style={styles.input}
-                  placeholder={`Digite o ${label.toLowerCase()}`}
-                  placeholderTextColor="#888"
-                />
-              </View>
-            ))}
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>Nome:</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Digite o nome"
+                placeholderTextColor="#888"
+                value={nome}
+                onChangeText={setNome}
+              />
+            </View>
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>CPF:</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Digite o CPF"
+                placeholderTextColor="#888"
+                value={cpf}
+                onChangeText={setCpf}
+              />
+            </View>
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>RA:</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Digite o RA"
+                placeholderTextColor="#888"
+                value={ra}
+                onChangeText={setRa}
+              />
+            </View>
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>Email:</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Digite o email"
+                placeholderTextColor="#888"
+                value={email}
+                onChangeText={setEmail}
+              />
+            </View>
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>Endereço:</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Digite o endereço"
+                placeholderTextColor="#888"
+                value={endereco}
+                onChangeText={setEndereco}
+              />
+            </View>
 
-            {/* Picker de Sexo */}
             <View style={styles.inputGroup}>
               <Text style={styles.label}>Sexo:</Text>
               <View style={styles.pickerWrapper}>
                 <Picker
                   selectedValue={sexo}
-                  onValueChange={(itemValue) => setSexo(itemValue)}
+                  onValueChange={setSexo}
                   style={[
                     styles.picker,
-                    { color: sexo === '' ? '#888' : '#000' } // preto para placeholder, cinza para os demais
+                    { color: sexo === '' ? '#888' : '#000' }
                   ]}
                 >
                   <Picker.Item label="Selecione o sexo" value="" />
@@ -105,16 +156,15 @@ export default function CadastroAluno({navigation}) { //Não é erro, é só o v
               </View>
             </View>
 
-            {/* Picker de Instituição */}
             <View style={styles.inputGroup}>
               <Text style={styles.label}>Instituição:</Text>
               <View style={styles.pickerWrapper}>
-                  <Picker
+                <Picker
                   selectedValue={instituicao}
-                  onValueChange={(itemValue) => setInstituicao(itemValue)}
+                  onValueChange={setInstituicao}
                   style={[
                     styles.picker,
-                    { color: instituicao === '' ? '#888' : '#000' } // preto para placeholder, cinza para os demais
+                    { color: instituicao === '' ? '#888' : '#000' }
                   ]}
                 >
                   <Picker.Item label="Selecione a instituição" value="" />
@@ -127,8 +177,7 @@ export default function CadastroAluno({navigation}) { //Não é erro, é só o v
           </ScrollView>
         </View>
 
-        <TouchableOpacity style={styles.button}
-          onPress={() => navigation.navigate('PerfilInstituicao')}>
+        <TouchableOpacity style={styles.button} onPress={getDados}>
           <Text style={styles.buttonText}>Cadastrar</Text>
         </TouchableOpacity>
       </View>
@@ -253,3 +302,4 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-start',
   }
 });
+ 
