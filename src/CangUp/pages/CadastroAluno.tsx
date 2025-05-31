@@ -1,20 +1,15 @@
+import React from 'react';
 import {
-  ActivityIndicator,
   SafeAreaView,
   ScrollView,
   StatusBar,
-  StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
   View,
 } from 'react-native';
-import { Picker } from '@react-native-picker/picker';
-import * as Font from 'expo-font';
-import { useEffect, useState } from 'react';
-import { useNavigation } from '@react-navigation/native';
-import { MaterialIcons } from '@expo/vector-icons';
 
+<<<<<<< HEAD
 export default function CadastroAluno({navigation}) {
   const [fontsLoaded, setFontsLoaded] = useState(false);
   const [nome, setNome] = useState('');
@@ -69,22 +64,31 @@ export default function CadastroAluno({navigation}) {
       </View>
     );
   }
+=======
+import styles from './style';
+>>>>>>> 56e2873a0a9dd6868cd0db4d7811ab806a0fa521
 
+export default function App() {
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar backgroundColor="#B9A6DA" barStyle="dark-content" />
+
       <View style={styles.header} />
 
       <View style={styles.content}>
         <View style={styles.formContainer}>
+<<<<<<< HEAD
           <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
             <MaterialIcons name="arrow-back" size={28} color="#000" />
           </TouchableOpacity>
+=======
+>>>>>>> 56e2873a0a9dd6868cd0db4d7811ab806a0fa521
           <ScrollView
             contentContainerStyle={styles.scrollContent}
             keyboardShouldPersistTaps="handled"
             showsVerticalScrollIndicator={false}
           >
+<<<<<<< HEAD
             <View style={styles.inputGroup}>
               <Text style={styles.label}>Nome:</Text>
               <TextInput
@@ -178,6 +182,24 @@ export default function CadastroAluno({navigation}) {
         </View>
 
         <TouchableOpacity style={styles.button} onPress={getDados}>
+=======
+            {['Nome', 'CPF', 'Sexo', 'RA', 'Email', 'Instituição', 'Endereço'].map(
+              (label, index) => (
+                <View key={index} style={styles.inputGroup}>
+                  <Text style={styles.label}>{label}:</Text>
+                  <TextInput
+                    style={styles.input}
+                    placeholder={`Digite o ${label.toLowerCase()}`}
+                    placeholderTextColor="#888"
+                  />
+                </View>
+              )
+            )}
+          </ScrollView>
+        </View>
+
+        <TouchableOpacity style={styles.button}>
+>>>>>>> 56e2873a0a9dd6868cd0db4d7811ab806a0fa521
           <Text style={styles.buttonText}>Cadastrar</Text>
         </TouchableOpacity>
       </View>
@@ -185,6 +207,7 @@ export default function CadastroAluno({navigation}) {
       <View style={styles.footer} />
     </SafeAreaView>
   );
+<<<<<<< HEAD
 }
 
 const styles = StyleSheet.create({
@@ -303,3 +326,6 @@ const styles = StyleSheet.create({
   }
 });
  
+=======
+}
+>>>>>>> 56e2873a0a9dd6868cd0db4d7811ab806a0fa521
