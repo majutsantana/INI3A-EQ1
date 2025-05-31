@@ -11,7 +11,7 @@ const Stack = createNativeStackNavigator();
 export default function App() {
   //Direciona a tela que será aberta  
   return <NavigationContainer> 
-      <Stack.Navigator initialRouteName='PerfilAluno'> 
+      <Stack.Navigator> 
         <Stack.Screen
           name="Login"
           component={Login}
@@ -37,12 +37,6 @@ export default function App() {
           component={PerfilAluno}
           options={{ headerShown: false }}
         />
-        <Stack.Screen
-          name="PerfilInstituicao"
-          component={PerfilInstituicao}
-          options={{ headerShown: false }}
-        />
-        
       </Stack.Navigator>
     </NavigationContainer>
 }

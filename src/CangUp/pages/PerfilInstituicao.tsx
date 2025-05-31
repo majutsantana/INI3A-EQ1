@@ -108,10 +108,8 @@ const styles = StyleSheet.create({
         backgroundColor: '#FCD28D',
     },
     header: {
-        height: '15%',
+        height: '10%',
         backgroundColor: '#BEACDE',
-        borderBottomLeftRadius: 20,
-        borderBottomRightRadius: 20,
     },
     profileTop: {
         backgroundColor: '#FFBE31',
@@ -180,7 +178,5 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-around',
         alignItems: 'center',
-        borderTopLeftRadius: 20,
-        borderTopRightRadius: 20,
     },
 });
