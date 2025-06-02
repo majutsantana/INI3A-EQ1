@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('email');
             $table->string('endereco');
             $table->string('sexo');
-            $table->string('instituição');
+            $table->string('instituicao');
             $table->timestamps();
         });
     }

@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 class AlunoController extends Controller
 {
     public function cadastrar(Request $req){
-        $req->validate([
+        $dados = $req->validate([
             'nome' => 'required|string',
             'cpf' => 'required|string',
             'ra' => 'required|string',
@@ -18,9 +18,7 @@ class AlunoController extends Controller
             'instituicao' => 'required|in:IF,UE,UF',
         ]);
 
-        $dados = $req->all();
-
-        Aluno::create($dados);
-        return redirect()->route('admin.cadastrar');
+        $aluno=  Aluno::create($dados);
+        return response()->json($aluno, 201);
     }
 }
