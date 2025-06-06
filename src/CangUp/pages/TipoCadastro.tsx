@@ -47,7 +47,7 @@ export default function TipoCadastro({navigation}) {
         <View style={styles.opcoes}>
           <Text style={styles.title}>Selecione o tipo de usuário:</Text>
 
-          <TouchableOpacity style={styles.button}>
+          <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('CadastroInstituicao')}>
             <Text style={styles.buttonText}>Instituição</Text>
           </TouchableOpacity>
 
@@ -57,7 +57,7 @@ export default function TipoCadastro({navigation}) {
             <Text style={styles.buttonText}>Aluno</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.button}>
+          <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('CadastroResponsavel')}>
             <Text style={styles.buttonText}>Responsável</Text>
           </TouchableOpacity>
         </View>

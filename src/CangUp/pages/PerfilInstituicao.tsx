@@ -1,4 +1,3 @@
-//Yasmin
 import { useNavigation } from '@react-navigation/core';
 import React, { useEffect, useState } from 'react';
 import {
@@ -9,14 +8,18 @@ import {
     TextInput,
     TouchableOpacity,
     Alert,
-    ActivityIndicator
+    ActivityIndicator,
+    ScrollView,
+    Platform
 } from 'react-native';
-import { Icon } from 'react-native-elements';
 import * as Font from 'expo-font';
+import { Ionicons, Entypo } from '@expo/vector-icons';
+import { Picker } from '@react-native-picker/picker';
 
-export default function PerfilInstituicao() {
+export default function PerfilAluno() {
     const navigation = useNavigation();
     const [fontsLoaded, setFontsLoaded] = useState(false);
+    const [selectedGenero, setSelectedGenero] = useState('');
 
     const loadFonts = async () => {
         await Font.loadAsync({
@@ -40,58 +43,51 @@ export default function PerfilInstituicao() {
 
     return (
         <SafeAreaView style={styles.safeArea}>
-            {/* Cabeçalho */}
+            {/* Header roxo */}
             <View style={styles.header} />
 
-            {/* Parte de cima com nome, foto e editar */}
+            {/* Parte de cima (amarelo forte) */}
             <View style={styles.profileTop}>
-                <Text style={styles.institutionName}>Nome da Instituição</Text>
-                <View style={styles.profilePic}>
-                    <Text style={{ fontFamily: 'PoppinsRegular', fontSize: 12 }}>Foto de Perfil</Text>
+                <View style={styles.nameTag}>
+                    <Text style={styles.nameText}>Nome da Instituição</Text> {/*Colocar nome da instituicao*/}
                 </View>
+            </View>
+
+            {/* Círculo da foto de perfil sobreposto na transição */}
+            <View style={styles.profilePicWrapper}>
+                <View style={styles.profilePic}>
+                    <Text style={styles.picText}>Foto de perfil</Text>
+                </View>
+            </View>
+
+            {/* Parte de baixo (amarelo claro) */}
+            <View style={styles.profileBottom}>
                 <TouchableOpacity
                     style={styles.editBtn}
                     onPress={() => Alert.alert("Função de edição ainda será implementada.")}
                 >
-                    <Text style={{ fontFamily: 'PoppinsRegular', fontSize: 16 }}>Editar perfil</Text>
+                    <Text style={styles.editText}>Editar perfil</Text>
                 </TouchableOpacity>
             </View>
 
             {/* Formulário */}
-            <View style={styles.formFields}>
-                <TextInput
-                    placeholder="Nome da Instituição:"
-                    style={styles.input}
-                    placeholderTextColor="#000"
-                />
-                <TextInput
-                    placeholder="Endereço:"
-                    style={styles.input}
-                    placeholderTextColor="#000"
-                />
-                <TextInput
-                    placeholder="Horários de Funcionamento:"
-                    style={styles.input}
-                    placeholderTextColor="#000"
-                />
-                <TextInput
-                    placeholder="Telefone para Contato:"
-                    style={styles.input}
-                    placeholderTextColor="#000"
-                />
-                
-            </View>
+            <ScrollView contentContainerStyle={styles.formContainer}>
+                <TextInput placeholder="Nome:" style={styles.input} placeholderTextColor="#000" />
+                <TextInput placeholder="Endereço:" style={styles.input} placeholderTextColor="#000" />
+                <TextInput placeholder="Horário de funcionamento:" style={styles.input} placeholderTextColor="#000" />
+                <TextInput placeholder="Telefone para contato:" style={styles.input} placeholderTextColor="#000" />
+            </ScrollView>
 
             {/* Rodapé */}
             <View style={styles.footer}>
                 <TouchableOpacity>
-                    <Icon name="perm-identity" type="material" color="#522a91" size={30} />
+                    <Ionicons name="person-circle-outline" size={30} color="#fff" />
                 </TouchableOpacity>
                 <TouchableOpacity>
-                    <Icon name="home" type="material" color="#522a91" size={30} />
+                    <Ionicons name="home-outline" size={30} color="#fff" />
                 </TouchableOpacity>
                 <TouchableOpacity>
-                    <Icon name="list" type="material" color="#522a91" size={30} />
+                    <Entypo name="menu" size={30} color="#fff" />
                 </TouchableOpacity>
             </View>
         </SafeAreaView>
@@ -99,84 +95,117 @@ export default function PerfilInstituicao() {
 }
 
 const styles = StyleSheet.create({
-    p0:{
-        backgroundColor: '#FFBE31',
-        width: '100%',
-    },
     safeArea: {
         flex: 1,
         backgroundColor: '#FCD28D',
     },
+
     header: {
-        height: '10%',
+        height: 100,
         backgroundColor: '#BEACDE',
     },
+
     profileTop: {
         backgroundColor: '#FFBE31',
         alignItems: 'center',
-        paddingVertical: 16,
+        paddingTop: 20,
+        paddingBottom: 60,
     },
-    institutionName: {
-        backgroundColor: '#FFFFFF',
-        paddingHorizontal: 16,
-        paddingVertical: 4,
-        borderRadius: 20,
-        fontFamily: 'PoppinsRegular',
-        fontSize: 16,
-        marginBottom: 10,
+
+    profileBottom: {
+        backgroundColor: '#FCD28D',
+        alignItems: 'center',
+        paddingTop: 80,
     },
+
+    profilePicWrapper: {
+        position: 'absolute',
+        top: 160, // ajuste fino da posição vertical
+        left: 0,
+        right: 0,
+        alignItems: 'center',
+        zIndex: 2,
+    },
+
     profilePic: {
-        width: 130,
-        height: 130,
+        width: 120,
+        height: 120,
+        borderRadius: 60,
         backgroundColor: '#D9D9D9',
-        borderRadius: 100,
         justifyContent: 'center',
         alignItems: 'center',
-        marginBottom: 10,
+        // borderWidth: 2,
+        // borderColor: '#3D3D3D',
     },
-    editBtn: {
-        backgroundColor: '#beacde',
-        borderRadius: 20,
-        paddingHorizontal: 16,
-        paddingVertical: 6,
-        shadowColor: "#000",
-        shadowOffset: {
-        width: 0,
-        height: 3,
-        },
-        shadowOpacity: 0.27,
-        shadowRadius: 4.65,
-        elevation: 6,
-        },
-    formFields: {
-        flex: 1,
-        gap:'8%',
-        alignItems:'center',
-        justifyContent:'center',
-    },
-    input: {
-        width:'80%',
-        height:'15%',
-        paddingLeft:'5%',
-        backgroundColor: '#F5F5F5',
-        borderRadius: 30,
-        borderColor: '#ccc',
+
+    picText: {
         fontFamily: 'PoppinsRegular',
         fontSize: 12,
-        shadowColor: "#000",
-        shadowOffset: {
-        width: 0,
-        height: 3,
-        },
-        shadowOpacity: 0.27,
-        shadowRadius: 4.65,
-        elevation: 6,
+        color: '#555',
     },
+
+    nameTag: {
+        backgroundColor: '#fff',
+        paddingHorizontal: 20,
+        paddingVertical: 5,
+        borderRadius: 20,
+        marginBottom: 10,
+    },
+
+    nameText: {
+        fontFamily: 'PoppinsBold',
+        fontSize: 14,
+        color: '#000',
+    },
+
+    // Botão de editar Perfil
+    editBtn: {
+        backgroundColor: '#FFBE31', //amarelo forte para o botão
+        borderRadius: 20, //borda arredondada
+        paddingHorizontal: 20,
+        paddingVertical: 6,
+    },
+
+    editText: {
+        fontFamily: 'PoppinsRegular',
+        fontSize: 14,
+        color: '#000',
+    },
+
+    formContainer: {
+        alignItems: 'center',
+        paddingVertical: 20,
+        paddingBottom: 100,
+    },
+
+    input: {
+        width: '85%',
+        height: 45,
+        backgroundColor: '#F5F5F5',
+        borderRadius: 20,
+        paddingHorizontal: 15,
+        marginVertical: 8,
+        justifyContent: 'center',
+        fontFamily: 'PoppinsRegular',
+    },
+
+    // Caixa do gênero 
+    picker: {
+        width: '100%',
+        height: Platform.OS === 'ios' ? undefined : 45,
+        color: '#000',
+        backgroundColor: '#F5F5F5',
+        borderWidth: 0,
+    },
+
     footer: {
-        backgroundColor: '#BEACDE',
-        height: '8%',
         flexDirection: 'row',
         justifyContent: 'space-around',
         alignItems: 'center',
+        backgroundColor: '#BEACDE',
+        paddingVertical: 12,
+        position: 'absolute',
+        bottom: 0,
+        width: '100%',
     },
 });

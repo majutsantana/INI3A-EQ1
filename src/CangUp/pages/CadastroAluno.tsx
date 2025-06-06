@@ -14,6 +14,7 @@ import * as Font from 'expo-font';
 import { useEffect, useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import { MaterialIcons } from '@expo/vector-icons';
+import { CheckBox } from 'react-native-elements';
 
 
 export default function CadastroAluno({navigation}) { //Não é erro, é só o vscode dando trabalho
@@ -22,9 +23,12 @@ export default function CadastroAluno({navigation}) { //Não é erro, é só o v
  const [cpf, setCpf] = useState('');
  const [ra, setRa] = useState('');
  const [email, setEmail] = useState('');
+ const [senha, setSenha] = useState('');
+ const [confSenha, setconfSenha] = useState('');
  const [endereco, setEndereco] = useState('');
  const [sexo, setSexo] = useState(''); 
  const [instituicao, setInstituicao] = useState('');
+ const [check, setCheck] = useState(false);
 
 
  const loadFonts = async () => {
@@ -47,7 +51,7 @@ export default function CadastroAluno({navigation}) { //Não é erro, é só o v
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({nome, cpf, ra, email, endereco, sexo, instituicao }),
+      body: JSON.stringify({nome, cpf, ra, email, senha, confSenha, endereco, sexo, instituicao, check }),
     });
      const dados = await response.json();
   } catch(error){
@@ -121,6 +125,26 @@ export default function CadastroAluno({navigation}) { //Não é erro, é só o v
               />
             </View>
             <View style={styles.inputGroup}>
+              <Text style={styles.label}>Senha:</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Digite a sua senha"
+                placeholderTextColor="#888"
+                value={senha}
+                onChangeText={setSenha}
+              />
+            </View>
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>Redigite a senha:</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Confirme a sua senha"
+                placeholderTextColor="#888"
+                value={confSenha}
+                onChangeText={setconfSenha}
+              />
+            </View>
+            <View style={styles.inputGroup}>
               <Text style={styles.label}>Endereço:</Text>
               <TextInput
                 style={styles.input}
@@ -172,6 +196,15 @@ export default function CadastroAluno({navigation}) { //Não é erro, é só o v
                  <Picker.Item label="Universidade Federal" value="UF" />
                </Picker>
              </View>
+           </View>
+           <View style={styles.check}>
+              <CheckBox
+              checked={check}
+              onPress={() => setCheck(!check)}/> 
+              <TouchableOpacity> {/*Direcionar para os termos de uso*/}
+                <Text style={styles.textCheck}>Termos de uso</Text>
+              </TouchableOpacity>
+              
            </View>
          </ScrollView>
        </View>
@@ -303,5 +336,19 @@ const styles = StyleSheet.create({
  },
  backButton: {
    alignSelf: 'flex-start',
+ },
+ check:{
+  display: 'flex',
+  flexDirection:'row',
+  alignItems:'center',
+  justifyContent:'flex-start',
+ },
+ CheckBox:{
+  padding:-10,
+ },
+ textCheck:{
+  fontSize: 14,
+  fontFamily: 'PoppinsRegular',
+  color: '#522a91', 
  }
 });
