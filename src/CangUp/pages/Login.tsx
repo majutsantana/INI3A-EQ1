@@ -19,16 +19,16 @@ export default function Login({navigation}) {
   
     useEffect(() => {
       loadFonts();
-      fetch("http://127.0.0.1:8000/")
-        .then(r=> r.json())
-        .then(r=> {alert(r.Hello); Alert.alert(r.Hello)})
+      // fetch("http://127.0.0.1:8000/")
+      //   .then(r=> r.json())
+      //   .then(r=> {alert(r.Hello); Alert.alert(r.Hello)})
     }, []);
 
-    async function getDados(){
+    /*async function getDados(){
       let r = await fetch("http://localhost:8000/cadastrar");
       let dados =  await r.json();
       alert(dados.Hello);
-    }
+    }*/
   
     if (!fontsLoaded) {
       return (

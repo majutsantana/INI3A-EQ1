@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 class AlunoController extends Controller
 {
     public function cadastrar(Request $req){
+
         $dados = $req->validate([
             'nome' => 'required|string',
             'cpf' => 'required|string',
@@ -16,8 +17,8 @@ class AlunoController extends Controller
             'endereco' => 'required|string',
             'sexo' => 'required|in:Masculino,Feminino,Neutro,Prefiro não informar',
             'instituicao' => 'required|in:IF,UE,UF',
+            'senha' => 'string', // TA NULO NO BANCO DE DADOS
         ]);
-
         $aluno=  Aluno::create($dados);
         return response()->json($aluno, 201);
     }

@@ -50,6 +50,8 @@ export default function CadastroAluno({navigation}) { //Não é erro, é só o v
       body: JSON.stringify({nome, cpf, ra, email, endereco, sexo, instituicao }),
     });
      const dados = await response.json();
+
+     navigation.navigate("Login");
   } catch(error){
     console.error('Erro ao cadastrar aluno:', error);
   }
@@ -178,7 +180,7 @@ export default function CadastroAluno({navigation}) { //Não é erro, é só o v
 
 
        <TouchableOpacity style={styles.button}
-         onPress= {() => {getDados(); navigation.navigate('Login');}}>
+         onPress= {() => {getDados(); }}>
          <Text style={styles.buttonText}>Cadastrar</Text>
        </TouchableOpacity>
      </View>
