@@ -81,13 +81,13 @@ export default function PerfilAluno() {
             {/* Rodapé */}
             <View style={styles.footer}>
                 <TouchableOpacity>
-                    <Ionicons name="person-circle-outline" size={30} color="#fff" />
+                    <Ionicons name="person-circle-outline" size={35} color="#fff" />
                 </TouchableOpacity>
                 <TouchableOpacity>
                     <Ionicons name="home-outline" size={30} color="#fff" />
                 </TouchableOpacity>
                 <TouchableOpacity>
-                    <Entypo name="menu" size={30} color="#fff" />
+                    <Entypo name="menu" size={35} color="#fff" />
                 </TouchableOpacity>
             </View>
         </SafeAreaView>

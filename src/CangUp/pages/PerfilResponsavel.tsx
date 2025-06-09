@@ -79,13 +79,13 @@ export default function PerfilResponsavel({navigation}) { //Navigation não est�
             {/* Rodapé */}
             <View style={styles.footer}>
                 <TouchableOpacity>
-                    <Ionicons name="person-circle-outline" size={30} color="#fff" />
+                    <Ionicons name="person-circle-outline" size={35} color="#fff" />
                 </TouchableOpacity>
                 <TouchableOpacity>
                     <Ionicons name="home-outline" size={30} color="#fff" />
                 </TouchableOpacity>
                 <TouchableOpacity>
-                    <Entypo name="menu" size={30} color="#fff" />
+                    <Entypo name="menu" size={35} color="#fff" />
                 </TouchableOpacity>
             </View>
         </SafeAreaView>
@@ -160,8 +160,6 @@ const styles = StyleSheet.create({
     // Botão de editar Perfil
     editBtn: {
         backgroundColor: '#FFBE31', //amarelo forte para o botão 
-        borderWidth: 2,
-        borderColor: '#fff', //borda branca
         borderRadius: 20, //borda arredondada
         paddingHorizontal: 20,
         paddingVertical: 6,
