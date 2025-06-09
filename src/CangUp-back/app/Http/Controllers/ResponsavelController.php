@@ -20,3 +20,9 @@ class ResponsavelController extends Controller
         return response()->json($responsavel, 201);
     }
 }
+
+/*use App\Helpers\UsuarioHelper;
+
+if (UsuarioHelper::hasPerfil('administrador')) {
+    // acesso permitido
+} */ //É a validação de acesso que deverá ser implementada nos controllers que necessitam de validação do usuário, inicialmente feitos pela instituição  

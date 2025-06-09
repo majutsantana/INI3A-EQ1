@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AlunoController;
+use App\Http\Controllers\LoginController; //Adicionado para o Back do Login
 
 /*
 |--------------------------------------------------------------------------
@@ -22,3 +23,5 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::post('/cadastrar', [AlunoController::class, 'cadastrar']);
 
 Route::get("/", function(Request $res) { return "oi";});    
+
+Route::post('/login', [LoginController::class, 'login']); //Rota Login

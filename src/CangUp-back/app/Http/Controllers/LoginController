@@ -1,0 +1,37 @@
+<?php
+namespace App\Http\Controllers; //LoginController criado para fazer O Back do Login
+
+use Illuminate\Http\Request;
+use App\Models\Usuario;
+
+class LoginController extends Controller
+{
+    public function login(Request $request)
+    {
+        $credentials = $request->validate([
+            'login' => 'required|string',
+            'senha' => 'required|string',
+            'perfil' => 'required|string'
+        ]);
+
+        $usuario = Usuario::where('login', $credentials['login'])->first();
+
+        if (!$usuario) {
+            return response()->json(['erro' => 'Usuário não encontrado'], 404);
+        }
+
+        if (!$usuario->checkSenha($credentials['senha'])) {
+            return response()->json(['erro' => 'Senha incorreta'], 401);
+        }
+
+        if (!$usuario->checkPerfil($credentials['perfil'])) {
+            return response()->json(['erro' => 'Perfil inválido'], 403);
+        }
+
+        return response()->json([
+            'mensagem' => 'Login realizado com sucesso',
+            'usuario' => $usuario->only(['id', 'login', 'email']),
+            'perfis' => $usuario->perfis()->pluck('rotulo')
+        ]);
+    }
+}
