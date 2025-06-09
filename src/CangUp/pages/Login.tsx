@@ -24,11 +24,11 @@ export default function Login({navigation}) {
       //   .then(r=> {alert(r.Hello); Alert.alert(r.Hello)})
     }, []);
 
-    /*async function getDados(){
+    async function getDados(){
       let r = await fetch("http://localhost:8000/cadastrar");
       let dados =  await r.json();
       alert(dados.Hello);
-    }*/
+    }
   
     if (!fontsLoaded) {
       return (
