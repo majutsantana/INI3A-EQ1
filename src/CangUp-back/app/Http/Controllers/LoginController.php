@@ -1,8 +1,9 @@
 <?php
-namespace App\Http\Controllers; //LoginController criado para fazer O Back do Login
+namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Usuario;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class LoginController extends Controller
 {
@@ -11,7 +12,7 @@ class LoginController extends Controller
         $credentials = $request->validate([
             'login' => 'required|string',
             'senha' => 'required|string',
-            'perfil' => 'required|string'
+         //   'perfil' => 'required|string'
         ]);
 
         $usuario = Usuario::where('login', $credentials['login'])->first();
@@ -28,9 +29,17 @@ class LoginController extends Controller
             return response()->json(['erro' => 'Perfil inválido'], 403);
         }
 
+        // Gera o token JWT
+        $token = JWTAuth::fromUser($usuario);
+
         return response()->json([
             'mensagem' => 'Login realizado com sucesso',
-            'usuario' => $usuario->only(['id', 'login', 'email']),
+            'token' => $token,
+            'usuario' => [
+                'id' => $usuario->id,
+                'login' => $usuario->login,
+                'email' => $usuario->email,
+            ],
             'perfis' => $usuario->perfis()->pluck('rotulo')
         ]);
     }
