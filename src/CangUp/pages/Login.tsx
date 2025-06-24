@@ -2,17 +2,22 @@ import { Image, StyleSheet, Text, TextInput, View, TouchableOpacity, ActivityInd
 import * as Font from 'expo-font';
 import { useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Icon from 'react-native-vector-icons/Feather';
 
 export default function Login({ navigation }) { //navigation não está dando erro, é só o vscode bugando
 
   const [fontsLoaded, setFontsLoaded] = useState<boolean>(false);
   const [username, setusername] = useState<string>('');
   const [senha, setsenha] = useState<string>('');
+  const [senhaVisivel, setSenhaVisivel] = useState(false);
 
+  const toggleSenhaVisibilidade = () => {
+    setSenhaVisivel(!senhaVisivel);
+  };
 
   const login = async () => {
     if (!username || !senha) {
-      Alert.alert("Erro", "Preencha todos os campos.");
+      Alert.alert("Erro", "Preencha todos os campos."); 
       return;
     }
 
@@ -94,20 +99,29 @@ export default function Login({ navigation }) { //navigation não está dando er
         <Text style={styles.title}>Bem-vindo de volta!</Text>
         <TextInput
           style={styles.input}
-          placeholder="Email / CPF / CNPJ"
+          placeholder="Email"
           placeholderTextColor="#888"
           value={username}
           onChangeText={setusername}
         />
-
-        <TextInput
-          style={styles.input}
-          placeholder="Senha"
-          placeholderTextColor="#888"
-          secureTextEntry
-          value={senha}
-          onChangeText={setsenha}
-        />
+        <View style={styles.inputgroup}>
+          <TextInput
+            style={styles.input}
+            placeholder="Senha"
+            placeholderTextColor="#888"
+            value={senha}
+            onChangeText={setsenha}
+            secureTextEntry={!senhaVisivel}
+          />
+          <TouchableOpacity onPress={toggleSenhaVisibilidade} style={styles.iconButton}>
+            <Icon
+              name={senhaVisivel ? 'eye' : 'eye-off'}
+              size={20}
+              color="#888" 
+            />Mostrar senha
+          </TouchableOpacity>
+        </View>
+        
 
         <TouchableOpacity style={styles.button} onPress={login}>
           <Text style={styles.buttonText}>Login</Text>
@@ -160,7 +174,6 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 20,
-    marginBottom: '5%',
     fontFamily: 'PoppinsBold',
   },
   input: {
@@ -168,7 +181,7 @@ const styles = StyleSheet.create({
     width: '90%',
     padding: '5%',
     borderRadius: 30,
-    marginBottom: '10%',
+    marginTop: '10%',
     paddingLeft: '5%',
     fontFamily: 'PoppinsRegular',
     shadowColor: "#000",
@@ -223,5 +236,20 @@ const styles = StyleSheet.create({
   image: {
     width: '80%',
     height: '100%',
-  }
+  },
+  inputgroup:{
+    width:'100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingBottom:'5%',
+  },
+  iconButton: {
+    padding:5,
+    fontFamily: 'PoppinsRegular',
+    flexDirection:'row',
+    columnGap: 10,
+    fontSize: 14,
+    alignItems:'center',
+    color:'#888',
+  },
 });
