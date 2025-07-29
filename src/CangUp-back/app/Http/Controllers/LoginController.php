@@ -3,7 +3,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Usuario;
-use Tymon\JWTAuth\Facades\JWTAuth;
+use Tymon\JWTAuth\Facades\JWTAuth; 
 
 class LoginController extends Controller
 {
@@ -12,7 +12,7 @@ class LoginController extends Controller
         $credentials = $request->validate([
             'login' => 'required|string',
             'senha' => 'required|string',
-         //   'perfil' => 'required|string'
+            'perfil' => 'required|string'
         ]);
 
         $usuario = Usuario::where('login', $credentials['login'])->first();

@@ -13,6 +13,8 @@ return new class extends Migration
     {
         Schema::create('perfils', function (Blueprint $table) {
             $table->id();
+            $table->text('nome')->nullable();
+            $table->text('rotulo')->nullable();
             $table->timestamps();
         });
     }

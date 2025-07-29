@@ -2,9 +2,8 @@ import { Image, StyleSheet, Text, TextInput, View, TouchableOpacity, ActivityInd
 import * as Font from 'expo-font';
 import { useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import Icon from 'react-native-vector-icons/Feather';
 
-export default function Login({ navigation }) { //navigation não está dando erro, é só o vscode bugando
+export default function Login({ navigation }) { //navigation não está dando erro, é erro do vscode 
 
   const [fontsLoaded, setFontsLoaded] = useState<boolean>(false);
   const [username, setusername] = useState<string>('');
@@ -28,7 +27,7 @@ export default function Login({ navigation }) { //navigation não está dando er
         headers: {
           "Content-Type": "application/json"
         },
-        body: JSON.stringify({ username, senha })
+        body: JSON.stringify({ login: username, senha })
       });
 
       if (!response.ok) {
