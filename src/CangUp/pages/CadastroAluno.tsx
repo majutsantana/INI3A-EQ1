@@ -232,13 +232,6 @@ export default function CadastroAluno({ navigation }) { // Não é erro, é só 
                   onChangeText={setSenha}
                   secureTextEntry={!senhaVisivel}
                 />
-                <TouchableOpacity onPress={toggleSenhaVisibilidade} style={styles.iconButton}>
-                  <Icon
-                    name={senhaVisivel ? 'eye' : 'eye-off'}
-                    size={20}
-                    color="#888" 
-                  />Mostrar senha
-                </TouchableOpacity>
               {errors.senha && <Text style={styles.errorText}>{errors.senha}</Text>}
             </View>
             <View style={styles.inputGroup}>
@@ -251,13 +244,6 @@ export default function CadastroAluno({ navigation }) { // Não é erro, é só 
                 onChangeText={setconfSenha}
                 secureTextEntry={!confSenhaVisivel}
               />
-               <TouchableOpacity onPress={toggleConfSenhaVisibilidade} style={styles.iconButton}>
-                  <Icon
-                    name={confSenhaVisivel ? 'eye' : 'eye-off'}
-                    size={20} // Defina o tamanho diretamente aqui
-                    color="#888" // Defina a cor diretamente aqui
-                  />Mostrar senha
-                </TouchableOpacity>
               {errors.confSenha && <Text style={styles.errorText}>{errors.confSenha}</Text>}
             </View>
             <View style={styles.inputGroup}>
@@ -272,8 +258,6 @@ export default function CadastroAluno({ navigation }) { // Não é erro, é só 
               {errors.endereco && <Text style={styles.errorText}>{errors.endereco}</Text>}
             </View>
 
-
-            {/* Picker de Sexo */}
             <View style={styles.inputGroup}>
               <Text style={styles.label}>Sexo:</Text>
               <View style={styles.pickerWrapper}>
@@ -295,8 +279,6 @@ export default function CadastroAluno({ navigation }) { // Não é erro, é só 
               {errors.sexo && <Text style={styles.errorText}>{errors.sexo}</Text>}
             </View>
 
-
-            {/* Picker de Instituição */}
             <View style={styles.inputGroup}>
               <Text style={styles.label}>Instituição:</Text>
               <View style={styles.pickerWrapper}>
@@ -320,7 +302,7 @@ export default function CadastroAluno({ navigation }) { // Não é erro, é só 
               <CheckBox
                 checked={check}
                 onPress={() => setCheck(!check)} />
-              <TouchableOpacity> {/* Direcionar para os termos de uso */}
+              <TouchableOpacity> 
                 <Text style={styles.textCheck}>Termos de uso</Text>
               </TouchableOpacity>
             </View>

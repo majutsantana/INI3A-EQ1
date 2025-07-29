@@ -22,11 +22,12 @@ import {
    const [fontsLoaded, setFontsLoaded] = useState(false);
    const [nome, setNome] = useState('');
    const [email, setEmail] = useState('');
+   const [endereco, setEndereco] = useState('');
+   //const [horario, setHorario] = useState('');
+   const [CNPJ, setCNPJ] = useState('');
+   const [telefone, setTelefone] = useState('');
    const [senha, setSenha] = useState('');
    const [confSenha, setconfSenha] = useState('');
-   const [endereco, setEndereco] = useState('');
-   const [horario, setHorario] = useState('');
-   const [CNPJ, setCNPJ] = useState('');
    const [plano, setPlano] = useState('');
    const [check, setCheck] = useState(false);
    const [errors, setErrors] = useState({});
@@ -95,8 +96,8 @@ import {
      if (!CNPJ.trim()) {
        newErrors.CNPJ = 'CNPJ é obrigatório.';
        isValid = false;
-     } else if (!/^\d{14}$/.test(CPNJ)) {
-       newErrors.CPNJ = 'CNPJ inválido. Deve conter 14 dígitos numéricos.';
+     } else if (!/^\d{14}$/.test(CNPJ)) {
+       newErrors.CNPJ = 'CNPJ inválido. Deve conter 14 dígitos numéricos.';
        isValid = false;
      }
  
@@ -130,14 +131,15 @@ import {
  
   const getDados = async () => {
    try{
-     const response = await fetch('http://localhost:8000/api/cadastrar', {
+     const response = await fetch('http://localhost:8000/api/cadastrarInst', {
        method: 'POST',
        headers: {
          'Content-Type': 'application/json',
        },
-       body: JSON.stringify({nome, email, senha, confSenha, endereco, horario, CNPJ, plano, check}),
+       body: JSON.stringify({nome, email, endereco, CNPJ, telefone, senha, plano}),
      });
-      const dados = await response.json();
+      const text = await response.text();
+      console.log('Resposta da API (texto):', text);
    } catch(error){
      console.error('Erro ao cadastrar instituição:', error);
    }
@@ -172,7 +174,7 @@ import {
                <Text style={styles.label}>Nome:</Text>
                <TextInput
                  style={styles.input}
-                 placeholder="Digite o nome da instituição"
+                 placeholder="Digite o nome"
                  placeholderTextColor="#888"
                  value={nome}
                  onChangeText={setNome}
@@ -189,7 +191,40 @@ import {
                  onChangeText={setEmail}
                />
                {errors.email && <Text style={styles.errorText}>{errors.email}</Text>}
-               <View style={styles.inputGroup}>
+              </View>
+              <View style={styles.inputGroup}>
+                <Text style={styles.label}>Endereço da instituição:</Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder="Digite o endereço"
+                  placeholderTextColor="#888"
+                  value={endereco}
+                  onChangeText={setEndereco}
+                />
+                {errors.endereco && <Text style={styles.errorText}>{errors.endereco}</Text>}
+              </View>
+              <View style={styles.inputGroup}>
+               <Text style={styles.label}>CNPJ:</Text>
+               <TextInput
+                 style={styles.input}
+                 placeholder="Digite o CNPJ"
+                 placeholderTextColor="#888"
+                 value={CNPJ}
+                 onChangeText={setCNPJ}
+               />
+               {errors.CNPJ && <Text style={styles.errorText}>{errors.CNPJ}</Text>}
+              </View>
+              <View style={styles.inputGroup}>
+               <Text style={styles.label}>Telefone:</Text>
+               <TextInput
+                 style={styles.input}
+                 placeholder="Digite o Telefone"
+                 placeholderTextColor="#888"
+                 value={telefone}
+                 onChangeText={setTelefone}
+               />
+              </View>
+              <View style={styles.inputGroup}>
                  <Text style={styles.label}>Senha:</Text>
                    <TextInput
                      style={styles.input} // Estilo específico para input de senha
@@ -199,13 +234,6 @@ import {
                      onChangeText={setSenha}
                      secureTextEntry={!senhaVisivel}
                    />
-                   <TouchableOpacity onPress={toggleSenhaVisibilidade} style={styles.iconButton}>
-                     <Icon
-                       name={senhaVisivel ? 'eye' : 'eye-off'}
-                       size={20} // Defina o tamanho diretamente aqui
-                       color="#888" // Defina a cor diretamente aqui
-                     />Mostrar senha
-                   </TouchableOpacity>
                  {errors.senha && <Text style={styles.errorText}>{errors.senha}</Text>}
                </View>
                <View style={styles.inputGroup}>
@@ -218,71 +246,31 @@ import {
                    onChangeText={setconfSenha}
                    secureTextEntry={!confSenhaVisivel}
                  />
-                   <TouchableOpacity onPress={toggleConfSenhaVisibilidade} style={styles.iconButton}>
-                     <Icon
-                       name={confSenhaVisivel ? 'eye' : 'eye-off'}
-                       size={20} // Defina o tamanho diretamente aqui
-                       color="#888" // Defina a cor diretamente aqui
-                     />Mostrar senha
-                   </TouchableOpacity>
                  {errors.confSenha && <Text style={styles.errorText}>{errors.confSenha}</Text>}
                </View>
-             </View>
-             <View style={styles.inputGroup}>
-               <Text style={styles.label}>Endereço da instituição:</Text>
-               <TextInput
-                 style={styles.input}
-                 placeholder="Digite o endereço"
-                 placeholderTextColor="#888"
-                 value={endereco}
-                 onChangeText={setEndereco}
-               />
-               {errors.endereco && <Text style={styles.errorText}>{errors.endereco}</Text>}
-             </View>
-             <View style={styles.inputGroup}>
-               <Text style={styles.label}>Horários de funcionamento:</Text> {/*Modificar como a pessoa vai adicionar os horários de funcionamento e deixar obrigatório*/}
-               <TextInput
-                 style={styles.input}
-                 placeholder="Digite o horário"
-                 placeholderTextColor="#888"
-                 value={horario}
-                 onChangeText={setHorario}
-               />
-             </View>
-             <View style={styles.inputGroup}>
-               <Text style={styles.label}>CNPJ:</Text>
-               <TextInput
-                 style={styles.input}
-                 placeholder="Digite o CNPJ"
-                 placeholderTextColor="#888"
-                 value={CNPJ}
-                 onChangeText={setCNPJ}
-               />
-               {errors.cnpj && <Text style={styles.errorText}>{errors.cnpj}</Text>}
-             </View>
-             <View style={styles.inputGroup}>
-                          <Text style={styles.label}>Plano da instituição:</Text>
-                          <View style={styles.pickerWrapper}>
-                            <Picker
-                              selectedValue={plano}
-                              onValueChange={(itemValue) => setPlano(itemValue)}
-                              style={[
-                                styles.picker,
-                                { color: plano === '' ? '#888' : '#000' } // preto para placeholder, cinza para os demais
-                              ]}
-                            >
-                              <Picker.Item label="Selecione o plano" value="" />
-                              <Picker.Item label="Semestral" value="Semestral" />
-                              <Picker.Item label="Anual" value="Anual" />
-                            </Picker>
-                          </View>
-                          {errors.plano && <Text style={styles.errorText}>{errors.plano}</Text>}
-                        </View>
+              <View style={styles.inputGroup}>
+                  <Text style={styles.label}>Plano da instituição:</Text>
+                  <View style={styles.pickerWrapper}>
+                    <Picker
+                      selectedValue={plano}
+                      onValueChange={(itemValue) => setPlano(itemValue)}
+                      style={[
+                        styles.picker,
+                        { color: plano === '' ? '#888' : '#000' } // preto para placeholder, cinza para os demais
+                      ]}
+                    >
+                      <Picker.Item label="Selecione o plano" value="" />
+                      <Picker.Item label="Semestral" value="Semestral" />
+                      <Picker.Item label="Anual" value="Anual" />
+                    </Picker>
+                  </View>
+                  {errors.plano && <Text style={styles.errorText}>{errors.plano}</Text>}
+                </View>
             <View style={styles.check}>
                <CheckBox
                checked={check}
                onPress={() => setCheck(!check)}/> 
-               <TouchableOpacity> {/*Direcionar para os termos de uso*/}
+               <TouchableOpacity> 
                  <Text style={styles.textCheck}>Termos de uso</Text>
                </TouchableOpacity>
             </View>
@@ -296,8 +284,6 @@ import {
           <Text style={styles.buttonText}>Cadastrar</Text>
         </TouchableOpacity>
       </View>
- 
- 
       <View style={styles.footer} />
     </SafeAreaView>
   );

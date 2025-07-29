@@ -14,9 +14,9 @@ return new class extends Migration
         Schema::create('instituicoes', function (Blueprint $table) {
             $table->increments('id');
             $table->string('nome');
-            $table->string('endereco');
             $table->string('email');
-            $table->string('horario');
+            $table->string('endereco');
+            $table->string('cnpj');
             $table->string('telefone');
             $table->string('senha');
             $table->string('plano');

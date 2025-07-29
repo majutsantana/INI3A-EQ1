@@ -113,15 +113,7 @@ export default function Login({ navigation }) { //navigation não está dando er
             onChangeText={setsenha}
             secureTextEntry={!senhaVisivel}
           />
-          <TouchableOpacity onPress={toggleSenhaVisibilidade} style={styles.iconButton}>
-            <Icon
-              name={senhaVisivel ? 'eye' : 'eye-off'}
-              size={20}
-              color="#888" 
-            />Mostrar senha
-          </TouchableOpacity>
         </View>
-        
 
         <TouchableOpacity style={styles.button} onPress={login}>
           <Text style={styles.buttonText}>Login</Text>
@@ -135,7 +127,7 @@ export default function Login({ navigation }) { //navigation não está dando er
           Não tem uma conta?
         </Text>
 
-        <TouchableOpacity onPress={() => navigation.navigate('TipoCadastro')}>
+        <TouchableOpacity onPress={()=>navigation.navigate('TipoCadastro')}>
           <Text style={styles.linkText}> Criar conta</Text>
         </TouchableOpacity>
       </View>

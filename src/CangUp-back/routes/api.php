@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AlunoController;
+use App\Http\Controllers\InstituicaoController;
 use App\Http\Controllers\LoginController; //Adicionado para o Back do Login
 use App\Http\Controllers\UserController;
 
@@ -22,6 +23,8 @@ use App\Http\Controllers\UserController;
 // });
 
 Route::post('/cadastrar', [AlunoController::class, 'cadastrar']);
+
+Route::post('/cadastrarInst', [InstituicaoController::class, 'cadastrarInst']);
 
 // Rota pública de login
 Route::post('/login', [LoginController::class, 'login']);

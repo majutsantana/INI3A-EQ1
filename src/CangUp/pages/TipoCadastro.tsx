@@ -23,22 +23,21 @@ export default function TipoCadastro({navigation}) {
   if (!fontsLoaded) {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <ActivityIndicator size="large" />
+        <ActivityIndicator size="large"/>
       </View>
     );
   }
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}> {/*HEADER COM IMAGEM*/}
+      <View style={styles.header}>
         <Image
           source={require('../assets/logocangUp-horizontal-claro.png')}
           style={styles.image}
         />
       </View>
 
-      <View style={styles.body}> {/*CORPO*/}
-        {/* Botão de voltar dentro do body*/}
+      <View style={styles.body}>
         <View style={styles.seta}>
           <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
             <MaterialIcons name="arrow-back" size={28} color="#000" />
@@ -47,13 +46,11 @@ export default function TipoCadastro({navigation}) {
         <View style={styles.opcoes}>
           <Text style={styles.title}>Selecione o tipo de usuário:</Text>
 
-          <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('CadastroInstituicao')}>
+          <TouchableOpacity style={styles.button} onPress={()=>navigation.navigate('CadastroInstituicao')}>
             <Text style={styles.buttonText}>Instituição</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => navigation.navigate('CadastroAluno')}>
+          <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('CadastroAluno')}>
             <Text style={styles.buttonText}>Aluno</Text>
           </TouchableOpacity>
 
@@ -63,8 +60,6 @@ export default function TipoCadastro({navigation}) {
         </View>
         
       </View>
-
-      {/*FOOTERr*/}
       <View style={styles.footer}></View> 
     </View>
   );
