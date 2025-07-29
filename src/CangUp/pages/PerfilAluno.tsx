@@ -15,6 +15,9 @@ import {
 import * as Font from 'expo-font';
 import { Ionicons, Entypo } from '@expo/vector-icons';
 import { Picker } from '@react-native-picker/picker';
+import Header from '../components/Header';
+import Footer from '../components/FooterComIcones';
+import FooterComIcones from '../components/FooterComIcones';
 
 export default function PerfilAluno() {
     const navigation = useNavigation();
@@ -43,24 +46,20 @@ export default function PerfilAluno() {
 
     return (
         <SafeAreaView style={styles.safeArea}>
-            {/* Header roxo */}
-            <View style={styles.header} />
+            <Header/>
 
-            {/* Parte de cima (amarelo forte) */}
             <View style={styles.profileTop}>
                 <View style={styles.nameTag}>
                     <Text style={styles.nameText}>Nome do Usuário</Text>
                 </View>
             </View>
 
-            {/* Círculo da foto de perfil sobreposto na transição */}
             <View style={styles.profilePicWrapper}>
                 <View style={styles.profilePic}>
                     <Text style={styles.picText}>Foto de perfil</Text>
                 </View>
             </View>
 
-            {/* Parte de baixo (amarelo claro) */}
             <View style={styles.profileBottom}>
                 <TouchableOpacity
                     style={styles.editBtn}
@@ -70,7 +69,6 @@ export default function PerfilAluno() {
                 </TouchableOpacity>
             </View>
 
-            {/* Formulário */}
             <ScrollView contentContainerStyle={styles.formContainer}>
                 <TextInput placeholder="Nome:" style={styles.input} placeholderTextColor="#000" />
                 <TextInput placeholder="CPF:" style={styles.input} placeholderTextColor="#000" />
@@ -95,18 +93,7 @@ export default function PerfilAluno() {
                 <TextInput placeholder="Bairro:" style={styles.input} placeholderTextColor="#000" />
             </ScrollView>
 
-            {/* Rodapé */}
-            <View style={styles.footer}>
-                <TouchableOpacity>
-                    <Ionicons name="person-circle-outline" size={35} color="#fff" />
-                </TouchableOpacity>
-                <TouchableOpacity>
-                    <Ionicons name="home-outline" size={30} color="#fff" />
-                </TouchableOpacity>
-                <TouchableOpacity>
-                    <Entypo name="menu" size={35} color="#fff" />
-                </TouchableOpacity>
-            </View>
+            <FooterComIcones/>
         </SafeAreaView>
     );
 }
@@ -115,11 +102,6 @@ const styles = StyleSheet.create({
     safeArea: {
         flex: 1,
         backgroundColor: '#FCD28D',
-    },
-
-    header: {
-        height: 100,
-        backgroundColor: '#BEACDE',
     },
 
     profileTop: {
@@ -213,16 +195,5 @@ const styles = StyleSheet.create({
         color: '#000',
         backgroundColor: '#F5F5F5',
         borderWidth: 0,
-    },
-
-    footer: {
-        flexDirection: 'row',
-        justifyContent: 'space-around',
-        alignItems: 'center',
-        backgroundColor: '#BEACDE',
-        paddingVertical: 12,
-        position: 'absolute',
-        bottom: 0,
-        width: '100%',
     },
 });

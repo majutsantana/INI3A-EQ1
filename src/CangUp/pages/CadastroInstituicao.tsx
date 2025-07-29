@@ -16,6 +16,10 @@ import {
  import { MaterialIcons } from '@expo/vector-icons';
  import { CheckBox } from 'react-native-elements';
  import Icon from 'react-native-vector-icons/Feather';
+ import Header from '../components/Header';
+ import Footer from '../components/FooterSemIcones'; // Importando o Footer sem ícones
+import FooterSemIcones from '../components/FooterSemIcones';
+
  
  
  export default function CadastroAluno({navigation}) { //Não é erro, é só o vscode dando trabalho
@@ -157,7 +161,7 @@ import {
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar backgroundColor="#B9A6DA" barStyle="dark-content" />
-      <View style={styles.header} />
+      <Header/>
  
  
       <View style={styles.content}>
@@ -284,7 +288,7 @@ import {
           <Text style={styles.buttonText}>Cadastrar</Text>
         </TouchableOpacity>
       </View>
-      <View style={styles.footer} />
+      <FooterSemIcones/>
     </SafeAreaView>
   );
  }
@@ -294,14 +298,6 @@ import {
   safeArea: {
     flex: 1,
     backgroundColor: '#FFD88D',
-  },
-  header: {
-    backgroundColor: '#B9A6DA',
-    height: '10%',
-  },
-  footer: {
-    backgroundColor: '#B9A6DA',
-    height: '8%',
   },
   content: {
     flex: 1,

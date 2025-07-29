@@ -16,6 +16,9 @@ import { useNavigation } from '@react-navigation/native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { CheckBox } from 'react-native-elements';
 import Icon from 'react-native-vector-icons/Feather';
+import Header from '../components/Header';
+import Footer from '../components/FooterSemIcones';
+import FooterSemIcones from '../components/FooterSemIcones';
 
 export default function CadastroAluno({ navigation }) { // Não é erro, é só o vscode dando trabalho
   const [fontsLoaded, setFontsLoaded] = useState(false);
@@ -165,7 +168,7 @@ export default function CadastroAluno({ navigation }) { // Não é erro, é só 
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar backgroundColor="#B9A6DA" barStyle="dark-content" />
-      <View style={styles.header} />
+      <Header/>
 
 
       <View style={styles.content}>
@@ -318,7 +321,7 @@ export default function CadastroAluno({ navigation }) { // Não é erro, é só 
       </View>
 
 
-      <View style={styles.footer} />
+      <FooterSemIcones/>
     </SafeAreaView>
   );
 }

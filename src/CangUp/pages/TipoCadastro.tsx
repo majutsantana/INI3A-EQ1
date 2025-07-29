@@ -4,6 +4,9 @@ import { useNavigation } from '@react-navigation/native';
 import { MaterialIcons } from '@expo/vector-icons'; // use isso com Expo
 import { useEffect, useState } from 'react';
 import * as Font from 'expo-font';
+import Header from '../components/Header';
+import Footer from '../components/FooterSemIcones';
+import FooterSemIcones from '../components/FooterSemIcones';
 
 export default function TipoCadastro({navigation}) {
   const [fontsLoaded, setFontsLoaded] = useState(false);
@@ -30,12 +33,7 @@ export default function TipoCadastro({navigation}) {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <Image
-          source={require('../assets/logocangUp-horizontal-claro.png')}
-          style={styles.image}
-        />
-      </View>
+      <Header/>
 
       <View style={styles.body}>
         <View style={styles.seta}>
@@ -60,7 +58,7 @@ export default function TipoCadastro({navigation}) {
         </View>
         
       </View>
-      <View style={styles.footer}></View> 
+      <FooterSemIcones/> 
     </View>
   );
 }

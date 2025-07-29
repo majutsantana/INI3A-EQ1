@@ -13,6 +13,9 @@ import {
 } from 'react-native';
 import * as Font from 'expo-font';
 import { Ionicons, Entypo } from '@expo/vector-icons';
+import Header from '../components/Header';
+import Footer from '../components/FooterComIcones';
+import FooterComIcones from '../components/FooterComIcones';
 
 
 export default function PerfilResponsavel({navigation}) { //Navigation não está dando erro, é apenas o vs code
@@ -41,24 +44,20 @@ export default function PerfilResponsavel({navigation}) { //Navigation não est�
 
     return (
         <SafeAreaView style={styles.safeArea}>
-            {/* Header roxo */}
-            <View style={styles.header} />
+            <Header/>
 
-            {/* Parte de cima (amarelo forte) */}
             <View style={styles.profileTop}>
                 <View style={styles.nameTag}>
                     <Text style={styles.nameText}>Nome do Responsável</Text>
                 </View>
             </View>
 
-            {/* Círculo da foto de perfil sobreposto na transição */}
             <View style={styles.profilePicWrapper}>
                 <View style={styles.profilePic}>
                     <Text style={styles.picText}>Foto de perfil</Text>
                 </View>
             </View>
 
-            {/* Parte de baixo (amarelo claro) */}
             <View style={styles.profileBottom}>
                 <TouchableOpacity
                     style={styles.editBtn}
@@ -68,7 +67,6 @@ export default function PerfilResponsavel({navigation}) { //Navigation não est�
                 </TouchableOpacity>
             </View>
 
-            {/* Formulário */}
             <ScrollView contentContainerStyle={styles.formContainer}>
                 <TextInput placeholder="Nome:" style={styles.input} placeholderTextColor="#000" />
                 <TextInput placeholder="CPF:" style={styles.input} placeholderTextColor="#000" />
@@ -76,18 +74,7 @@ export default function PerfilResponsavel({navigation}) { //Navigation não est�
                 <TextInput placeholder="Telefone para contato:" style={styles.input} placeholderTextColor="#000" />
             </ScrollView>
 
-            {/* Rodapé */}
-            <View style={styles.footer}>
-                <TouchableOpacity>
-                    <Ionicons name="person-circle-outline" size={35} color="#fff" />
-                </TouchableOpacity>
-                <TouchableOpacity>
-                    <Ionicons name="home-outline" size={30} color="#fff" />
-                </TouchableOpacity>
-                <TouchableOpacity>
-                    <Entypo name="menu" size={35} color="#fff" />
-                </TouchableOpacity>
-            </View>
+            <FooterComIcones/>
         </SafeAreaView>
     );
 }
