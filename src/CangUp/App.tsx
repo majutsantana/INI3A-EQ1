@@ -6,6 +6,8 @@ import CadastroAluno from './pages/CadastroAluno';
 import PerfilInstituicao from './pages/PerfilInstituicao';
 import PerfilAluno from './pages/PerfilAluno';
 import PerfilResponsavel from './pages/PerfilResponsavel';
+import PreCadastroAluno from './pages/PreCadastroAluno';
+import PreCadastroResponsavel from './pages/PreCadastroResponsavel';
 import CadastroInstituicao from './pages/CadastroInstituicao';
 import CadastroResponsavel from './pages/CadastroResponsavel';
 
@@ -14,7 +16,7 @@ const Stack = createNativeStackNavigator();
 export default function App() {
   //Direciona a tela que será aberta  
   return <NavigationContainer>
-    <Stack.Navigator initialRouteName='Login'>
+    <Stack.Navigator initialRouteName='PreCadastroAluno'>
       <Stack.Screen
         name="Login"
         component={Login}
@@ -24,6 +26,16 @@ export default function App() {
         name="TipoCadastro"
         component={TipoCadastro}
         options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="PreCadastroAluno"
+        component={PreCadastroAluno}
+        options={{ headerShown: false }} // MUDAR DIRECIONAMENTO
+      />
+      <Stack.Screen
+        name="PreCadastroResponsavel"
+        component={PreCadastroResponsavel}
+        options={{ headerShown: false }} // MUDAR DIRECIONAMENTO
       />
       <Stack.Screen
         name="CadastroAluno"
