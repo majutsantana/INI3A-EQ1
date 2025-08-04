@@ -2,24 +2,25 @@ import { Image, StyleSheet, Text, TextInput, View, TouchableOpacity, ActivityInd
 import * as Font from 'expo-font';
 import { useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Feather, Ionicons } from '@expo/vector-icons';
+import FooterSemIcones from '../components/FooterSemIcones';
 
 export default function Login({ navigation }) { //navigation não está dando erro, é erro do vscode 
 
   const [fontsLoaded, setFontsLoaded] = useState<boolean>(false);
   const [username, setusername] = useState<string>('');
-  const [senha, setsenha] = useState<string>('');
+  const [senha, setSenha] = useState<string>('');
   const [senhaVisivel, setSenhaVisivel] = useState(false);
-
   const toggleSenhaVisibilidade = () => {
     setSenhaVisivel(!senhaVisivel);
   };
+
 
   const login = async () => {
     if (!username || !senha) {
       Alert.alert("Erro", "Preencha todos os campos."); 
       return;
     }
-
 
     try {
       const response = await fetch("http://127.0.0.1:8000/api/login", {
@@ -103,15 +104,22 @@ export default function Login({ navigation }) { //navigation não está dando er
           value={username}
           onChangeText={setusername}
         />
-        <View style={styles.inputgroup}>
+        <View style={styles.passwordContainer}>
           <TextInput
-            style={styles.input}
+            style={styles.passwordInput}
             placeholder="Senha"
             placeholderTextColor="#888"
             value={senha}
-            onChangeText={setsenha}
+            onChangeText={setSenha}
             secureTextEntry={!senhaVisivel}
           />
+          <TouchableOpacity onPress={toggleSenhaVisibilidade} style={styles.eyeIcon}>
+            <Feather
+              name={senhaVisivel ? 'eye' : 'eye-off'}
+              size={20}
+              color="#888"
+            />
+          </TouchableOpacity>
         </View>
 
         <TouchableOpacity style={styles.button} onPress={login}>
@@ -131,9 +139,7 @@ export default function Login({ navigation }) { //navigation não está dando er
         </TouchableOpacity>
       </View>
 
-      {/*FOOTER*/}
-      <View style={styles.footer}>
-      </View>
+      <FooterSemIcones/>
     </View>
   );
 }
@@ -184,12 +190,36 @@ const styles = StyleSheet.create({
     shadowRadius: 4.65,
     elevation: 6,
   },
+  passwordContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#d9d9d9',
+    width: '90%',
+    borderRadius: 30,
+    marginTop: '10%',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.27,
+    shadowRadius: 4.65,
+    elevation: 6,
+  },
+  passwordInput: {
+    flex: 1, 
+    padding: '5%',
+    paddingLeft: '5%',
+    fontFamily: 'PoppinsRegular',
+    color: '#000',
+  },
+  eyeIcon: {
+    paddingRight: '5%',
+  },
   button: {
     backgroundColor: '#FFBE31',
     paddingVertical: '5%',
     paddingHorizontal: '10%',
     width: '60%',
     borderRadius: 20,
+    marginTop: '10%',
     marginBottom: '10%',
     shadowColor: "#000",
     shadowOffset: {

@@ -10,15 +10,14 @@ import {
   View,
  } from 'react-native';
  import { Picker } from '@react-native-picker/picker';
- import * as Font from 'expo-font';
- import { useEffect, useState } from 'react';
- import { useNavigation } from '@react-navigation/native';
- import { MaterialIcons } from '@expo/vector-icons';
- import { CheckBox } from 'react-native-elements';
- import Icon from 'react-native-vector-icons/Feather';
- import Header from '../components/Header';
- import Footer from '../components/FooterSemIcones'; // Importando o Footer sem ícones
+import * as Font from 'expo-font';
+import { useEffect, useState } from 'react';
+import { useNavigation } from '@react-navigation/native';
+import { MaterialIcons } from '@expo/vector-icons';
+import { CheckBox } from 'react-native-elements';
+import Header from '../components/Header';
 import FooterSemIcones from '../components/FooterSemIcones';
+import { Feather} from '@expo/vector-icons';
 
  
  
@@ -229,29 +228,49 @@ import FooterSemIcones from '../components/FooterSemIcones';
                />
               </View>
               <View style={styles.inputGroup}>
-                 <Text style={styles.label}>Senha:</Text>
-                   <TextInput
-                     style={styles.input} // Estilo específico para input de senha
-                     placeholder="Digite a sua senha"
-                     placeholderTextColor="#888"
-                     value={senha}
-                     onChangeText={setSenha}
-                     secureTextEntry={!senhaVisivel}
-                   />
-                 {errors.senha && <Text style={styles.errorText}>{errors.senha}</Text>}
-               </View>
-               <View style={styles.inputGroup}>
-                 <Text style={styles.label}>Redigite a senha:</Text>
-                 <TextInput
-                   style={styles.input}
-                   placeholder="Confirme a sua senha"
-                   placeholderTextColor="#888"
-                   value={confSenha}
-                   onChangeText={setconfSenha}
-                   secureTextEntry={!confSenhaVisivel}
-                 />
-                 {errors.confSenha && <Text style={styles.errorText}>{errors.confSenha}</Text>}
-               </View>
+                <Text style={styles.label}>Senha:</Text>
+                <View style={styles.passwordContainer}>
+                
+                <TextInput
+                  style={styles.passwordInput}
+                  placeholder="Digite a senha"
+                  placeholderTextColor="#888"
+                  value={senha}
+                  onChangeText={setSenha}
+                  secureTextEntry={!senhaVisivel}
+                />
+                <TouchableOpacity onPress={toggleSenhaVisibilidade} style={styles.eyeIcon}>
+                  <Feather
+                    name={senhaVisivel ? 'eye' : 'eye-off'}
+                    size={20}
+                    color="#888"
+                  />
+                </TouchableOpacity>
+                </View>
+                {errors.senha && <Text style={styles.errorText}>{errors.senha}</Text>}
+              </View>
+              <View style={styles.inputGroup}>
+                <Text style={styles.label}>Confirme a senha:</Text>
+                <View style={styles.passwordContainer}>
+                
+                <TextInput
+                  style={styles.passwordInput}
+                  placeholder="Redigite a senha"
+                  placeholderTextColor="#888"
+                  value={confSenha}
+                  onChangeText={setconfSenha}
+                  secureTextEntry={!confSenhaVisivel}
+                />
+                <TouchableOpacity onPress={toggleConfSenhaVisibilidade} style={styles.eyeIcon}>
+                  <Feather
+                    name={confSenhaVisivel ? 'eye' : 'eye-off'}
+                    size={20}
+                    color="#888"
+                  />
+                </TouchableOpacity>
+                </View> 
+                {errors.confSenha && <Text style={styles.errorText}>{errors.confSenha}</Text>}
+              </View>
               <View style={styles.inputGroup}>
                   <Text style={styles.label}>Plano da instituição:</Text>
                   <View style={styles.pickerWrapper}>
@@ -349,6 +368,28 @@ import FooterSemIcones from '../components/FooterSemIcones';
     shadowOpacity: 0.27,
     shadowRadius: 4.65,
     elevation: 6,
+  },
+  passwordContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#d9d9d9',
+    borderRadius: 30,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.27,
+    shadowRadius: 4.65,
+    elevation: 6,
+  },
+  passwordInput: {
+    fontSize:16,
+    flex: 1, 
+    padding: '5%',
+    paddingLeft: '5%',
+    fontFamily: 'PoppinsRegular',
+    color: '#000',
+  },
+  eyeIcon: {
+    paddingRight: '5%',
   },
   pickerWrapper: {
     alignItems: 'center',

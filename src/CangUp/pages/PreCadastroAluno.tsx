@@ -159,7 +159,7 @@ const styles = StyleSheet.create({
         flex: 1,
         paddingHorizontal: '5%',
         paddingTop: '10%',
-        paddingBottom: '10%',
+        paddingBottom: '25%',
         justifyContent: 'space-between',
         alignItems: 'center',
     },

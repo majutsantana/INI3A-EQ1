@@ -9,16 +9,15 @@ import {
   TouchableOpacity,
   View,
  } from 'react-native';
- import { Picker } from '@react-native-picker/picker';
- import * as Font from 'expo-font';
- import { useEffect, useState } from 'react';
- import { useNavigation } from '@react-navigation/native';
- import { MaterialIcons } from '@expo/vector-icons';
- import { CheckBox } from 'react-native-elements';
- import Icon from 'react-native-vector-icons/Feather';
- import Header from '../components/Header';
- import Footer from '../components/FooterSemIcones'; // Importando o Footer sem ícones
+import { Picker } from '@react-native-picker/picker';
+import * as Font from 'expo-font';
+import { useEffect, useState } from 'react';
+import { useNavigation } from '@react-navigation/native';
+import { MaterialIcons } from '@expo/vector-icons';
+import { CheckBox } from 'react-native-elements';
+import Header from '../components/Header';
 import FooterSemIcones from '../components/FooterSemIcones';
+import { Feather} from '@expo/vector-icons';
  
  
  export default function CadastroAluno({navigation}) { //Não é erro, é só o vscode dando trabalho
@@ -163,28 +162,7 @@ import FooterSemIcones from '../components/FooterSemIcones';
             keyboardShouldPersistTaps="handled"
             showsVerticalScrollIndicator={false}
           >
-            <View style={styles.inputGroup}>
-               <Text style={styles.label}>Nome:</Text>
-               <TextInput
-                 style={styles.input}
-                 placeholder="Digite o nome"
-                 placeholderTextColor="#888"
-                 value={nome}
-                 onChangeText={setNome}
-               />
-               {errors.nome && <Text style={styles.errorText}>{errors.nome}</Text>}
-             </View>
-             <View style={styles.inputGroup}>
-               <Text style={styles.label}>CPF:</Text>
-               <TextInput
-                 style={styles.input}
-                 placeholder="Digite o CPF"
-                 placeholderTextColor="#888"
-                 value={cpf}
-                 onChangeText={setCpf}
-               />
-               {errors.cpf && <Text style={styles.errorText}>{errors.cpf}</Text>}
-             </View>
+
              <View style={styles.inputGroup}>
                <Text style={styles.label}>Email:</Text>
                <TextInput
@@ -196,63 +174,53 @@ import FooterSemIcones from '../components/FooterSemIcones';
                />
                {errors.email && <Text style={styles.errorText}>{errors.email}</Text>}
              </View>
-             <View style={styles.inputGroup}>
-                 <Text style={styles.label}>Senha:</Text>
-                   <TextInput
-                     style={styles.input} // Estilo específico para input de senha
-                     placeholder="Digite a sua senha"
-                     placeholderTextColor="#888"
-                     value={senha}
-                     onChangeText={setSenha}
-                     secureTextEntry={!senhaVisivel}
-                   />
-                 {errors.senha && <Text style={styles.errorText}>{errors.senha}</Text>}
-               </View>
-               <View style={styles.inputGroup}>
-                 <Text style={styles.label}>Redigite a senha:</Text>
-                 <TextInput
-                   style={styles.input}
-                   placeholder="Confirme a sua senha"
-                   placeholderTextColor="#888"
-                   value={confSenha}
-                   onChangeText={setconfSenha}
-                   secureTextEntry={!confSenhaVisivel}
-                 />
-                 {errors.confSenha && <Text style={styles.errorText}>{errors.confSenha}</Text>}
-               </View>
-            <View style={styles.inputGroup}>
-              <Text style={styles.label}>Sexo:</Text>
-              <View style={styles.pickerWrapper}>
-                <Picker
-                  selectedValue={sexo}
-                  onValueChange={(itemValue) => setSexo(itemValue)}
-                  style={[
-                    styles.picker,
-                    { color: sexo === '' ? '#888' : '#000' } // preto para placeholder, cinza para os demais
-                  ]}
-                >
-                  <Picker.Item label="Selecione o sexo" value="" />
-                  <Picker.Item label="Masculino" value="Masculino" />
-                  <Picker.Item label="Feminino" value="Feminino" />
-                  <Picker.Item label="Neutro" value="Neutro" />
-                  <Picker.Item label="Prefiro não informar" value="Prefiro não informar" />
-                </Picker>
+              <View style={styles.inputGroup}>
+                <Text style={styles.label}>Senha:</Text>
+                <View style={styles.passwordContainer}>
+                
+                <TextInput
+                  style={styles.passwordInput}
+                  placeholder="Digite a senha"
+                  placeholderTextColor="#888"
+                  value={senha}
+                  onChangeText={setSenha}
+                  secureTextEntry={!senhaVisivel}
+                />
+                <TouchableOpacity onPress={toggleSenhaVisibilidade} style={styles.eyeIcon}>
+                  <Feather
+                    name={senhaVisivel ? 'eye' : 'eye-off'}
+                    size={20}
+                    color="#888"
+                  />
+                </TouchableOpacity>
+                </View>
+                {errors.senha && <Text style={styles.errorText}>{errors.senha}</Text>}
               </View>
-              {errors.sexo && <Text style={styles.errorText}>{errors.sexo}</Text>}
-            </View>
- 
-            <View style={styles.check}>
-               <CheckBox
-               checked={check}
-               onPress={() => setCheck(!check)}/> 
-               <TouchableOpacity> 
-                 <Text style={styles.textCheck}>Termos de uso</Text>
-               </TouchableOpacity>
-            </View>
-            {errors.check && <Text style={styles.errorText}>{errors.check}</Text>}
+              <View style={styles.inputGroup}>
+                <Text style={styles.label}>Confirme a senha:</Text>
+                <View style={styles.passwordContainer}>
+                
+                <TextInput
+                  style={styles.passwordInput}
+                  placeholder="Redigite a senha"
+                  placeholderTextColor="#888"
+                  value={confSenha}
+                  onChangeText={setconfSenha}
+                  secureTextEntry={!confSenhaVisivel}
+                />
+                <TouchableOpacity onPress={toggleConfSenhaVisibilidade} style={styles.eyeIcon}>
+                  <Feather
+                    name={confSenhaVisivel ? 'eye' : 'eye-off'}
+                    size={20}
+                    color="#888"
+                  />
+                </TouchableOpacity>
+                </View>
+                {errors.confSenha && <Text style={styles.errorText}>{errors.confSenha}</Text>}
+              </View>
+
           </ScrollView>
         </View>
- 
  
         <TouchableOpacity style={styles.button}
           onPress= {handleCadastro}>
@@ -320,6 +288,28 @@ import FooterSemIcones from '../components/FooterSemIcones';
     shadowOpacity: 0.27,
     shadowRadius: 4.65,
     elevation: 6,
+  },
+  passwordContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#d9d9d9',
+    borderRadius: 30,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.27,
+    shadowRadius: 4.65,
+    elevation: 6,
+  },
+  passwordInput: {
+    fontSize:16,
+    flex: 1, 
+    padding: '5%',
+    paddingLeft: '5%',
+    fontFamily: 'PoppinsRegular',
+    color: '#000',
+  },
+  eyeIcon: {
+    paddingRight: '5%',
   },
   pickerWrapper: {
     alignItems: 'center',
