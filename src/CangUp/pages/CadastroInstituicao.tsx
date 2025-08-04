@@ -21,7 +21,7 @@ import { Feather} from '@expo/vector-icons';
 
  
  
- export default function CadastroAluno({navigation}) { //Não é erro, é só o vscode dando trabalho
+ export default function CadastroAluno({navigation}) {
    const [fontsLoaded, setFontsLoaded] = useState(false);
    const [nome, setNome] = useState('');
    const [email, setEmail] = useState('');
@@ -72,6 +72,14 @@ import { Feather} from '@expo/vector-icons';
        isValid = false;
      } else if (!/\S+@\S+\.\S+/.test(email)) { // Regex para validação de formato de email
        newErrors.email = 'Email inválido.';
+       isValid = false;
+     }
+
+     if (!email.trim()) {
+       newErrors.telefone = 'Telefone é obrigatório.';
+       isValid = false;
+     } else if (telefone.length < 11 && telefone.length > 11) { 
+       newErrors.telefone = 'Telefone inválido.';
        isValid = false;
      }
  
@@ -207,10 +215,10 @@ import { Feather} from '@expo/vector-icons';
                 {errors.endereco && <Text style={styles.errorText}>{errors.endereco}</Text>}
               </View>
               <View style={styles.inputGroup}>
-               <Text style={styles.label}>cnpj:</Text>
+               <Text style={styles.label}>CNPJ:</Text>
                <TextInput
                  style={styles.input}
-                 placeholder="Digite o cnpj"
+                 placeholder="Digite o CNPJ"
                  placeholderTextColor="#888"
                  value={cnpj}
                  onChangeText={setcnpj}
@@ -226,6 +234,7 @@ import { Feather} from '@expo/vector-icons';
                  value={telefone}
                  onChangeText={setTelefone}
                />
+               {errors.telefone && <Text style={styles.errorText}>{errors.telefone}</Text>}
               </View>
               <View style={styles.inputGroup}>
                 <Text style={styles.label}>Senha:</Text>
