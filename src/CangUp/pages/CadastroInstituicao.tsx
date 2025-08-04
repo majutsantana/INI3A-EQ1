@@ -27,7 +27,7 @@ import { Feather} from '@expo/vector-icons';
    const [email, setEmail] = useState('');
    const [endereco, setEndereco] = useState('');
    //const [horario, setHorario] = useState('');
-   const [CNPJ, setCNPJ] = useState('');
+   const [cnpj, setcnpj] = useState('');
    const [telefone, setTelefone] = useState('');
    const [senha, setSenha] = useState('');
    const [confSenha, setconfSenha] = useState('');
@@ -96,11 +96,11 @@ import { Feather} from '@expo/vector-icons';
        isValid = false;
      }
  
-     if (!CNPJ.trim()) {
-       newErrors.CNPJ = 'CNPJ é obrigatório.';
+     if (!cnpj.trim()) {
+       newErrors.cnpj = 'cnpj é obrigatório.';
        isValid = false;
-     } else if (!/^\d{14}$/.test(CNPJ)) {
-       newErrors.CNPJ = 'CNPJ inválido. Deve conter 14 dígitos numéricos.';
+     } else if (!/^\d{14}$/.test(cnpj)) {
+       newErrors.cnpj = 'cnpj inválido. Deve conter 14 dígitos numéricos.';
        isValid = false;
      }
  
@@ -139,7 +139,7 @@ import { Feather} from '@expo/vector-icons';
        headers: {
          'Content-Type': 'application/json',
        },
-       body: JSON.stringify({nome, email, endereco, CNPJ, telefone, senha, plano}),
+       body: JSON.stringify({nome, email, endereco, cnpj, telefone, senha, plano}),
      });
       const text = await response.text();
       console.log('Resposta da API (texto):', text);
@@ -207,15 +207,15 @@ import { Feather} from '@expo/vector-icons';
                 {errors.endereco && <Text style={styles.errorText}>{errors.endereco}</Text>}
               </View>
               <View style={styles.inputGroup}>
-               <Text style={styles.label}>CNPJ:</Text>
+               <Text style={styles.label}>cnpj:</Text>
                <TextInput
                  style={styles.input}
-                 placeholder="Digite o CNPJ"
+                 placeholder="Digite o cnpj"
                  placeholderTextColor="#888"
-                 value={CNPJ}
-                 onChangeText={setCNPJ}
+                 value={cnpj}
+                 onChangeText={setcnpj}
                />
-               {errors.CNPJ && <Text style={styles.errorText}>{errors.CNPJ}</Text>}
+               {errors.cnpj && <Text style={styles.errorText}>{errors.cnpj}</Text>}
               </View>
               <View style={styles.inputGroup}>
                <Text style={styles.label}>Telefone:</Text>
@@ -283,8 +283,8 @@ import { Feather} from '@expo/vector-icons';
                       ]}
                     >
                       <Picker.Item label="Selecione o plano" value="" />
-                      <Picker.Item label="Semestral" value="Semestral" />
-                      <Picker.Item label="Anual" value="Anual" />
+                      <Picker.Item label="Semestral" value="S" />
+                      <Picker.Item label="Anual" value="A" />
                     </Picker>
                   </View>
                   {errors.plano && <Text style={styles.errorText}>{errors.plano}</Text>}
