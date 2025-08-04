@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Feather, Ionicons } from '@expo/vector-icons';
 import FooterSemIcones from '../components/FooterSemIcones';
+ import { Picker } from '@react-native-picker/picker';
 
 export default function Login({ navigation }) { //navigation não está dando erro, é erro do vscode 
 
@@ -11,6 +12,7 @@ export default function Login({ navigation }) { //navigation não está dando er
   const [username, setusername] = useState<string>('');
   const [senha, setSenha] = useState<string>('');
   const [senhaVisivel, setSenhaVisivel] = useState(false);
+  const [tipoDeLogin, setTipoDeLogin] = useState<string>('');
   const toggleSenhaVisibilidade = () => {
     setSenhaVisivel(!senhaVisivel);
   };
@@ -24,11 +26,11 @@ export default function Login({ navigation }) { //navigation não está dando er
 
     try {
       const response = await fetch("http://127.0.0.1:8000/api/login", {
-        method: "POST",
+        method: "POST", 
         headers: {
           "Content-Type": "application/json"
         },
-        body: JSON.stringify({ login: username, senha, perfil:"adm" })
+        body: JSON.stringify({ login: username, senha, perfil:tipoDeLogin })
       });
 
       if (!response.ok) {
@@ -42,7 +44,12 @@ export default function Login({ navigation }) { //navigation não está dando er
 
       if (token) {
         await AsyncStorage.setItem("jwt", token);
-        navigation.navigate("Home"); // Troque "Home" pelo nome real da sua tela
+        if (tipoDeLogin === "inst")
+          navigation.navigate("PerfilInstituicao"); // Troque "Home" pelo nome real da sua tela
+        else if (tipoDeLogin === "alun")
+          navigation.navigate("PerfilAluno");
+        else
+          navigation.navigate("PerfilResponsavel");
       } else {
         Alert.alert("Erro", "Token não recebido.");
       }
@@ -97,6 +104,22 @@ export default function Login({ navigation }) { //navigation não está dando er
       {/*BODY*/}
       <View style={styles.body}>
         <Text style={styles.title}>Bem-vindo de volta!</Text>
+          <View style={styles.pickerWrapper}>
+          <Picker
+              selectedValue={tipoDeLogin}
+              onValueChange={(itemValue) => setTipoDeLogin(itemValue)}
+              style={[
+              styles.picker,
+              { color: tipoDeLogin === '' ? '#888' : '#000' } // preto para placeholder, cinza para os demais
+              ]}
+            >
+            <Picker.Item label="Selecione o tipo de Login" value="" />
+            <Picker.Item label="Instituição" value="inst" />
+            <Picker.Item label="Aluno" value="alun" />
+            <Picker.Item label="Responsável" value="resp" />
+          </Picker>
+        </View>
+
         <TextInput
           style={styles.input}
           placeholder="Email"
@@ -272,5 +295,29 @@ const styles = StyleSheet.create({
     fontSize: 14,
     alignItems:'center',
     color:'#888',
+  },
+  picker: {
+    width:'100%',
+    fontSize: 16,
+    fontFamily: 'PoppinsRegular',
+    backgroundColor: '#d9d9d9',
+    borderWidth:0,
+  },
+  pickerWrapper: {
+    alignItems: 'center',
+    justifyContent:'center',
+    paddingHorizontal: '5%',
+    paddingVertical: '5%',
+    borderRadius: 25,
+    overflow: 'hidden',
+    backgroundColor: '#d9d9d9',
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 3,
+    },
+    shadowOpacity: 0.27,
+    shadowRadius: 4.65,
+    elevation: 6,
   },
 });

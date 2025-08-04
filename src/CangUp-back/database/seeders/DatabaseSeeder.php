@@ -30,5 +30,9 @@ class DatabaseSeeder extends Seeder
             'rotulo' => 'adm',
             'nome'=>'administrativo'
         ]);
+        \App\Models\Perfil::create([
+            'rotulo' => 'inst',
+            'nome'=>'instituição'
+        ]);
     }
 }
