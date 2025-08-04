@@ -28,7 +28,7 @@ export default function Login({ navigation }) { //navigation não está dando er
         headers: {
           "Content-Type": "application/json"
         },
-        body: JSON.stringify({ login: username, senha })
+        body: JSON.stringify({ login: username, senha, perfil:"adm" })
       });
 
       if (!response.ok) {

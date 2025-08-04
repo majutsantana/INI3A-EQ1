@@ -13,6 +13,11 @@ return new class extends Migration
     {
         Schema::create('perfil_usuario', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('perfil_id');
+            $table->unsignedBigInteger('usuario_id');
+            $table->foreign('perfil_id')->references('id')->on('perfils');
+            $table->foreign('usuario_id')->references('id')->on('usuarios');
+
             $table->timestamps();
         });
     }

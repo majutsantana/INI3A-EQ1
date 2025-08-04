@@ -22,12 +22,11 @@ use App\Http\Controllers\UserController;
 //     return $request->user();
 // });
 
+
 Route::post('/cadastrar', [AlunoController::class, 'cadastrar']);
 
 Route::post('/cadastrarInst', [InstituicaoController::class, 'cadastrarInst']);
 
-// Rota pública de login
-Route::post('/login', [LoginController::class, 'login']);
 
 // Grupo de rotas protegidas por JWT
 Route::middleware(['auth:api'])->group(function () {
@@ -40,6 +39,10 @@ Route::middleware(['auth:api'])->group(function () {
 
     // Outras rotas protegidas podem ir aqui
 });
+
+
+// Rota pública de login
+Route::post('/login', [LoginController::class, 'login']);
 
 
 Route::get("/", function(Request $res) { return "oi";});    
