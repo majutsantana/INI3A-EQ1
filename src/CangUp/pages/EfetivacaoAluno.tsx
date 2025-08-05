@@ -1,174 +1,302 @@
-import React, { useState } from 'react';
-import { 
-  StyleSheet, 
-  Text, 
-  View, 
-  TextInput, 
-  TouchableOpacity, 
-  SafeAreaView, 
-  StatusBar 
-} from 'react-native';
+import {
+  ActivityIndicator,
+  SafeAreaView,
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+ } from 'react-native';
+ import * as Font from 'expo-font';
+ import { useEffect, useState } from 'react';
+ import { MaterialIcons } from '@expo/vector-icons';
+ import Header from '../components/Header';
+ import { TextInputMask } from 'react-native-masked-text';
+ import { Picker } from '@react-native-picker/picker';
+import FooterSemIcones from '../components/FooterSemIcones';
 
-/**
- * Componente principal da tela de efetivação do aluno.
- * Ele gerencia o estado dos campos de formulário e a lógica do botão.
- */
-const EfetivacaoAluno = () => {
-  // Hooks de Estado para gerenciar os valores dos inputs
-  // useState('') inicializa cada campo com uma string vazia.
-  const [instituicao, setInstituicao] = useState('');
-  const [nome, setNome] = useState('');
-  const [matricula, setMatricula] = useState('');
-  const [cpf, setCpf] = useState('');
-
-  const handleProseguir = () => {
-    // Exemplo: Imprime os dados no console.
-    console.log('Dados submetidos:', { instituicao, nome, matricula, cpf });
+export default function EfetivacaoAluno({ navigation }) {
     
-  };
+    const [fontsLoaded, setFontsLoaded] = useState(false);
+    const [errors, setErrors] = useState({});
+    const [instituicao, setInstituicao] = useState('');
+    const [nome, setNome] = useState('');
+    const [RA, setRA] = useState('');
+    const [CPF, setCPF] = useState('');
 
-  // Renderização da Interface do Usuário 
-  return (
-    // SafeAreaView garante que o conteúdo não seja sobreposto pela barra de status, etc.
-    <SafeAreaView style={styles.container}>
-      {/* StatusBar configura o estilo da barra de status (ex: cor dos ícones) */}
-      <StatusBar barStyle="dark-content" />
-      
-      {/* View para a faixa superior roxa da tela*/}
-      <View style={styles.header} />
+    const validateForm = () => {
+     let newErrors = {};
+     let isValid = true;
+ 
+      if (!instituicao.trim()) {
+        newErrors.instituicao = 'Instituição é obrigatória.';
+        isValid = false;
+      }
 
-      {/* View que atua como o container principal do formulário, 
-          centralizando os campos de input */}
-      <View style={styles.formContainer}>
-        
-        {/* Cada View `inputGroup` agrupa um TextInput com espaçamento inferior */}
-        <View style={styles.inputGroup}>
-          <TextInput
-            style={styles.input}
-            placeholder="Instituição:"
-            value={instituicao}
-            onChangeText={setInstituicao} // Atualiza o estado 'instituicao' a cada digitação
-          />
+     if (!nome.trim()) {
+       newErrors.nome = 'Nome é obrigatório.';
+       isValid = false;
+     }
+ 
+     if (!RA.trim()) {
+       newErrors.RA = 'O número de matrícula é obrigatório.';
+       isValid = false;
+     }
+
+     if (!CPF.trim()) {
+       newErrors.CPF = 'CPF é obrigatório.';
+       isValid = false;
+     } else if (CPF.length < 14) {
+       newErrors.CPF = 'CPF inválido. Deve conter 11 dígitos numéricos.';
+       isValid = false;
+     }
+ 
+     setErrors(newErrors);
+     return isValid;
+   };
+
+   const loadFonts = async () => {
+       await Font.loadAsync({
+         'PoppinsRegular': require('../assets/fonts/PoppinsRegular.ttf'),
+         'PoppinsBold': require('../assets/fonts/PoppinsBold.ttf'),
+       });
+       setFontsLoaded(true);
+     };
+ 
+     useEffect(() => {
+       loadFonts();
+     }, []);
+
+    const handleCadastro  = async () => {
+        if (validateForm()) {
+        try {
+            await getDados();
+            navigation.navigate('Login');
+        } catch (error) {
+            console.error("Erro no processo de cadastro (handleCadastro):", error);
+        }
+        } else {
+        console.log('Formulário inválido, corrigindo erros:', errors);
+        }
+    };
+
+    const getDados = async () => {
+        try{
+            const response = await fetch('http://localhost:8000/api/cadastrarAluno', { // luiza e maghu arrumem
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({nome, RA, CPF}),
+            });
+            const text = await response.text();
+            console.log('Resposta da API (texto):', text);
+        } catch(error){
+            console.error('Erro ao cadastrar aluno:', error);
+        }
+    };
+    
+    return(
+      <SafeAreaView style={styles.safeArea}>
+      <StatusBar backgroundColor="#B9A6DA" barStyle="dark-content" />
+      <Header/>
+
+      <View style={styles.content}>
+        <View style={styles.formContainer}>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+        <MaterialIcons name="arrow-back" size={28} color="#000" />
+        </TouchableOpacity>
+          <ScrollView
+            contentContainerStyle={styles.scrollContent}
+            keyboardShouldPersistTaps="handled"
+            showsVerticalScrollIndicator={false}
+          >
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>Instituição:</Text>
+              <View style={styles.pickerWrapper}>
+                <Picker
+                  selectedValue={instituicao}
+                  onValueChange={(itemValue) => setInstituicao(itemValue)}
+                  style={[
+                    styles.picker,
+                    { color: instituicao === '' ? '#888' : '#000' } 
+                  ]}
+                >
+                  <Picker.Item label="Selecione a instituição" value="" />
+                  <Picker.Item label="CTI" value="cti" />
+                  <Picker.Item label="ETEC" value="etec" />
+                </Picker>
+              </View>
+              {errors.instituicao && <Text style={styles.errorText}>{errors.instituicao}</Text>}
+            </View>
+
+            <View style={styles.inputGroup}>
+               <Text style={styles.label}>Nome:</Text>
+               <TextInput
+                 style={styles.input}
+                 placeholder="Digite o nome"
+                 placeholderTextColor="#888"
+                 value={nome}
+                 onChangeText={setNome}
+               />
+               {errors.nome && <Text style={styles.errorText}>{errors.nome}</Text>}
+             </View>
+             <View style={styles.inputGroup}>
+               <Text style={styles.label}>Número de matrícula/RA:</Text>
+               <TextInput
+                 style={styles.input}
+                 placeholder="Digite o número de matrícula"
+                 placeholderTextColor="#888"
+                 value={RA}
+                 onChangeText={setRA}
+               />
+               {errors.RA && <Text style={styles.errorText}>{errors.RA}</Text>}
+              </View>
+              <View style={styles.inputGroup}>
+               <Text style={styles.label}>CPF:</Text>
+               <TextInputMask
+                 type={'cpf'}
+                 value={CPF}
+                 onChangeText={text => setCPF(text)}
+                 placeholder="000.000.000-00"
+                 style={styles.input}
+               />
+               {errors.CPF && <Text style={styles.errorText}>{errors.CPF}</Text>}
+              </View>
+          </ScrollView>
         </View>
-
-        <View style={styles.inputGroup}>
-          <TextInput
-            style={styles.input}
-            placeholder="Nome:"
-            value={nome}
-            onChangeText={setNome} // Atualiza o estado 'nome'
-          />
-        </View>
-
-        <View style={styles.inputGroup}>
-          <TextInput
-            style={styles.input}
-            placeholder="Ra/nº da matrícula:"
-            value={matricula}
-            onChangeText={setMatricula} // Atualiza o estado 'matricula'
-            keyboardType="numeric" // Exibe o teclado numérico para este campo
-          />
-        </View>
-
-        <View style={styles.inputGroup}>
-          <TextInput
-            style={styles.input}
-            placeholder="CPF:"
-            value={cpf}
-            onChangeText={setCpf} // Atualiza o estado 'cpf'
-            keyboardType="numeric" // Exibe o teclado numérico para este campo
-          />
-        </View>
-      </View>
-
-      {/* View para a área do rodapé onde o botão está localizado */}
-      <View style={styles.footer}>
-        {/* TouchableOpacity cria um botão com feedback de toque (opacidade) */}
-        <TouchableOpacity style={styles.button} onPress={handleProseguir}>
-          {/* Text para o rótulo do botão */}
+ 
+        <TouchableOpacity style={styles.button}
+          onPress= {handleCadastro}>
           <Text style={styles.buttonText}>Prosseguir</Text>
         </TouchableOpacity>
       </View>
-      {/* Adicionando a nova faixa roxa no final */}
-      <View style={styles.footerBand} />
+      <FooterSemIcones/>
     </SafeAreaView>
-  );
-};
-
-// Objeto de Estilos usando StyleSheet para otimização
+    );
+}
 const styles = StyleSheet.create({
-  // Estilos para o container principal da tela
-  container: {
-    flex: 1, // Ocupa todo o espaço disponível
-    backgroundColor: '#FFD992', // Cor de fundo amarela/creme principal
-  },
-  // Estilos para a faixa superior
-  header: {
-    backgroundColor: '#BEACDE', // Cor da faixa superior (roxa)
-    height: 60,
-    width: '100%',
-  },
-  // Estilos para o container do formulário
-  formContainer: {
-    flex: 1, // Ocupa o restante do espaço entre o header e o footer
-    padding: 20,
-    justifyContent: 'center', // Centraliza o conteúdo verticalmente
-  },
-  // Estilos para cada grupo de input
-  inputGroup: {
-    marginBottom: 20, // Espaçamento entre os campos de input
-  },
-  // Estilos para os componentes TextInput
-  input: {
-    backgroundColor: '#FFFFFF', // Fundo branco
-    borderRadius: 10,
-    paddingHorizontal: 15,
-    paddingVertical: 12,
-    fontSize: 16,
-    color: '#333',
-    // Propriedades de sombra para iOS
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    // Propriedade de sombra para Android
-    elevation: 3,
-  },
-  // Estilos para o rodapé
-  footer: {
-    backgroundColor: '#FFD992', //cor de fundo atrás do botão (bege, mesma da principal)
-    padding: 20,
-    alignItems: 'center', // Centraliza o botão horizontalmente
-  },
-  // Estilos para o botão
-  button: {
-    backgroundColor: '#FFCC66', // Cor do botão (laranja)
-    paddingVertical: 15,
-    paddingHorizontal: 40,
-    borderRadius: 25,
-    width: '80%', // Ocupa 80% da largura do container
-    alignItems: 'center',
-    // Sombra para iOS
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    // Sombra para Android
-    elevation: 5,
-  },
-  // Estilos para o texto do botão
-  buttonText: {
-    color: '#black',
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-  // Estilo para a nova faixa roxa no rodapé
-  footerBand: {
-    backgroundColor: '#BEACDE', // Cor roxa
-    height: 40, // Altura da faixa
-    width: '100%',
-  },
+    safeArea: {
+        flex: 1,
+        backgroundColor: '#FFD88D',
+    },
+    content: {
+        flex: 1,
+        paddingHorizontal: '5%',
+        paddingTop: '10%',
+        paddingBottom: '25%',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+    },
+    formContainer: {
+        flex: 1,
+        backgroundColor: '#F5F5F5',
+        borderRadius: 30,
+        padding: '5%',
+        width: '90%',
+        shadowColor: '#000',
+        shadowOffset: { width: 2, height: 6 },
+        shadowOpacity: 0.15,
+        shadowRadius: 4.65,
+        elevation: 1,
+    },
+    scrollContent: {
+        flexGrow: 1,
+        paddingBottom: '2%',
+        margin: '5%',
+    },
+    inputGroup: {
+        padding:'1%',
+        marginBottom:'2%',
+    },
+    label: {
+        fontWeight: 'bold',
+        fontSize: 16,
+        marginBottom: '2%',
+        fontFamily: 'PoppinsRegular',
+    },
+    input: {
+        backgroundColor: '#d9d9d9',
+        borderRadius: 25,
+        paddingHorizontal: '5%',
+        paddingVertical: '5%',
+        fontSize: 16,
+        fontFamily: 'PoppinsRegular',
+        shadowColor: "#000",
+        shadowOffset: {
+        width: 0,
+        height: 3,
+        },
+        shadowOpacity: 0.27,
+        shadowRadius: 4.65,
+        elevation: 6,
+    },
+    pickerWrapper: {
+      alignItems: 'center',
+      justifyContent: 'center',
+      paddingHorizontal: '5%',
+      paddingVertical: '5%',
+      borderRadius: 25,
+      overflow: 'hidden',
+      backgroundColor: '#d9d9d9',
+      shadowColor: "#000",
+      shadowOffset: {
+        width: 0,
+        height: 3,
+      },
+      shadowOpacity: 0.27,
+      shadowRadius: 4.65,
+      elevation: 6,
+    },
+    picker: {
+      width: '100%',
+      fontSize: 16,
+      fontFamily: 'PoppinsRegular',
+      backgroundColor: '#d9d9d9',
+      borderWidth: 0,
+    },
+    button: {
+        backgroundColor: '#FFBE31',
+        paddingVertical: '5%',
+        width:'60%',
+        borderRadius: 20,
+        alignItems: 'center',
+        marginTop: '10%',
+        shadowColor: '#000',
+        shadowOffset: {
+        width: 0,
+        height: 3,
+        },
+        shadowOpacity: 0.27,
+        shadowRadius: 4.65,
+        elevation: 6,
+    },
+    buttonText: {
+        fontSize: 18,
+        fontFamily: 'PoppinsRegular',
+    },
+    seta:{
+        height:'15%',
+    },
+    backButton: {
+        alignSelf: 'flex-start',
+    },
+    errorText: {
+        color: 'red',
+        fontSize: 12,
+        marginTop: 5,
+        fontFamily: 'PoppinsRegular',
+    },
+    iconButton: {
+        padding:5,
+        fontFamily: 'PoppinsRegular',
+        flexDirection:'row',
+        columnGap: 10,
+        fontSize: 14,
+        alignItems:'center',
+        color:'#888',
+    },
 });
-
-// Exporta o componente para que ele possa ser importado em outros arquivos
-export default EfetivacaoAluno;
+    
