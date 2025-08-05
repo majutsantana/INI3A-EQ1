@@ -17,17 +17,25 @@ import {
  import { Picker } from '@react-native-picker/picker';
 import FooterSemIcones from '../components/FooterSemIcones';
 
-export default function EfetivacaoAluno({ navigation }) {
+
+type errorType ={ 
+  nome : string | undefined,
+  RA : string | undefined,
+  CPF : string | undefined,
+  instituicao : string | undefined,
+};
+
+export default function EfetivacaoAluno({ navigation }) { //Navigation não é erro
     
     const [fontsLoaded, setFontsLoaded] = useState(false);
-    const [errors, setErrors] = useState({});
+    const [errors, setErrors] = useState<errorType>({CPF:undefined, instituicao:undefined, nome:undefined, RA:undefined});
     const [instituicao, setInstituicao] = useState('');
     const [nome, setNome] = useState('');
     const [RA, setRA] = useState('');
     const [CPF, setCPF] = useState('');
 
     const validateForm = () => {
-     let newErrors = {};
+     let newErrors : errorType = {CPF:undefined, instituicao:undefined, nome:undefined, RA:undefined};
      let isValid = true;
  
       if (!instituicao.trim()) {

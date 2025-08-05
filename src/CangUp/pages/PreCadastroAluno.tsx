@@ -1,5 +1,4 @@
 import {
-  ActivityIndicator,
   SafeAreaView,
   ScrollView,
   StatusBar,
@@ -14,18 +13,24 @@ import {
  import { MaterialIcons } from '@expo/vector-icons';
  import Header from '../components/Header';
  import FooterComIcones from '../components/FooterComIcones';
- import { TextInputMask } from 'react-native-masked-text';
+ import { TextInputMask } from 'react-native-masked-text'; //Pacote instalado 
 
-export default function PreCadastroAluno({ navigation }) {
+type errorType ={ 
+  nome : string | undefined,
+  RA : string | undefined,
+  CPF : string | undefined
+};
+
+export default function PreCadastroAluno({ navigation }) { 
     
     const [fontsLoaded, setFontsLoaded] = useState(false);
-    const [errors, setErrors] = useState({});
+    const [errors, setErrors] = useState<errorType>({nome:undefined, CPF:undefined, RA:undefined});
     const [nome, setNome] = useState('');
     const [RA, setRA] = useState('');
     const [CPF, setCPF] = useState('');
 
     const validateForm = () => {
-     let newErrors = {};
+     let newErrors : errorType = {nome:undefined, CPF:undefined, RA:undefined};
      let isValid = true;
  
      if (!nome.trim()) {

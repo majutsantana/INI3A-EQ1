@@ -6,6 +6,8 @@ use App\Http\Controllers\AlunoController;
 use App\Http\Controllers\InstituicaoController;
 use App\Http\Controllers\LoginController; //Adicionado para o Back do Login
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\AdminController;
+use App\Http\Controllers\PerfilController;
 
 /*
 |--------------------------------------------------------------------------
@@ -26,6 +28,10 @@ use App\Http\Controllers\UserController;
 Route::post('/cadastrar', [AlunoController::class, 'cadastrar']);
 
 Route::post('/cadastrarInst', [InstituicaoController::class, 'cadastrarInst']);
+
+Route::post('/cadastrarAdmin', [AdminController::class, 'store']);
+
+Route::get("/perfis", [PerfilController::class, 'getAll']);
 
 
 // Grupo de rotas protegidas por JWT

@@ -37,7 +37,7 @@ class InstituicaoController extends Controller
         $usuario->senha = $dados["senha"];
         $usuario->save();
 
-        $perfil = Perfil::where("rotulo", "inst")->get()[0];
+        $perfil = Perfil::where("rotulo", "inst")->first();
 
         DB::table("perfil_usuario")->insert([
             "usuario_id" => $usuario->id,

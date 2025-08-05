@@ -6,6 +6,12 @@ import { Feather, Ionicons } from '@expo/vector-icons';
 import FooterSemIcones from '../components/FooterSemIcones';
  import { Picker } from '@react-native-picker/picker';
 
+type _perfil = {
+  rotulo: string,
+  nome: string,
+  id: number
+}
+
 export default function Login({ navigation }) { //navigation não está dando erro, é erro do vscode 
 
   const [fontsLoaded, setFontsLoaded] = useState<boolean>(false);
@@ -13,6 +19,7 @@ export default function Login({ navigation }) { //navigation não está dando er
   const [senha, setSenha] = useState<string>('');
   const [senhaVisivel, setSenhaVisivel] = useState(false);
   const [tipoDeLogin, setTipoDeLogin] = useState<string>('');
+  const [perfis, setPerfis] = useState<_perfil[]>([]);
   const toggleSenhaVisibilidade = () => {
     setSenhaVisivel(!senhaVisivel);
   };
@@ -73,6 +80,10 @@ export default function Login({ navigation }) { //navigation não está dando er
     // fetch("http://127.0.0.1:8000/")
     //   .then(r=> r.json())
     //   .then(r=> {alert(r.Hello); Alert.alert(r.Hello)})
+    fetch("http://127.0.0.1:8000/api/perfis", {
+      method: 'GET'
+    }).then(r => r.json())
+      .then(r => setPerfis(r))
   }, []);
 
   async function getDados() {
@@ -81,6 +92,11 @@ export default function Login({ navigation }) { //navigation não está dando er
     // alert(dados.Hello);
 
     navigation.navigate("ForgotPswdScreen");
+  }
+
+  const renderPerfis = () => {
+    return perfis.map(p => 
+            <Picker.Item label={p.nome} value={p.rotulo} />)
   }
 
   if (!fontsLoaded) {
@@ -114,9 +130,7 @@ export default function Login({ navigation }) { //navigation não está dando er
               ]}
             >
             <Picker.Item label="Selecione o tipo de Login" value="" />
-            <Picker.Item label="Instituição" value="inst" />
-            <Picker.Item label="Aluno" value="alun" />
-            <Picker.Item label="Responsável" value="resp" />
+            {renderPerfis()}
           </Picker>
         </View>
 
