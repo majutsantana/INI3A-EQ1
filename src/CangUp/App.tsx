@@ -8,13 +8,16 @@ import PerfilAluno from './pages/PerfilAluno';
 import PerfilResponsavel from './pages/PerfilResponsavel';
 import CadastroInstituicao from './pages/CadastroInstituicao';
 import CadastroResponsavel from './pages/CadastroResponsavel';
+import EfetivacaoAluno from './pages/EfetivacaoAluno';
+import EfetivacaoResponsavel from './pages/EfetivacaoResponsavel';
+
 
 const Stack = createNativeStackNavigator();
 
 export default function App() {
-  //Direciona a tela que será aberta  
-  return <NavigationContainer>
-    <Stack.Navigator initialRouteName='Login'>
+  //Direciona a tela que será aberta inicialmente 
+  return <NavigationContainer> 
+    <Stack.Navigator initialRouteName='Login'> 
       <Stack.Screen
         name="Login"
         component={Login}
@@ -49,11 +52,24 @@ export default function App() {
         name="PerfilAluno"
         component={PerfilAluno}
         options={{ headerShown: false }}
-      /><Stack.Screen
+      />
+      <Stack.Screen
         name="PerfilResponsavel"
         component={PerfilResponsavel}
         options={{ headerShown: false }}
       />
+      <Stack.Screen
+        name="EfetivacaoAluno"
+        component={EfetivacaoAluno}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="EfetivacaoResponsavel"
+        component={EfetivacaoResponsavel}
+        options={{ headerShown: false }}
+      />
+
+
     </Stack.Navigator>
   </NavigationContainer>
 }
