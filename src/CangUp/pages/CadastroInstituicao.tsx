@@ -18,10 +18,10 @@ import { CheckBox } from 'react-native-elements';
 import Header from '../components/Header';
 import FooterSemIcones from '../components/FooterSemIcones';
 import { Feather} from '@expo/vector-icons';
-
+import { TextInputMask } from 'react-native-masked-text';
  
  
- export default function CadastroAluno({navigation}) {
+ export default function CadastroInstituicao({navigation}) {
    const [fontsLoaded, setFontsLoaded] = useState(false);
    const [nome, setNome] = useState('');
    const [email, setEmail] = useState('');
@@ -216,13 +216,14 @@ import { Feather} from '@expo/vector-icons';
               </View>
               <View style={styles.inputGroup}>
                <Text style={styles.label}>CNPJ:</Text>
-               <TextInput
-                 style={styles.input}
-                 placeholder="Digite o CNPJ"
-                 placeholderTextColor="#888"
-                 value={cnpj}
-                 onChangeText={setcnpj}
-               />
+               <TextInputMask
+                  type={'cnpj'}
+                  value={cnpj}
+                  onChangeText={text => setcnpj(text)}
+                  placeholder="00.000.000/0000-00"
+                  style={styles.input}
+                />
+               
                {errors.cnpj && <Text style={styles.errorText}>{errors.cnpj}</Text>}
               </View>
               <View style={styles.inputGroup}>

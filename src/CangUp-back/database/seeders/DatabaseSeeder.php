@@ -34,5 +34,13 @@ class DatabaseSeeder extends Seeder
             'rotulo' => 'inst',
             'nome'=>'instituição'
         ]);
+        \App\Models\Perfil::create([
+            'rotulo' => 'resp',
+            'nome'=>'responsável'
+        ]);
+        \App\Models\Perfil::create([
+            'rotulo' => 'alun',
+            'nome'=>'aluno'
+        ]);
     }
 }

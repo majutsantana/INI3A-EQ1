@@ -14,6 +14,7 @@ import {
  import { MaterialIcons } from '@expo/vector-icons';
  import Header from '../components/Header';
  import FooterComIcones from '../components/FooterComIcones';
+ import { TextInputMask } from 'react-native-masked-text';
 
 export default function PreCadastroAluno({ navigation }) {
     
@@ -91,7 +92,7 @@ export default function PreCadastroAluno({ navigation }) {
     };
     
     return(
-        <SafeAreaView style={styles.safeArea}>
+      <SafeAreaView style={styles.safeArea}>
       <StatusBar backgroundColor="#B9A6DA" barStyle="dark-content" />
       <Header/>
 
@@ -129,12 +130,12 @@ export default function PreCadastroAluno({ navigation }) {
               </View>
               <View style={styles.inputGroup}>
                <Text style={styles.label}>CPF:</Text>
-               <TextInput
-                 style={styles.input}
-                 placeholder="Digite o CPF"
-                 placeholderTextColor="#888"
+               <TextInputMask
+                 type={'cpf'}
                  value={CPF}
-                 onChangeText={setCPF}
+                 onChangeText={text => setCPF(text)}
+                 placeholder="000.000.000-00"
+                 style={styles.input}
                />
                {errors.CPF && <Text style={styles.errorText}>{errors.CPF}</Text>}
               </View>

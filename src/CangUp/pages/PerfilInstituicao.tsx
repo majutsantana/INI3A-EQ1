@@ -19,7 +19,7 @@ import Header from '../components/Header';
 import Footer from '../components/FooterComIcones';
 import FooterComIcones from '../components/FooterComIcones';
 
-export default function PerfilAluno() {
+export default function PerfilInstituicao() {
     const navigation = useNavigation();
     const [fontsLoaded, setFontsLoaded] = useState(false);
     const [selectedGenero, setSelectedGenero] = useState('');

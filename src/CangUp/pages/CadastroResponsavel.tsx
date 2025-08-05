@@ -20,7 +20,7 @@ import FooterSemIcones from '../components/FooterSemIcones';
 import { Feather} from '@expo/vector-icons';
  
  
- export default function CadastroAluno({navigation}) { //Não é erro, é só o vscode dando trabalho
+ export default function CadastroResponsavel({navigation}) { //Não é erro, é só o vscode dando trabalho
    const [fontsLoaded, setFontsLoaded] = useState(false);
    const [nome, setNome] = useState('');
    const [cpf, setCpf] = useState('');

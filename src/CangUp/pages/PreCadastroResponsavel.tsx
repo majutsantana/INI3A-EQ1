@@ -13,8 +13,10 @@ import {
  import { MaterialIcons } from '@expo/vector-icons';
  import Header from '../components/Header';
  import FooterComIcones from '../components/FooterComIcones';
+ import { useSafeAreaInsets } from 'react-native-safe-area-context';
+ import { TextInputMask } from 'react-native-masked-text';
 
-export default function PreCadastroAluno({ navigation }) {
+export default function PreCadastroResponsavel({ navigation }) {
     
     const [fontsLoaded, setFontsLoaded] = useState(false);
     const [errors, setErrors] = useState({});
@@ -82,60 +84,66 @@ export default function PreCadastroAluno({ navigation }) {
             console.error('Erro ao cadastrar responsáveis:', error);
         }
     };
+
+    const insets = useSafeAreaInsets();
     
     return(
-        <SafeAreaView style={styles.safeArea}>
-      <StatusBar backgroundColor="#B9A6DA" barStyle="dark-content" />
-      <Header/>
+      <SafeAreaView style={{flex: 1,
+        backgroundColor: '#FFD88D',
+        paddingTop: insets.top,
+        paddingBottom: insets.bottom,
+        paddingLeft: insets.left,
+        paddingRight: insets.right,}}>
+        <StatusBar backgroundColor="#B9A6DA" barStyle="dark-content" />
+        <Header/>
 
-      <View style={styles.content}>
-        <View style={styles.formContainer}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-        <MaterialIcons name="arrow-back" size={28} color="#000" />
-        </TouchableOpacity>
-          <ScrollView
-            contentContainerStyle={styles.scrollContent}
-            keyboardShouldPersistTaps="handled"
-            showsVerticalScrollIndicator={false}
-          >
-            <View style={styles.inputGroup}>
-               <Text style={styles.label}>Nome:</Text>
-               <TextInput
-                 style={styles.input}
-                 placeholder="Digite o nome"
-                 placeholderTextColor="#888"
-                 value={nome}
-                 onChangeText={setNome}
-               />
-               {errors.nome && <Text style={styles.errorText}>{errors.nome}</Text>}
-             </View>
+        <View style={styles.content}>
+          <View style={styles.formContainer}>
+          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+          <MaterialIcons name="arrow-back" size={28} color="#000" />
+          </TouchableOpacity>
+            <ScrollView
+              contentContainerStyle={styles.scrollContent}
+              keyboardShouldPersistTaps="handled"
+              showsVerticalScrollIndicator={false}
+            >
               <View style={styles.inputGroup}>
-               <Text style={styles.label}>CPF:</Text>
-               <TextInput
-                 style={styles.input}
-                 placeholder="Digite o CPF"
-                 placeholderTextColor="#888"
-                 value={CPF}
-                 onChangeText={setCPF}
-               />
-               {errors.CPF && <Text style={styles.errorText}>{errors.CPF}</Text>}
+                <Text style={styles.label}>Nome:</Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder="Digite o nome"
+                  placeholderTextColor="#888"
+                  value={nome}
+                  onChangeText={setNome}
+                />
+                {errors.nome && <Text style={styles.errorText}>{errors.nome}</Text>}
               </View>
-          </ScrollView>
+                <View style={styles.inputGroup}>
+                <Text style={styles.label}>CPF:</Text>
+                <TextInputMask
+                  type={'cpf'}
+                  value={CPF}
+                  onChangeText={text => setCPF(text)}
+                  placeholder="000.000.000-00"
+                  style={styles.input}
+                />
+                {errors.CPF && <Text style={styles.errorText}>{errors.CPF}</Text>}
+                </View>
+            </ScrollView>
+          </View>
+  
+          <TouchableOpacity style={styles.button}
+            onPress= {handleCadastro}>
+            <Text style={styles.buttonText}>Cadastrar Responsável</Text>
+          </TouchableOpacity>
         </View>
- 
-        <TouchableOpacity style={styles.button}
-          onPress= {handleCadastro}>
-          <Text style={styles.buttonText}>Cadastrar Responsável</Text>
-        </TouchableOpacity>
-      </View>
-      <FooterComIcones/>
+        <FooterComIcones/>
     </SafeAreaView>
     );
 }
 const styles = StyleSheet.create({
   safeArea: {
-    flex: 1,
-    backgroundColor: '#FFD88D',
+    
   },
   content: {
     flex: 1,
@@ -144,6 +152,7 @@ const styles = StyleSheet.create({
     paddingBottom: '25%',
     justifyContent: 'space-between',
     alignItems: 'center',
+    
   },
   formContainer: {
     flex: 1,
