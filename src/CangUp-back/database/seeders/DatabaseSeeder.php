@@ -25,5 +25,22 @@ class DatabaseSeeder extends Seeder
             'email'=>'teste@srasda.com',
             'senha'=>'1234'
         ]);
+
+        \App\Models\Perfil::create([
+            'rotulo' => 'adm',
+            'nome'=>'administrativo'
+        ]);
+        \App\Models\Perfil::create([
+            'rotulo' => 'inst',
+            'nome'=>'instituição'
+        ]);
+        \App\Models\Perfil::create([
+            'rotulo' => 'resp',
+            'nome'=>'responsável'
+        ]);
+        \App\Models\Perfil::create([
+            'rotulo' => 'alun',
+            'nome'=>'aluno'
+        ]);
     }
 }

@@ -16,7 +16,6 @@ class LoginController extends Controller
         ]);
 
         $usuario = Usuario::where('login', $credentials['login'])->first();
-
         if (!$usuario) {
             return response()->json(['erro' => 'Usuário não encontrado'], 404);
         }

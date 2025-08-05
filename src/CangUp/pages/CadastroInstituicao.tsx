@@ -10,25 +10,24 @@ import {
   View,
  } from 'react-native';
  import { Picker } from '@react-native-picker/picker';
- import * as Font from 'expo-font';
- import { useEffect, useState } from 'react';
- import { useNavigation } from '@react-navigation/native';
- import { MaterialIcons } from '@expo/vector-icons';
- import { CheckBox } from 'react-native-elements';
- import Icon from 'react-native-vector-icons/Feather';
- import Header from '../components/Header';
- import Footer from '../components/FooterSemIcones'; // Importando o Footer sem ícones
+import * as Font from 'expo-font';
+import { useEffect, useState } from 'react';
+import { useNavigation } from '@react-navigation/native';
+import { MaterialIcons } from '@expo/vector-icons';
+import { CheckBox } from 'react-native-elements';
+import Header from '../components/Header';
 import FooterSemIcones from '../components/FooterSemIcones';
-
+import { Feather} from '@expo/vector-icons';
+import { TextInputMask } from 'react-native-masked-text';
  
  
- export default function CadastroAluno({navigation}) { //Não é erro, é só o vscode dando trabalho
+ export default function CadastroInstituicao({navigation}) {
    const [fontsLoaded, setFontsLoaded] = useState(false);
    const [nome, setNome] = useState('');
    const [email, setEmail] = useState('');
    const [endereco, setEndereco] = useState('');
    //const [horario, setHorario] = useState('');
-   const [CNPJ, setCNPJ] = useState('');
+   const [cnpj, setcnpj] = useState('');
    const [telefone, setTelefone] = useState('');
    const [senha, setSenha] = useState('');
    const [confSenha, setconfSenha] = useState('');
@@ -75,6 +74,14 @@ import FooterSemIcones from '../components/FooterSemIcones';
        newErrors.email = 'Email inválido.';
        isValid = false;
      }
+
+     if (!email.trim()) {
+       newErrors.telefone = 'Telefone é obrigatório.';
+       isValid = false;
+     } else if (telefone.length < 11 && telefone.length > 11) { 
+       newErrors.telefone = 'Telefone inválido.';
+       isValid = false;
+     }
  
      if (!senha.trim()) {
        newErrors.senha = 'Senha é obrigatória.';
@@ -97,11 +104,11 @@ import FooterSemIcones from '../components/FooterSemIcones';
        isValid = false;
      }
  
-     if (!CNPJ.trim()) {
-       newErrors.CNPJ = 'CNPJ é obrigatório.';
+     if (!cnpj.trim()) {
+       newErrors.cnpj = 'cnpj é obrigatório.';
        isValid = false;
-     } else if (!/^\d{14}$/.test(CNPJ)) {
-       newErrors.CNPJ = 'CNPJ inválido. Deve conter 14 dígitos numéricos.';
+     } else if (!/^\d{14}$/.test(cnpj)) {
+       newErrors.cnpj = 'cnpj inválido. Deve conter 14 dígitos numéricos.';
        isValid = false;
      }
  
@@ -140,7 +147,7 @@ import FooterSemIcones from '../components/FooterSemIcones';
        headers: {
          'Content-Type': 'application/json',
        },
-       body: JSON.stringify({nome, email, endereco, CNPJ, telefone, senha, plano}),
+       body: JSON.stringify({nome, email, endereco, cnpj, telefone, senha, plano}),
      });
       const text = await response.text();
       console.log('Resposta da API (texto):', text);
@@ -209,14 +216,15 @@ import FooterSemIcones from '../components/FooterSemIcones';
               </View>
               <View style={styles.inputGroup}>
                <Text style={styles.label}>CNPJ:</Text>
-               <TextInput
-                 style={styles.input}
-                 placeholder="Digite o CNPJ"
-                 placeholderTextColor="#888"
-                 value={CNPJ}
-                 onChangeText={setCNPJ}
-               />
-               {errors.CNPJ && <Text style={styles.errorText}>{errors.CNPJ}</Text>}
+               <TextInputMask
+                  type={'cnpj'}
+                  value={cnpj}
+                  onChangeText={text => setcnpj(text)}
+                  placeholder="00.000.000/0000-00"
+                  style={styles.input}
+                />
+               
+               {errors.cnpj && <Text style={styles.errorText}>{errors.cnpj}</Text>}
               </View>
               <View style={styles.inputGroup}>
                <Text style={styles.label}>Telefone:</Text>
@@ -227,31 +235,52 @@ import FooterSemIcones from '../components/FooterSemIcones';
                  value={telefone}
                  onChangeText={setTelefone}
                />
+               {errors.telefone && <Text style={styles.errorText}>{errors.telefone}</Text>}
               </View>
               <View style={styles.inputGroup}>
-                 <Text style={styles.label}>Senha:</Text>
-                   <TextInput
-                     style={styles.input} // Estilo específico para input de senha
-                     placeholder="Digite a sua senha"
-                     placeholderTextColor="#888"
-                     value={senha}
-                     onChangeText={setSenha}
-                     secureTextEntry={!senhaVisivel}
-                   />
-                 {errors.senha && <Text style={styles.errorText}>{errors.senha}</Text>}
-               </View>
-               <View style={styles.inputGroup}>
-                 <Text style={styles.label}>Redigite a senha:</Text>
-                 <TextInput
-                   style={styles.input}
-                   placeholder="Confirme a sua senha"
-                   placeholderTextColor="#888"
-                   value={confSenha}
-                   onChangeText={setconfSenha}
-                   secureTextEntry={!confSenhaVisivel}
-                 />
-                 {errors.confSenha && <Text style={styles.errorText}>{errors.confSenha}</Text>}
-               </View>
+                <Text style={styles.label}>Senha:</Text>
+                <View style={styles.passwordContainer}>
+                
+                <TextInput
+                  style={styles.passwordInput}
+                  placeholder="Digite a senha"
+                  placeholderTextColor="#888"
+                  value={senha}
+                  onChangeText={setSenha}
+                  secureTextEntry={!senhaVisivel}
+                />
+                <TouchableOpacity onPress={toggleSenhaVisibilidade} style={styles.eyeIcon}>
+                  <Feather
+                    name={senhaVisivel ? 'eye' : 'eye-off'}
+                    size={20}
+                    color="#888"
+                  />
+                </TouchableOpacity>
+                </View>
+                {errors.senha && <Text style={styles.errorText}>{errors.senha}</Text>}
+              </View>
+              <View style={styles.inputGroup}>
+                <Text style={styles.label}>Confirme a senha:</Text>
+                <View style={styles.passwordContainer}>
+                
+                <TextInput
+                  style={styles.passwordInput}
+                  placeholder="Redigite a senha"
+                  placeholderTextColor="#888"
+                  value={confSenha}
+                  onChangeText={setconfSenha}
+                  secureTextEntry={!confSenhaVisivel}
+                />
+                <TouchableOpacity onPress={toggleConfSenhaVisibilidade} style={styles.eyeIcon}>
+                  <Feather
+                    name={confSenhaVisivel ? 'eye' : 'eye-off'}
+                    size={20}
+                    color="#888"
+                  />
+                </TouchableOpacity>
+                </View> 
+                {errors.confSenha && <Text style={styles.errorText}>{errors.confSenha}</Text>}
+              </View>
               <View style={styles.inputGroup}>
                   <Text style={styles.label}>Plano da instituição:</Text>
                   <View style={styles.pickerWrapper}>
@@ -264,8 +293,8 @@ import FooterSemIcones from '../components/FooterSemIcones';
                       ]}
                     >
                       <Picker.Item label="Selecione o plano" value="" />
-                      <Picker.Item label="Semestral" value="Semestral" />
-                      <Picker.Item label="Anual" value="Anual" />
+                      <Picker.Item label="Semestral" value="S" />
+                      <Picker.Item label="Anual" value="A" />
                     </Picker>
                   </View>
                   {errors.plano && <Text style={styles.errorText}>{errors.plano}</Text>}
@@ -349,6 +378,28 @@ import FooterSemIcones from '../components/FooterSemIcones';
     shadowOpacity: 0.27,
     shadowRadius: 4.65,
     elevation: 6,
+  },
+  passwordContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#d9d9d9',
+    borderRadius: 30,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.27,
+    shadowRadius: 4.65,
+    elevation: 6,
+  },
+  passwordInput: {
+    fontSize:16,
+    flex: 1, 
+    padding: '5%',
+    paddingLeft: '5%',
+    fontFamily: 'PoppinsRegular',
+    color: '#000',
+  },
+  eyeIcon: {
+    paddingRight: '5%',
   },
   pickerWrapper: {
     alignItems: 'center',

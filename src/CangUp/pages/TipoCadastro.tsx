@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, Image,  ActivityIndicator } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { MaterialIcons } from '@expo/vector-icons'; // use isso com Expo
+import { MaterialIcons } from '@expo/vector-icons'; // retirar a opção instituição pro usuário
 import { useEffect, useState } from 'react';
 import * as Font from 'expo-font';
 import Header from '../components/Header';
@@ -44,7 +44,7 @@ export default function TipoCadastro({navigation}) {
         <View style={styles.opcoes}>
           <Text style={styles.title}>Selecione o tipo de usuário:</Text>
 
-          <TouchableOpacity style={styles.button} onPress={()=>navigation.navigate('CadastroInstituicao')}>
+          <TouchableOpacity style={styles.button} onPress={()=>navigation.navigate('CadastroInstituicao')}> 
             <Text style={styles.buttonText}>Instituição</Text>
           </TouchableOpacity>
 
