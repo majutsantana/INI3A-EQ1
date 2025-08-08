@@ -1,4 +1,4 @@
-// Yasmin
+import { useNavigation } from '@react-navigation/core';
 import React, { useEffect, useState } from 'react';
 import {
     SafeAreaView,
@@ -10,15 +10,17 @@ import {
     Alert,
     ActivityIndicator,
     ScrollView,
+    Platform
 } from 'react-native';
 import * as Font from 'expo-font';
 import { Ionicons, Entypo } from '@expo/vector-icons';
-import Header from '../components/Header';
-import Footer from '../components/FooterComIcones';
-import FooterComIcones from '../components/FooterComIcones';
+import { Picker } from '@react-native-picker/picker';
+import Header from '../../components/Header';
+import Footer from '../../components/FooterComIcones';
+import FooterComIcones from '../../components/FooterComIcones';
 
-
-export default function PerfilResponsavel({navigation}) { //Navigation não está dando erro, é apenas o vs code
+export default function PerfilInstituicao() {
+    const navigation = useNavigation();
     const [fontsLoaded, setFontsLoaded] = useState(false);
     const [selectedGenero, setSelectedGenero] = useState('');
 
@@ -48,7 +50,7 @@ export default function PerfilResponsavel({navigation}) { //Navigation não est�
 
             <View style={styles.profileTop}>
                 <View style={styles.nameTag}>
-                    <Text style={styles.nameText}>Nome do Responsável</Text>
+                    <Text style={styles.nameText}>Nome da Instituição</Text>
                 </View>
             </View>
 
@@ -69,8 +71,8 @@ export default function PerfilResponsavel({navigation}) { //Navigation não est�
 
             <ScrollView contentContainerStyle={styles.formContainer}>
                 <TextInput placeholder="Nome:" style={styles.input} placeholderTextColor="#000" />
-                <TextInput placeholder="CPF:" style={styles.input} placeholderTextColor="#000" />
-                <TextInput placeholder="E-mail:" style={styles.input} placeholderTextColor="#000" />
+                <TextInput placeholder="Endereço:" style={styles.input} placeholderTextColor="#000" />
+                <TextInput placeholder="Horário de funcionamento:" style={styles.input} placeholderTextColor="#000" />
                 <TextInput placeholder="Telefone para contato:" style={styles.input} placeholderTextColor="#000" />
             </ScrollView>
 
@@ -79,16 +81,10 @@ export default function PerfilResponsavel({navigation}) { //Navigation não est�
     );
 }
 
-    /*Recursos de estilização da tela*/
 const styles = StyleSheet.create({
     safeArea: {
         flex: 1,
         backgroundColor: '#FCD28D',
-    },
-
-    header: {
-        height: 100,
-        backgroundColor: '#BEACDE',
     },
 
     profileTop: {
@@ -120,8 +116,8 @@ const styles = StyleSheet.create({
         backgroundColor: '#D9D9D9',
         justifyContent: 'center',
         alignItems: 'center',
-        //borderWidth: 2,
-        //borderColor: '#3D3D3D',
+        // borderWidth: 2,
+        // borderColor: '#3D3D3D',
     },
 
     picText: {
@@ -146,7 +142,7 @@ const styles = StyleSheet.create({
 
     // Botão de editar Perfil
     editBtn: {
-        backgroundColor: '#FFBE31', //amarelo forte para o botão 
+        backgroundColor: '#FFBE31', //amarelo forte para o botão
         borderRadius: 20, //borda arredondada
         paddingHorizontal: 20,
         paddingVertical: 6,
@@ -175,14 +171,12 @@ const styles = StyleSheet.create({
         fontFamily: 'PoppinsRegular',
     },
 
-    footer: {
-        flexDirection: 'row',
-        justifyContent: 'space-around',
-        alignItems: 'center',
-        backgroundColor: '#BEACDE',
-        paddingVertical: 12,
-        position: 'absolute',
-        bottom: 0,
+    // Caixa do gênero 
+    picker: {
         width: '100%',
+        height: Platform.OS === 'ios' ? undefined : 45,
+        color: '#000',
+        backgroundColor: '#F5F5F5',
+        borderWidth: 0,
     },
 });

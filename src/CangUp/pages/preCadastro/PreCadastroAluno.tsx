@@ -1,5 +1,4 @@
 import {
-  ActivityIndicator,
   SafeAreaView,
   ScrollView,
   StatusBar,
@@ -12,37 +11,28 @@ import {
  import * as Font from 'expo-font';
  import { useEffect, useState } from 'react';
  import { MaterialIcons } from '@expo/vector-icons';
- import Header from '../components/Header';
- import { TextInputMask } from 'react-native-masked-text';
- import { Picker } from '@react-native-picker/picker';
-import FooterSemIcones from '../components/FooterSemIcones';
-
+ import Header from '../../components/Header';
+ import FooterComIcones from '../../components/FooterComIcones';
+ import { TextInputMask } from 'react-native-masked-text'; //Pacote instalado 
 
 type errorType ={ 
   nome : string | undefined,
   RA : string | undefined,
-  CPF : string | undefined,
-  instituicao : string | undefined,
+  CPF : string | undefined
 };
 
-export default function EfetivacaoAluno({ navigation }) { //Navigation não é erro
+export default function PreCadastroAluno({ navigation }) { 
     
     const [fontsLoaded, setFontsLoaded] = useState(false);
-    const [errors, setErrors] = useState<errorType>({CPF:undefined, instituicao:undefined, nome:undefined, RA:undefined});
-    const [instituicao, setInstituicao] = useState('');
+    const [errors, setErrors] = useState<errorType>({nome:undefined, CPF:undefined, RA:undefined});
     const [nome, setNome] = useState('');
     const [RA, setRA] = useState('');
     const [CPF, setCPF] = useState('');
 
     const validateForm = () => {
-     let newErrors : errorType = {CPF:undefined, instituicao:undefined, nome:undefined, RA:undefined};
+     let newErrors : errorType = {nome:undefined, CPF:undefined, RA:undefined};
      let isValid = true;
  
-      if (!instituicao.trim()) {
-        newErrors.instituicao = 'Instituição é obrigatória.';
-        isValid = false;
-      }
-
      if (!nome.trim()) {
        newErrors.nome = 'Nome é obrigatório.';
        isValid = false;
@@ -56,7 +46,7 @@ export default function EfetivacaoAluno({ navigation }) { //Navigation não é e
      if (!CPF.trim()) {
        newErrors.CPF = 'CPF é obrigatório.';
        isValid = false;
-     } else if (CPF.length < 14) {
+     } else if (!/^\d{11}$/.test(CPF)) {
        newErrors.CPF = 'CPF inválido. Deve conter 11 dígitos numéricos.';
        isValid = false;
      }
@@ -122,25 +112,6 @@ export default function EfetivacaoAluno({ navigation }) { //Navigation não é e
             showsVerticalScrollIndicator={false}
           >
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>Instituição:</Text>
-              <View style={styles.pickerWrapper}>
-                <Picker
-                  selectedValue={instituicao}
-                  onValueChange={(itemValue) => setInstituicao(itemValue)}
-                  style={[
-                    styles.picker,
-                    { color: instituicao === '' ? '#888' : '#000' } 
-                  ]}
-                >
-                  <Picker.Item label="Selecione a instituição" value="" />
-                  <Picker.Item label="CTI" value="cti" />
-                  <Picker.Item label="ETEC" value="etec" />
-                </Picker>
-              </View>
-              {errors.instituicao && <Text style={styles.errorText}>{errors.instituicao}</Text>}
-            </View>
-
-            <View style={styles.inputGroup}>
                <Text style={styles.label}>Nome:</Text>
                <TextInput
                  style={styles.input}
@@ -178,10 +149,10 @@ export default function EfetivacaoAluno({ navigation }) { //Navigation não é e
  
         <TouchableOpacity style={styles.button}
           onPress= {handleCadastro}>
-          <Text style={styles.buttonText}>Prosseguir</Text>
+          <Text style={styles.buttonText}>Cadastrar Aluno</Text>
         </TouchableOpacity>
       </View>
-      <FooterSemIcones/>
+      <FooterComIcones/>
     </SafeAreaView>
     );
 }
@@ -240,30 +211,6 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.27,
         shadowRadius: 4.65,
         elevation: 6,
-    },
-    pickerWrapper: {
-      alignItems: 'center',
-      justifyContent: 'center',
-      paddingHorizontal: '5%',
-      paddingVertical: '5%',
-      borderRadius: 25,
-      overflow: 'hidden',
-      backgroundColor: '#d9d9d9',
-      shadowColor: "#000",
-      shadowOffset: {
-        width: 0,
-        height: 3,
-      },
-      shadowOpacity: 0.27,
-      shadowRadius: 4.65,
-      elevation: 6,
-    },
-    picker: {
-      width: '100%',
-      fontSize: 16,
-      fontFamily: 'PoppinsRegular',
-      backgroundColor: '#d9d9d9',
-      borderWidth: 0,
     },
     button: {
         backgroundColor: '#FFBE31',

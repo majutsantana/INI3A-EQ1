@@ -15,11 +15,11 @@ import {
 import * as Font from 'expo-font';
 import { Ionicons, Entypo } from '@expo/vector-icons';
 import { Picker } from '@react-native-picker/picker';
-import Header from '../components/Header';
-import Footer from '../components/FooterComIcones';
-import FooterComIcones from '../components/FooterComIcones';
+import Header from '../../components/Header';
+import Footer from '../../components/FooterComIcones';
+import FooterComIcones from '../../components/FooterComIcones';
 
-export default function PerfilInstituicao() {
+export default function PerfilAluno() {
     const navigation = useNavigation();
     const [fontsLoaded, setFontsLoaded] = useState(false);
     const [selectedGenero, setSelectedGenero] = useState('');
@@ -50,7 +50,7 @@ export default function PerfilInstituicao() {
 
             <View style={styles.profileTop}>
                 <View style={styles.nameTag}>
-                    <Text style={styles.nameText}>Nome da Instituição</Text>
+                    <Text style={styles.nameText}>Nome do Usuário</Text>
                 </View>
             </View>
 
@@ -71,9 +71,26 @@ export default function PerfilInstituicao() {
 
             <ScrollView contentContainerStyle={styles.formContainer}>
                 <TextInput placeholder="Nome:" style={styles.input} placeholderTextColor="#000" />
+                <TextInput placeholder="CPF:" style={styles.input} placeholderTextColor="#000" />
+                <View style={styles.input}>
+                    <Picker
+                        selectedValue={selectedGenero}
+                        onValueChange={(itemValue) => setSelectedGenero(itemValue)}
+                        style={styles.picker}
+                        dropdownIconColor="#000"
+                    >
+                        <Picker.Item label="Gênero:" value="" />
+                        <Picker.Item label="Masculino" value="masculino" />
+                        <Picker.Item label="Feminino" value="feminino" />
+                        <Picker.Item label="Neutro" value="neutro" />
+                        <Picker.Item label="Prefiro não informar" value="nao_informar" />
+                    </Picker>
+                </View>
+                <TextInput placeholder="RA:" style={styles.input} placeholderTextColor="#000" />
+                <TextInput placeholder="E-mail:" style={styles.input} placeholderTextColor="#000" />
+                <TextInput placeholder="Instituição:" style={styles.input} placeholderTextColor="#000" />
                 <TextInput placeholder="Endereço:" style={styles.input} placeholderTextColor="#000" />
-                <TextInput placeholder="Horário de funcionamento:" style={styles.input} placeholderTextColor="#000" />
-                <TextInput placeholder="Telefone para contato:" style={styles.input} placeholderTextColor="#000" />
+                <TextInput placeholder="Bairro:" style={styles.input} placeholderTextColor="#000" />
             </ScrollView>
 
             <FooterComIcones/>
@@ -142,7 +159,7 @@ const styles = StyleSheet.create({
 
     // Botão de editar Perfil
     editBtn: {
-        backgroundColor: '#FFBE31', //amarelo forte para o botão
+        backgroundColor: '#FFBE31', //amarelo forte para o botão 
         borderRadius: 20, //borda arredondada
         paddingHorizontal: 20,
         paddingVertical: 6,

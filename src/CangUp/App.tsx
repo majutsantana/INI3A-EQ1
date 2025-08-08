@@ -1,17 +1,17 @@
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Login from './pages/Login';
-import TipoCadastro from './pages/TipoCadastro';
-import CadastroAluno from './pages/CadastroAluno';
-import PerfilInstituicao from './pages/PerfilInstituicao';
-import PerfilAluno from './pages/PerfilAluno';
-import PerfilResponsavel from './pages/PerfilResponsavel';
-import PreCadastroAluno from './pages/PreCadastroAluno';
-import PreCadastroResponsavel from './pages/PreCadastroResponsavel';
-import CadastroInstituicao from './pages/CadastroInstituicao';
-import CadastroResponsavel from './pages/CadastroResponsavel';
-import EfetivacaoAluno from './pages/EfetivacaoAluno';
-import EfetivacaoResponsavel from './pages/EfetivacaoResponsavel';
+import TipoCadastro from './pages/cadastro/TipoCadastro';
+import CadastroAluno from './pages/cadastro/CadastroAluno';
+import PerfilInstituicao from './pages/perfil/PerfilInstituicao';
+import PerfilAluno from './pages/perfil/PerfilAluno';
+import PerfilResponsavel from './pages/perfil/PerfilResponsavel';
+import PreCadastroAluno from './pages/preCadastro/PreCadastroAluno';
+import PreCadastroResponsavel from './pages/preCadastro/PreCadastroResponsavel';
+import CadastroInstituicao from './pages/cadastro/CadastroInstituicao';
+import CadastroResponsavel from './pages/cadastro/CadastroResponsavel';
+import EfetivacaoAluno from './pages/efetivacao/EfetivacaoAluno';
+import EfetivacaoResponsavel from './pages/efetivacao/EfetivacaoResponsavel';
 
 
 const Stack = createNativeStackNavigator();
@@ -19,7 +19,7 @@ const Stack = createNativeStackNavigator();
 export default function App() {
   //Direciona a tela que será aberta inicialmente 
   return <NavigationContainer> 
-    <Stack.Navigator initialRouteName='Login'> 
+    <Stack.Navigator initialRouteName='EfetivacaoResponsavel'> 
       <Stack.Screen
         name="Login"
         component={Login}

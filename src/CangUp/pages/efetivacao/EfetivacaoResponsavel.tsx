@@ -1,4 +1,5 @@
 import {
+  ActivityIndicator,
   SafeAreaView,
   ScrollView,
   StatusBar,
@@ -11,42 +12,44 @@ import {
  import * as Font from 'expo-font';
  import { useEffect, useState } from 'react';
  import { MaterialIcons } from '@expo/vector-icons';
- import Header from '../components/Header';
- import FooterComIcones from '../components/FooterComIcones';
- import { TextInputMask } from 'react-native-masked-text'; //Pacote instalado 
+ import Header from '../../components/Header';
+ import { TextInputMask } from 'react-native-masked-text';
+ import { Picker } from '@react-native-picker/picker';
+import FooterSemIcones from '../../components/FooterSemIcones';
+
 
 type errorType ={ 
   nome : string | undefined,
-  RA : string | undefined,
-  CPF : string | undefined
+  CPF : string | undefined,
+  instituicao : string | undefined,
 };
 
-export default function PreCadastroAluno({ navigation }) { 
+export default function EfetivacaoAluno({ navigation }) { //Navigation não é erro
     
     const [fontsLoaded, setFontsLoaded] = useState(false);
-    const [errors, setErrors] = useState<errorType>({nome:undefined, CPF:undefined, RA:undefined});
+    const [errors, setErrors] = useState<errorType>({CPF:undefined, instituicao:undefined, nome:undefined});
+    const [instituicao, setInstituicao] = useState('');
     const [nome, setNome] = useState('');
-    const [RA, setRA] = useState('');
     const [CPF, setCPF] = useState('');
 
     const validateForm = () => {
-     let newErrors : errorType = {nome:undefined, CPF:undefined, RA:undefined};
+     let newErrors : errorType = {CPF:undefined, instituicao:undefined, nome:undefined};
      let isValid = true;
  
+      if (!instituicao.trim()) {
+        newErrors.instituicao = 'Instituição é obrigatória.';
+        isValid = false;
+      }
+
      if (!nome.trim()) {
        newErrors.nome = 'Nome é obrigatório.';
-       isValid = false;
-     }
- 
-     if (!RA.trim()) {
-       newErrors.RA = 'O número de matrícula é obrigatório.';
        isValid = false;
      }
 
      if (!CPF.trim()) {
        newErrors.CPF = 'CPF é obrigatório.';
        isValid = false;
-     } else if (!/^\d{11}$/.test(CPF)) {
+     } else if (CPF.length < 14) {
        newErrors.CPF = 'CPF inválido. Deve conter 11 dígitos numéricos.';
        isValid = false;
      }
@@ -82,17 +85,17 @@ export default function PreCadastroAluno({ navigation }) {
 
     const getDados = async () => {
         try{
-            const response = await fetch('http://localhost:8000/api/cadastrarAluno', { // luiza e maghu arrumem
+            const response = await fetch('http://localhost:8000/api/cadastrarResponsavel', { // luiza e maghu arrumem
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({nome, RA, CPF}),
+            body: JSON.stringify({nome, CPF}),
             });
             const text = await response.text();
             console.log('Resposta da API (texto):', text);
         } catch(error){
-            console.error('Erro ao cadastrar aluno:', error);
+            console.error('Erro ao cadastrar responsavel:', error);
         }
     };
     
@@ -112,6 +115,25 @@ export default function PreCadastroAluno({ navigation }) {
             showsVerticalScrollIndicator={false}
           >
             <View style={styles.inputGroup}>
+              <Text style={styles.label}>Instituição:</Text>
+              <View style={styles.pickerWrapper}>
+                <Picker
+                  selectedValue={instituicao}
+                  onValueChange={(itemValue) => setInstituicao(itemValue)}
+                  style={[
+                    styles.picker,
+                    { color: instituicao === '' ? '#888' : '#000' } 
+                  ]}
+                >
+                  <Picker.Item label="Selecione a instituição" value="" />
+                  <Picker.Item label="CTI" value="cti" />
+                  <Picker.Item label="ETEC" value="etec" />
+                </Picker>
+              </View>
+              {errors.instituicao && <Text style={styles.errorText}>{errors.instituicao}</Text>}
+            </View>
+
+            <View style={styles.inputGroup}>
                <Text style={styles.label}>Nome:</Text>
                <TextInput
                  style={styles.input}
@@ -122,17 +144,6 @@ export default function PreCadastroAluno({ navigation }) {
                />
                {errors.nome && <Text style={styles.errorText}>{errors.nome}</Text>}
              </View>
-             <View style={styles.inputGroup}>
-               <Text style={styles.label}>Número de matrícula/RA:</Text>
-               <TextInput
-                 style={styles.input}
-                 placeholder="Digite o número de matrícula"
-                 placeholderTextColor="#888"
-                 value={RA}
-                 onChangeText={setRA}
-               />
-               {errors.RA && <Text style={styles.errorText}>{errors.RA}</Text>}
-              </View>
               <View style={styles.inputGroup}>
                <Text style={styles.label}>CPF:</Text>
                <TextInputMask
@@ -140,6 +151,7 @@ export default function PreCadastroAluno({ navigation }) {
                  value={CPF}
                  onChangeText={text => setCPF(text)}
                  placeholder="000.000.000-00"
+                 placeholderTextColor="#888" 
                  style={styles.input}
                />
                {errors.CPF && <Text style={styles.errorText}>{errors.CPF}</Text>}
@@ -149,10 +161,10 @@ export default function PreCadastroAluno({ navigation }) {
  
         <TouchableOpacity style={styles.button}
           onPress= {handleCadastro}>
-          <Text style={styles.buttonText}>Cadastrar Aluno</Text>
+          <Text style={styles.buttonText}>Prosseguir</Text>
         </TouchableOpacity>
       </View>
-      <FooterComIcones/>
+      <FooterSemIcones/>
     </SafeAreaView>
     );
 }
@@ -211,6 +223,30 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.27,
         shadowRadius: 4.65,
         elevation: 6,
+    },
+    pickerWrapper: {
+      alignItems: 'center',
+      justifyContent: 'center',
+      paddingHorizontal: '5%',
+      paddingVertical: '5%',
+      borderRadius: 25,
+      overflow: 'hidden',
+      backgroundColor: '#d9d9d9',
+      shadowColor: "#000",
+      shadowOffset: {
+        width: 0,
+        height: 3,
+      },
+      shadowOpacity: 0.27,
+      shadowRadius: 4.65,
+      elevation: 6,
+    },
+    picker: {
+      width: '100%',
+      fontSize: 16,
+      fontFamily: 'PoppinsRegular',
+      backgroundColor: '#d9d9d9',
+      borderWidth: 0,
     },
     button: {
         backgroundColor: '#FFBE31',

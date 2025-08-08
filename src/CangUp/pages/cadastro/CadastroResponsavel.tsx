@@ -9,34 +9,30 @@ import {
   TouchableOpacity,
   View,
  } from 'react-native';
- import { Picker } from '@react-native-picker/picker';
+import { Picker } from '@react-native-picker/picker';
 import * as Font from 'expo-font';
 import { useEffect, useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { CheckBox } from 'react-native-elements';
-import Header from '../components/Header';
-import FooterSemIcones from '../components/FooterSemIcones';
+import Header from '../../components/Header';
+import FooterSemIcones from '../../components/FooterSemIcones';
 import { Feather} from '@expo/vector-icons';
-import { TextInputMask } from 'react-native-masked-text';
  
  
- export default function CadastroInstituicao({navigation}) {
+ export default function CadastroResponsavel({navigation}) { //Não é erro, é só o vscode dando trabalho
    const [fontsLoaded, setFontsLoaded] = useState(false);
    const [nome, setNome] = useState('');
+   const [cpf, setCpf] = useState('');
    const [email, setEmail] = useState('');
-   const [endereco, setEndereco] = useState('');
-   //const [horario, setHorario] = useState('');
-   const [cnpj, setcnpj] = useState('');
-   const [telefone, setTelefone] = useState('');
    const [senha, setSenha] = useState('');
    const [confSenha, setconfSenha] = useState('');
-   const [plano, setPlano] = useState('');
+   const [sexo, setSexo] = useState(''); 
    const [check, setCheck] = useState(false);
    const [errors, setErrors] = useState({});
    const [senhaVisivel, setSenhaVisivel] = useState(false);
    const [confSenhaVisivel, setConfSenhaVisivel] = useState(false);
- 
+   
    const toggleSenhaVisibilidade = () => {
      setSenhaVisivel(!senhaVisivel);
    };
@@ -44,7 +40,7 @@ import { TextInputMask } from 'react-native-masked-text';
    const toggleConfSenhaVisibilidade = () => {
      setConfSenhaVisivel(!confSenhaVisivel);
    };
-   
+ 
    const handleCadastro  = async () => {
      if (validateForm()) {
        try {
@@ -67,19 +63,19 @@ import { TextInputMask } from 'react-native-masked-text';
        isValid = false;
      }
  
+     if (!cpf.trim()) {
+       newErrors.cpf = 'CPF é obrigatório.';
+       isValid = false;
+     } else if (!/^\d{11}$/.test(cpf)) {
+       newErrors.cpf = 'CPF inválido. Deve conter 11 dígitos numéricos.';
+       isValid = false;
+     }
+ 
      if (!email.trim()) {
        newErrors.email = 'Email é obrigatório.';
        isValid = false;
-     } else if (!/\S+@\S+\.\S+/.test(email)) { // Regex para validação de formato de email
+     } else if (!/\S+@\S+\.\S+/.test(email)) {
        newErrors.email = 'Email inválido.';
-       isValid = false;
-     }
-
-     if (!email.trim()) {
-       newErrors.telefone = 'Telefone é obrigatório.';
-       isValid = false;
-     } else if (telefone.length < 11 && telefone.length > 11) { 
-       newErrors.telefone = 'Telefone inválido.';
        isValid = false;
      }
  
@@ -99,21 +95,8 @@ import { TextInputMask } from 'react-native-masked-text';
        isValid = false;
      }
  
-     if (!endereco.trim()) {
-       newErrors.endereco = 'Endereço é obrigatório.';
-       isValid = false;
-     }
- 
-     if (!cnpj.trim()) {
-       newErrors.cnpj = 'cnpj é obrigatório.';
-       isValid = false;
-     } else if (!/^\d{14}$/.test(cnpj)) {
-       newErrors.cnpj = 'cnpj inválido. Deve conter 14 dígitos numéricos.';
-       isValid = false;
-     }
- 
-     if (!plano) {
-       newErrors.plano = 'Selecione o plano.';
+     if (!sexo) {
+       newErrors.sexo = 'Selecione o sexo.';
        isValid = false;
      }
  
@@ -125,7 +108,6 @@ import { TextInputMask } from 'react-native-masked-text';
      setErrors(newErrors);
      return isValid;
    };
- 
  
   const loadFonts = async () => {
     await Font.loadAsync({
@@ -142,17 +124,16 @@ import { TextInputMask } from 'react-native-masked-text';
  
   const getDados = async () => {
    try{
-     const response = await fetch('http://localhost:8000/api/cadastrarInst', {
+     const response = await fetch('http://localhost:8000/api/cadastrar', {
        method: 'POST',
        headers: {
          'Content-Type': 'application/json',
        },
-       body: JSON.stringify({nome, email, endereco, cnpj, telefone, senha, plano}),
+       body: JSON.stringify({nome, cpf, email, senha, confSenha, sexo, check }),
      });
-      const text = await response.text();
-      console.log('Resposta da API (texto):', text);
+      const dados = await response.json();
    } catch(error){
-     console.error('Erro ao cadastrar instituição:', error);
+     console.error('Erro ao cadastrar responsável:', error);
    }
   };
  
@@ -181,19 +162,9 @@ import { TextInputMask } from 'react-native-masked-text';
             keyboardShouldPersistTaps="handled"
             showsVerticalScrollIndicator={false}
           >
-            <View style={styles.inputGroup}>
-               <Text style={styles.label}>Nome:</Text>
-               <TextInput
-                 style={styles.input}
-                 placeholder="Digite o nome"
-                 placeholderTextColor="#888"
-                 value={nome}
-                 onChangeText={setNome}
-               />
-               {errors.nome && <Text style={styles.errorText}>{errors.nome}</Text>}
-             </View>
+
              <View style={styles.inputGroup}>
-               <Text style={styles.label}>Email da instituição:</Text>
+               <Text style={styles.label}>Email:</Text>
                <TextInput
                  style={styles.input}
                  placeholder="Digite o email"
@@ -202,41 +173,7 @@ import { TextInputMask } from 'react-native-masked-text';
                  onChangeText={setEmail}
                />
                {errors.email && <Text style={styles.errorText}>{errors.email}</Text>}
-              </View>
-              <View style={styles.inputGroup}>
-                <Text style={styles.label}>Endereço da instituição:</Text>
-                <TextInput
-                  style={styles.input}
-                  placeholder="Digite o endereço"
-                  placeholderTextColor="#888"
-                  value={endereco}
-                  onChangeText={setEndereco}
-                />
-                {errors.endereco && <Text style={styles.errorText}>{errors.endereco}</Text>}
-              </View>
-              <View style={styles.inputGroup}>
-               <Text style={styles.label}>CNPJ:</Text>
-               <TextInputMask
-                  type={'cnpj'}
-                  value={cnpj}
-                  onChangeText={text => setcnpj(text)}
-                  placeholder="00.000.000/0000-00"
-                  style={styles.input}
-                />
-               
-               {errors.cnpj && <Text style={styles.errorText}>{errors.cnpj}</Text>}
-              </View>
-              <View style={styles.inputGroup}>
-               <Text style={styles.label}>Telefone:</Text>
-               <TextInput
-                 style={styles.input}
-                 placeholder="Digite o Telefone"
-                 placeholderTextColor="#888"
-                 value={telefone}
-                 onChangeText={setTelefone}
-               />
-               {errors.telefone && <Text style={styles.errorText}>{errors.telefone}</Text>}
-              </View>
+             </View>
               <View style={styles.inputGroup}>
                 <Text style={styles.label}>Senha:</Text>
                 <View style={styles.passwordContainer}>
@@ -278,39 +215,12 @@ import { TextInputMask } from 'react-native-masked-text';
                     color="#888"
                   />
                 </TouchableOpacity>
-                </View> 
+                </View>
                 {errors.confSenha && <Text style={styles.errorText}>{errors.confSenha}</Text>}
               </View>
-              <View style={styles.inputGroup}>
-                  <Text style={styles.label}>Plano da instituição:</Text>
-                  <View style={styles.pickerWrapper}>
-                    <Picker
-                      selectedValue={plano}
-                      onValueChange={(itemValue) => setPlano(itemValue)}
-                      style={[
-                        styles.picker,
-                        { color: plano === '' ? '#888' : '#000' } // preto para placeholder, cinza para os demais
-                      ]}
-                    >
-                      <Picker.Item label="Selecione o plano" value="" />
-                      <Picker.Item label="Semestral" value="S" />
-                      <Picker.Item label="Anual" value="A" />
-                    </Picker>
-                  </View>
-                  {errors.plano && <Text style={styles.errorText}>{errors.plano}</Text>}
-                </View>
-            <View style={styles.check}>
-               <CheckBox
-               checked={check}
-               onPress={() => setCheck(!check)}/> 
-               <TouchableOpacity> 
-                 <Text style={styles.textCheck}>Termos de uso</Text>
-               </TouchableOpacity>
-            </View>
-            {errors.check && <Text style={styles.errorText}>{errors.check}</Text>}
+
           </ScrollView>
         </View>
- 
  
         <TouchableOpacity style={styles.button}
           onPress= {handleCadastro}>

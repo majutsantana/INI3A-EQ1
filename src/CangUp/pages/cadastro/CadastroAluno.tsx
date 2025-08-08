@@ -15,8 +15,8 @@ import { useEffect, useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { CheckBox } from 'react-native-elements';
-import Header from '../components/Header';
-import FooterSemIcones from '../components/FooterSemIcones';
+import Header from '../../components/Header';
+import FooterSemIcones from '../../components/FooterSemIcones';
 import { Feather} from '@expo/vector-icons';
 
 export default function CadastroAluno({ navigation }) { // Não é erro, é só o vscode dando trabalho
