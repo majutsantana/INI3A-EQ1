@@ -57,8 +57,8 @@ export default function PreCadastroAluno({ navigation }) {
 
    const loadFonts = async () => {
        await Font.loadAsync({
-         'PoppinsRegular': require('../assets/fonts/PoppinsRegular.ttf'),
-         'PoppinsBold': require('../assets/fonts/PoppinsBold.ttf'),
+         'PoppinsRegular': require('../../assets/fonts/PoppinsRegular.ttf'),
+         'PoppinsBold': require('../../assets/fonts/PoppinsBold.ttf'),
        });
        setFontsLoaded(true);
      };

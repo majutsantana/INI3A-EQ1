@@ -19,7 +19,7 @@ const Stack = createNativeStackNavigator();
 export default function App() {
   //Direciona a tela que será aberta inicialmente 
   return <NavigationContainer> 
-    <Stack.Navigator initialRouteName='EfetivacaoResponsavel'> 
+    <Stack.Navigator initialRouteName='TipoCadastro'> 
       <Stack.Screen
         name="Login"
         component={Login}

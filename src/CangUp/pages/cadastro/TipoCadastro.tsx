@@ -5,7 +5,6 @@ import { MaterialIcons } from '@expo/vector-icons'; // retirar a opção institu
 import { useEffect, useState } from 'react';
 import * as Font from 'expo-font';
 import Header from '../../components/Header';
-import Footer from '../../components/FooterSemIcones';
 import FooterSemIcones from '../../components/FooterSemIcones';
 
 export default function TipoCadastro({navigation}) {
@@ -13,8 +12,8 @@ export default function TipoCadastro({navigation}) {
 
   const loadFonts = async () => {
     await Font.loadAsync({
-      'PoppinsRegular': require('../assets/fonts/PoppinsRegular.ttf'),
-      'PoppinsBold': require('../assets/fonts/PoppinsBold.ttf'),
+      'PoppinsRegular': require('../../assets/fonts/PoppinsRegular.ttf'),
+      'PoppinsBold': require('../../assets/fonts/PoppinsBold.ttf'),
     });
     setFontsLoaded(true);
   };
