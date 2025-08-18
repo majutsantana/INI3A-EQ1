@@ -15,8 +15,10 @@ import {
  import Header from '../../components/Header';
  import { TextInputMask } from 'react-native-masked-text';
  import { Picker } from '@react-native-picker/picker';
-import FooterSemIcones from '../../components/FooterSemIcones';
+ import FooterSemIcones from '../../components/FooterSemIcones';
+ import * as SQLite from "expo-sqlite";
 
+ // const db = SQLite.openDatabase("meubanco.db");
 
 type errorType ={ 
   nome : string | undefined,
@@ -33,6 +35,7 @@ export default function EfetivacaoAluno({ navigation }) { //Navigation não é e
     const [nome, setNome] = useState('');
     const [RA, setRA] = useState('');
     const [CPF, setCPF] = useState('');
+    const [instituicoes, setInstituicoes] = useState<any[]>([]);
 
     const validateForm = () => {
      let newErrors : errorType = {CPF:undefined, instituicao:undefined, nome:undefined, RA:undefined};
@@ -105,6 +108,21 @@ export default function EfetivacaoAluno({ navigation }) { //Navigation não é e
             console.error('Erro ao cadastrar aluno:', error);
         }
     };
+
+    /* useEffect(() => {
+      db.transaction((tx) => {
+        tx.executeSql(
+          "SELECT * FROM instituicoes ORDER BY nome ASC;",
+          [],
+          (_, { rows }) => {
+            setInstituicao(rows._array); // Armazena todas as instituicoes no estado
+          },
+          (_, error) => {
+            console.error("Erro ao buscar instituicoes:", error);
+          }
+        );
+      });
+    }, []); */
     
     return(
       <SafeAreaView style={styles.safeArea}>

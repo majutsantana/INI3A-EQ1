@@ -28,6 +28,7 @@ export default function PreCadastroAluno({ navigation }) {
     const [nome, setNome] = useState('');
     const [RA, setRA] = useState('');
     const [CPF, setCPF] = useState('');
+    
 
     const validateForm = () => {
      let newErrors : errorType = {nome:undefined, CPF:undefined, RA:undefined};
@@ -141,6 +142,7 @@ export default function PreCadastroAluno({ navigation }) {
                  onChangeText={text => setCPF(text)}
                  placeholder="000.000.000-00"
                  style={styles.input}
+                 placeholderTextColor="#888"
                />
                {errors.CPF && <Text style={styles.errorText}>{errors.CPF}</Text>}
               </View>

@@ -125,6 +125,7 @@ export default function PreCadastroResponsavel({ navigation }) {
                   value={CPF}
                   onChangeText={text => setCPF(text)}
                   placeholder="000.000.000-00"
+                  placeholderTextColor="#888"
                   style={styles.input}
                 />
                 {errors.CPF && <Text style={styles.errorText}>{errors.CPF}</Text>}

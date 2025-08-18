@@ -52,7 +52,7 @@ export default function Login({ navigation }) { //navigation não está dando er
       if (token) {
         await AsyncStorage.setItem("jwt", token);
         if (tipoDeLogin === "inst")
-          navigation.navigate("PerfilInstituicao"); // Troque "Home" pelo nome real da sua tela
+          navigation.navigate("PerfilInstituicao");
         else if (tipoDeLogin === "alun")
           navigation.navigate("PerfilAluno");
         else
@@ -109,7 +109,6 @@ export default function Login({ navigation }) { //navigation não está dando er
 
   return (
     <View style={styles.container}>
-      {/*HEADER COM IMAGEM*/}
       <View style={styles.header}>
         <Image
           source={require('../assets/logocangUp-horizontal-claro.png')}
@@ -117,7 +116,6 @@ export default function Login({ navigation }) { //navigation não está dando er
         />
       </View>
 
-      {/*BODY*/}
       <View style={styles.body}>
         <Text style={styles.title}>Bem-vindo de volta!</Text>
           <View style={styles.pickerWrapper}>

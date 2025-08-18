@@ -22,10 +22,11 @@
     "react-native": "0.79.2",
     "react-native-elements": "^3.4.3",
     "react-native-maps": "^1.23.8",
-    "react-native-masked-text": "^1.12.5",
+    "react-native-masked-text": "^1.13.0",
     "react-native-safe-area-context": "^5.5.2",
     "react-native-vector-icons": "^10.3.0",
-    "react-native-web": "^0.20.0"
+    "react-native-web": "^0.20.0",
+    "expo-sqlite": "~15.2.14"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
