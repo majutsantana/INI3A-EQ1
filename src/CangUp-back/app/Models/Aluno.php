@@ -8,6 +8,6 @@ use Illuminate\Database\Eloquent\Model;
 class Aluno extends Model
 {
     protected $fillable = [
-        'nome', 'cpf', 'ra', 'email', 'endereco', 'sexo', 'instituicao'
+        'nome', 'cpf', 'ra', 'email', 'sexo', 'endereco', 'instituicao'
     ];
 }

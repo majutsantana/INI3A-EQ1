@@ -107,7 +107,7 @@ import { TextInputMask } from 'react-native-masked-text';
      if (!cnpj.trim()) {
        newErrors.cnpj = 'cnpj é obrigatório.';
        isValid = false;
-     } else if (!/^\d{14}$/.test(cnpj)) {
+     } else if (cnpj.length<14) {
        newErrors.cnpj = 'cnpj inválido. Deve conter 14 dígitos numéricos.';
        isValid = false;
      }
