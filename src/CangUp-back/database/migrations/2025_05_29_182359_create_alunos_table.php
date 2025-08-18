@@ -17,8 +17,8 @@ return new class extends Migration
             $table->string('cpf');
             $table->string('ra');
             $table->string('email');
-            $table->string('endereco');
             $table->string('sexo');
+            $table->string('endereco');
             $table->string('instituicao');
             $table->string('senha');
             $table->timestamps();

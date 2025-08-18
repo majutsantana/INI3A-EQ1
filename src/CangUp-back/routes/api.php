@@ -25,7 +25,9 @@ use App\Http\Controllers\PerfilController;
 // });
 
 
-Route::post('/cadastrar', [AlunoController::class, 'cadastrar']);
+Route::post('/cadastrarAlun', [AlunoController::class, 'cadastrarAlun']);
+
+Route::post('/cadastrarResp', [InstituicaoController::class, 'cadastrarResp']);
 
 Route::post('/cadastrarInst', [InstituicaoController::class, 'cadastrarInst']);
 

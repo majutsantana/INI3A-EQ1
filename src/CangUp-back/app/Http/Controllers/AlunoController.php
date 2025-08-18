@@ -3,23 +3,51 @@
 namespace App\Http\Controllers;
 
 use App\Models\Aluno;
+use App\Models\Perfil;
+use App\Models\Usuario;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 
 class AlunoController extends Controller
 {
-    public function cadastrar(Request $req){
+    public function cadastrarAlun(Request $req){
 
         $dados = $req->validate([
             'nome' => 'required|string',
             'cpf' => 'required|string',
             'ra' => 'required|string',
             'email' => 'required|email',
-            'endereco' => 'required|string',
             'sexo' => 'required|in:Masculino,Feminino,Neutro,Prefiro não informar',
+            'endereco' => 'required|string',
             'instituicao' => 'required|in:IF,UE,UF',
-            'senha' => 'string', // TA NULO NO BANCO DE DADOS
+            'senha' => 'string', 
         ]);
-        $aluno=  Aluno::create($dados);
+        
+        $aluno=new Aluno();
+        $aluno->nome = $dados["nome"];
+        $aluno->cpf = $dados["cpf"];
+        $aluno->ra = $dados["ra"];
+        $aluno->email = $dados["email"];
+        $aluno->endereco = $dados["endereco"];
+        $aluno->sexo = $dados["sexo"];
+        $aluno->instituicao = $dados["instituicao"];
+        $aluno->senha = $dados["senha"];
+        $aluno->save();
+
+        $usuario = new Usuario();
+        $usuario->email = $dados["email"];
+        $usuario->login = $dados["email"];
+        $usuario->senha = $dados["senha"];
+        $usuario->save();
+
+        $perfil = Perfil::where("rotulo", "alun")->first();
+
+        DB::table("perfil_usuario")->insert([
+            "usuario_id" => $usuario->id,
+            "perfil_id" => $perfil->id
+        ]);
+
         return response()->json($aluno, 201);
     }
 }
