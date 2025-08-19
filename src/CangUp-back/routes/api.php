@@ -24,7 +24,6 @@ use App\Http\Controllers\PerfilController;
 //     return $request->user();
 // });
 
-
 Route::post('/cadastrarAlun', [AlunoController::class, 'cadastrarAlun']);
 
 Route::post('/cadastrarResp', [InstituicaoController::class, 'cadastrarResp']);
@@ -35,15 +34,22 @@ Route::post('/cadastrarAdmin', [AdminController::class, 'store']);
 
 Route::get("/perfis", [PerfilController::class, 'getAll']);
 
+// Exemplo: pegar dados do usuário autenticado
+Route::get('/usuario', [UserController::class, 'me']);
+
+// Exemplo: logout (invalida token)
+Route::post('/logout', [LoginController::class, 'logout']);
+
+Route::get('instituicoes/', [InstituicaoController::class, 'index']);      // listar todas
+Route::get('instituicoes/{id}', [InstituicaoController::class, 'show']);   // listar uma
+Route::post('instituicoes/', [InstituicaoController::class, 'store']);     // criar
+Route::put('instituicoes/{id}', [InstituicaoController::class, 'update']); // atualizar
+Route::delete('instituicoes/{id}', [InstituicaoController::class, 'destroy']); // deletar
+
+
 
 // Grupo de rotas protegidas por JWT
 Route::middleware(['auth:api'])->group(function () {
-
-    // Exemplo: pegar dados do usuário autenticado
-    Route::get('/usuario', [UserController::class, 'me']);
-
-    // Exemplo: logout (invalida token)
-    Route::post('/logout', [LoginController::class, 'logout']);
 
     // Outras rotas protegidas podem ir aqui
 });
@@ -52,5 +58,3 @@ Route::middleware(['auth:api'])->group(function () {
 // Rota pública de login
 Route::post('/login', [LoginController::class, 'login']);
 
-
-Route::get("/", function(Request $res) { return "oi";});    

@@ -50,11 +50,12 @@ export default function Login({ navigation }) { //navigation não está dando er
 
       const data = await response.json();
       const token = data.token;
+      const InstId = data.id;
 
       if (token) {
         await AsyncStorage.setItem("jwt", token);
         if (tipoDeLogin === "inst")
-          navigation.navigate("PreCadastroAluno");
+          navigation.navigate("PerfilInstituicao");
         else if (tipoDeLogin === "alun")
           navigation.navigate("PerfilAluno");
         else

@@ -21,7 +21,6 @@ return new class extends Migration
             $table->string('endereco');
             $table->unsignedInteger('id_inst');
             $table->foreign('id_inst')->references('id')->on('instituicoes')->onDelete('cascade');
-            $table->string('senha');
             $table->timestamps();
         });
     }

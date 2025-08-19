@@ -15,30 +15,107 @@ import {
 import * as Font from 'expo-font';
 import Header from '../../components/Header';
 import FooterComIcones from '../../components/FooterComIcones';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import useApi from '../../hooks/useApi';
+
+type Instituicao = {
+    id: number;
+    nome: string;
+    endereco: string;
+    horario_funcionamento: string;
+    telefone: string;
+  }  
+
 
 export default function PerfilInstituicao() {
     const navigation = useNavigation();
     const [fontsLoaded, setFontsLoaded] = useState(false);
     const [selectedGenero, setSelectedGenero] = useState('');
 
+    const [instituicao, setInstituicao] = useState<Instituicao | null>(null);
+    const [editando, setEditando] = useState(false);
+  
+    const { url } = useApi();
+  
+    // carregar fontes
     const loadFonts = async () => {
-        await Font.loadAsync({
-            'PoppinsRegular': require('../../assets/fonts/PoppinsRegular.ttf'),
-            'PoppinsBold': require('../../assets/fonts/PoppinsBold.ttf'),
-        });
-        setFontsLoaded(true);
+      await Font.loadAsync({
+        'PoppinsRegular': require('../../assets/fonts/PoppinsRegular.ttf'),
+        'PoppinsBold': require('../../assets/fonts/PoppinsBold.ttf'),
+      });
+      setFontsLoaded(true);
     };
-
+  
+    // buscar dados da instituição
+    const fetchInstituicao = async () => {
+      try {
+        const token = await AsyncStorage.getItem("jwt");
+        if (!token) {
+          Alert.alert("Erro", "Você precisa estar logado.");
+          return;
+        }
+        
+        const id = await AsyncStorage.getItem("id_instituicao");
+        const res = await fetch(url + "/api/instituicoes/" + id, {
+          method: "GET",
+          headers: {
+            "Authorization": `Bearer ${token}`
+          }
+        });
+  
+        if (!res.ok) {
+          Alert.alert("Erro", "Falha ao carregar dados.");
+          return;
+        }
+  
+        const data = await res.json();
+        setInstituicao(data);
+      } catch (err) {
+        console.error(err);
+        Alert.alert("Erro", "Não foi possível buscar os dados.");
+      }
+    };
+  
+    // salvar edição
+    const salvarEdicao = async () => {
+      if (!instituicao) return;
+      try {
+        const token = await AsyncStorage.getItem("jwt");
+        const res = await fetch(url + "/api/instituicoes/" + instituicao.id, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`
+          },
+          body: JSON.stringify(instituicao)
+        });
+  
+        if (!res.ok) {
+          Alert.alert("Erro", "Não foi possível atualizar.");
+          return;
+        }
+  
+        const atualizado = await res.json();
+        setInstituicao(atualizado);
+        setEditando(false);
+        Alert.alert("Sucesso", "Perfil atualizado!");
+      } catch (err) {
+        console.error(err);
+        Alert.alert("Erro", "Falha ao salvar dados.");
+      }
+    };
+  
     useEffect(() => {
-        loadFonts();
+      loadFonts();
+      fetchInstituicao();
     }, []);
-
-    if (!fontsLoaded) {
-        return (
-            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-                <ActivityIndicator size="large" />
-            </View>
-        );
+  
+    if (!fontsLoaded || !instituicao) {
+      return (
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+          <ActivityIndicator size="large" />
+        </View>
+      );
     }
 
     return (
@@ -47,7 +124,7 @@ export default function PerfilInstituicao() {
 
             <View style={styles.profileTop}>
                 <View style={styles.nameTag}>
-                    <Text style={styles.nameText}>Nome da Instituição</Text>
+                    <Text style={styles.nameText}>{instituicao.nome}</Text>
                 </View>
             </View>
 

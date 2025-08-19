@@ -18,7 +18,6 @@ return new class extends Migration
             $table->string('endereco');
             $table->string('cnpj');
             $table->string('telefone');
-            $table->string('senha');
             $table->string('plano');
             $table->timestamps();
         });

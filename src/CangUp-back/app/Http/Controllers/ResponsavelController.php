@@ -17,7 +17,7 @@ class ResponsavelController extends Controller
             'cpf' => 'required|string',
             'email' => 'required|email',
             'telefone' => 'required|string',
-            'senha' => 'required|string',
+            'senha' => 'string'
         ]);
 
         $responsavel=new Responsavel();
@@ -25,7 +25,6 @@ class ResponsavelController extends Controller
         $responsavel->cpf = $dados["cpf"];
         $responsavel->email = $dados["email"];
         $responsavel->telefone = $dados["telefone"];
-        $responsavel->senha = $dados["senha"];
         $responsavel->save();
 
         $usuario = new Usuario();
@@ -43,4 +42,5 @@ class ResponsavelController extends Controller
 
         return response()->json($responsavel, 201);
     }
+
 }

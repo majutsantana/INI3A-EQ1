@@ -21,7 +21,7 @@ class AlunoController extends Controller
             'sexo' => 'in:Masculino,Feminino,Neutro,Prefiro não informar',
             'endereco' => 'string',
             'id_inst' => 'required|exists:instituicoes,id',
-            'senha' => 'string', 
+            'senha' => 'string'
         ]);
         
         $aluno=new Aluno();
@@ -32,7 +32,6 @@ class AlunoController extends Controller
         $aluno->endereco = $dados["endereco"];
         $aluno->sexo = $dados["sexo"];
         $aluno->id_inst = $dados["id_inst"];
-        $aluno->senha = $dados["senha"];
         $aluno->save();
 
         $usuario = new Usuario();

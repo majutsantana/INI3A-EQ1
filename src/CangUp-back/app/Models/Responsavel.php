@@ -8,6 +8,6 @@ use Illuminate\Database\Eloquent\Model;
 class Responsavel extends Model
 {
     protected $fillable = [
-        'nome', 'cpf', 'email', 'telefone', 'senha'
+        'nome', 'cpf', 'email', 'telefone'
     ];
 }
