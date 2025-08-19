@@ -15,6 +15,7 @@ import {
  import FooterComIcones from '../../components/FooterComIcones';
  import { useSafeAreaInsets } from 'react-native-safe-area-context';
  import { TextInputMask } from 'react-native-masked-text';
+import useApi from '../../hooks/useApi';
 
 export default function PreCadastroResponsavel({ navigation }) {
     
@@ -71,7 +72,9 @@ export default function PreCadastroResponsavel({ navigation }) {
 
     const getDados = async () => {
         try{
-            const response = await fetch('http://localhost:8000/api/cadastrarResponsavel', { // luiza e maghu arrumem
+            let {url} = useApi();
+            const response = await f
+            fetch(url+'/api/cadastrarResponsavel', { // luiza e maghu arrumem
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

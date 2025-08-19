@@ -17,6 +17,7 @@ import {
  import { Picker } from '@react-native-picker/picker';
  import FooterSemIcones from '../../components/FooterSemIcones';
  import * as SQLite from "expo-sqlite";
+import useApi from '../../hooks/useApi';
 
  // const db = SQLite.openDatabase("meubanco.db");
 
@@ -95,7 +96,8 @@ export default function EfetivacaoAluno({ navigation }) { //Navigation não é e
 
     const getDados = async () => {
         try{
-            const response = await fetch('http://localhost:8000/api/cadastrarAluno', { // luiza e maghu arrumem
+            let {url} = useApi();
+            const response = await fetch(url+'/api/cadastrarAluno', { // luiza e maghu arrumem
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

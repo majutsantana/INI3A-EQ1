@@ -5,6 +5,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Feather, Ionicons } from '@expo/vector-icons';
 import FooterSemIcones from '../components/FooterSemIcones';
  import { Picker } from '@react-native-picker/picker';
+import useApi from '../hooks/useApi';
 
 type _perfil = {
   rotulo: string,
@@ -32,7 +33,8 @@ export default function Login({ navigation }) { //navigation não está dando er
     }
 
     try {
-      const response = await fetch("http://127.0.0.1:8000/api/login", {
+      let {url} = useApi();
+      const response = await fetch(url+"/api/login", {
         method: "POST", 
         headers: {
           "Content-Type": "application/json"
@@ -80,7 +82,8 @@ export default function Login({ navigation }) { //navigation não está dando er
     // fetch("http://127.0.0.1:8000/")
     //   .then(r=> r.json())
     //   .then(r=> {alert(r.Hello); Alert.alert(r.Hello)})
-    fetch("http://127.0.0.1:8000/api/perfis", {
+    let {url} = useApi();
+    fetch(url+"/api/perfis", {
       method: 'GET'
     }).then(r => r.json())
       .then(r => setPerfis(r))
