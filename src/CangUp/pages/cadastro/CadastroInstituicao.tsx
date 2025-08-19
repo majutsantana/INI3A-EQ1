@@ -19,6 +19,7 @@ import Header from '../../components/Header';
 import FooterSemIcones from '../../components/FooterSemIcones';
 import { Feather} from '@expo/vector-icons';
 import { TextInputMask } from 'react-native-masked-text';
+import useApi from '../../hooks/useApi';
  
  
  export default function CadastroInstituicao({navigation}) {
@@ -142,7 +143,8 @@ import { TextInputMask } from 'react-native-masked-text';
  
   const getDados = async () => {
    try{
-     const response = await fetch('http://localhost:8000/api/cadastrarInst', {
+    let {url} = useApi();
+     const response = await fetch(url+'/api/cadastrarInst', {
        method: 'POST',
        headers: {
          'Content-Type': 'application/json',

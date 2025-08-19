@@ -14,6 +14,7 @@ import {
  import Header from '../../components/Header';
  import FooterComIcones from '../../components/FooterComIcones';
  import { TextInputMask } from 'react-native-masked-text'; //Pacote instalado 
+import useApi from '../../hooks/useApi';
 
 type errorType ={ 
   nome : string | undefined,
@@ -47,7 +48,7 @@ export default function PreCadastroAluno({ navigation }) {
      if (!CPF.trim()) {
        newErrors.CPF = 'CPF é obrigatório.';
        isValid = false;
-     } else if (!/^\d{11}$/.test(CPF)) {
+     } else if (CPF.length < 14) {
        newErrors.CPF = 'CPF inválido. Deve conter 11 dígitos numéricos.';
        isValid = false;
      }
@@ -83,7 +84,8 @@ export default function PreCadastroAluno({ navigation }) {
 
     const getDados = async () => {
         try{
-            const response = await fetch('http://localhost:8000/api/cadastrarAluno', { // luiza e maghu arrumem
+            let {url} = useApi();
+            const response = await fetch(url+'/api/cadastrarAluno', { // luiza e maghu arrumem
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

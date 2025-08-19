@@ -16,6 +16,7 @@ import {
  import { TextInputMask } from 'react-native-masked-text';
  import { Picker } from '@react-native-picker/picker';
 import FooterSemIcones from '../../components/FooterSemIcones';
+import useApi from '../../hooks/useApi';
 
 
 type errorType ={ 
@@ -85,7 +86,8 @@ export default function EfetivacaoAluno({ navigation }) { //Navigation não é e
 
     const getDados = async () => {
         try{
-            const response = await fetch('http://localhost:8000/api/cadastrarResponsavel', { // luiza e maghu arrumem
+            let {url} = useApi();
+            const response = await fetch(url+'/api/cadastrarResponsavel', { // luiza e maghu arrumem
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

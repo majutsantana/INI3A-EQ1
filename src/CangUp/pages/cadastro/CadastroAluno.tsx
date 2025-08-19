@@ -18,6 +18,7 @@ import { CheckBox } from 'react-native-elements';
 import Header from '../../components/Header';
 import FooterSemIcones from '../../components/FooterSemIcones';
 import { Feather} from '@expo/vector-icons';
+import useApi from '../../hooks/useApi';
 
 export default function CadastroAluno({ navigation }) { // Não é erro, é só o vscode dando trabalho
   
@@ -119,7 +120,8 @@ export default function CadastroAluno({ navigation }) { // Não é erro, é só 
 
   const getDados = async () => {
     try {
-      const response = await fetch('http://localhost:8000/api/cadastrar', {
+      let {url} = useApi();
+      const response = await fetch(url + '/api/cadastrar', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
