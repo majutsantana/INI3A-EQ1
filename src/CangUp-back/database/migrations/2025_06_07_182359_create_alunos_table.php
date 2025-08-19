@@ -19,7 +19,8 @@ return new class extends Migration
             $table->string('email');
             $table->string('sexo');
             $table->string('endereco');
-            $table->string('instituicao');
+            $table->unsignedInteger('id_inst');
+            $table->foreign('id_inst')->references('id')->on('instituicoes')->onDelete('cascade');
             $table->string('senha');
             $table->timestamps();
         });

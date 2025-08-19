@@ -14,4 +14,9 @@ class Instituicao extends Model
     protected $fillable = [
         'nome', 'email', 'endereco', 'cnpj', 'telefone', 'senha', 'plano'
     ];
+
+    public function alunos()
+    {
+        return $this->hasMany(Aluno::class, 'id_inst');
+    }
 }

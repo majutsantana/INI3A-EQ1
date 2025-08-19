@@ -18,7 +18,7 @@ class InstituicaoController extends Controller
             'endereco' => 'required|string',
             'cnpj' => 'required|string', 
             'telefone' => 'required|string',
-            'senha' => 'required|string'->nullable(),
+            'senha' => 'string',
             'plano' => 'required|in:S,A',
         ]);
 

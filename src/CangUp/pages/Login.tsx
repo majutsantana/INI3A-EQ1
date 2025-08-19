@@ -52,7 +52,7 @@ export default function Login({ navigation }) { //navigation não está dando er
       if (token) {
         await AsyncStorage.setItem("jwt", token);
         if (tipoDeLogin === "inst")
-          navigation.navigate("PerfilInstituicao");
+          navigation.navigate("PreCadastroAluno");
         else if (tipoDeLogin === "alun")
           navigation.navigate("PerfilAluno");
         else

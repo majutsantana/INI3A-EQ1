@@ -17,10 +17,10 @@ class AlunoController extends Controller
             'nome' => 'required|string',
             'cpf' => 'required|string',
             'ra' => 'required|string',
-            'email' => 'required|email',
-            'sexo' => 'required|in:Masculino,Feminino,Neutro,Prefiro não informar',
-            'endereco' => 'required|string',
-            'instituicao' => 'required|in:IF,UE,UF',
+            'email' => 'email',
+            'sexo' => 'in:Masculino,Feminino,Neutro,Prefiro não informar',
+            'endereco' => 'string',
+            'id_inst' => 'required|exists:instituicoes,id',
             'senha' => 'string', 
         ]);
         
@@ -31,7 +31,7 @@ class AlunoController extends Controller
         $aluno->email = $dados["email"];
         $aluno->endereco = $dados["endereco"];
         $aluno->sexo = $dados["sexo"];
-        $aluno->instituicao = $dados["instituicao"];
+        $aluno->id_inst = $dados["id_inst"];
         $aluno->senha = $dados["senha"];
         $aluno->save();
 
