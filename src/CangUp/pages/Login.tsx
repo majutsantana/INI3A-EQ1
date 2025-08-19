@@ -122,27 +122,25 @@ export default function Login({ navigation }) { //navigation não está dando er
 
       <View style={styles.body}>
         <Text style={styles.title}>Bem-vindo de volta!</Text>
+        <View style={styles.inputgroup}>
           <View style={styles.pickerWrapper}>
-          <Picker
-              selectedValue={tipoDeLogin}
-              onValueChange={(itemValue) => setTipoDeLogin(itemValue)}
-              style={[
-              styles.picker,
-              { color: tipoDeLogin === '' ? '#888' : '#000' } // preto para placeholder, cinza para os demais
-              ]}
-            >
-            <Picker.Item label="Selecione o tipo de Login" value="" />
-            {renderPerfis()}
-          </Picker>
-        </View>
-
+            <Picker
+                selectedValue={tipoDeLogin}
+                onValueChange={(itemValue) => setTipoDeLogin(itemValue)}
+                
+              >
+              <Picker.Item label="Tipo de Login" value="" />
+              {renderPerfis()}
+            </Picker>
+          </View>
+        
         <TextInput
           style={styles.input}
           placeholder="Email"
           placeholderTextColor="#888"
           value={username}
           onChangeText={setusername}
-        />
+        /> 
         <View style={styles.passwordContainer}>
           <TextInput
             style={styles.passwordInput}
@@ -159,6 +157,7 @@ export default function Login({ navigation }) { //navigation não está dando er
               color="#888"
             />
           </TouchableOpacity>
+          </View>
         </View>
 
         <TouchableOpacity style={styles.button} onPress={login}>
@@ -209,6 +208,7 @@ const styles = StyleSheet.create({
     elevation: 1,
   },
   title: {
+    
     fontSize: 20,
     fontFamily: 'PoppinsBold',
   },
@@ -320,13 +320,16 @@ const styles = StyleSheet.create({
     borderWidth:0,
   },
   pickerWrapper: {
-    alignItems: 'center',
-    justifyContent:'center',
-    paddingHorizontal: '5%',
-    paddingVertical: '5%',
-    borderRadius: 25,
-    overflow: 'hidden',
-    backgroundColor: '#d9d9d9',
+    // Estilos para alinhar com os outros inputs
+    width: '90%',
+    height: 60, // Definir uma altura fixa é a melhor solução
+    borderRadius: 30, // Igual ao `input` e `passwordContainer`
+    marginTop: '10%',
+    // Estilos visuais
+    fontFamily: 'PoppinsRegular',
+    justifyContent: 'center', // Centraliza o item do Picker verticalmente
+    
+    // Sombra (copiada do seu estilo de input)
     shadowColor: "#000",
     shadowOffset: {
       width: 0,

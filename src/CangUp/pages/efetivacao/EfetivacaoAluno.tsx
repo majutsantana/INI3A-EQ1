@@ -243,7 +243,6 @@ const styles = StyleSheet.create({
     label: {
         fontWeight: 'bold',
         fontSize: 16,
-        marginBottom: '2%',
         fontFamily: 'PoppinsRegular',
     },
     input: {
