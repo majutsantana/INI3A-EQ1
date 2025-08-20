@@ -76,7 +76,7 @@ import useApi from '../../hooks/useApi';
        isValid = false;
      }
 
-     if (!email.trim()) {
+     if (!telefone.trim()) {
        newErrors.telefone = 'Telefone é obrigatório.';
        isValid = false;
      } else if (telefone.length < 11 && telefone.length > 11) { 

@@ -100,7 +100,7 @@ export default function Login({ navigation }) { //navigation não está dando er
 
   const renderPerfis = () => {
     return perfis.map(p => 
-            <Picker.Item label={p.nome} value={p.rotulo} />)
+            <Picker.Item key={p.id} label={p.nome} value={p.rotulo} />)
   }
 
   if (!fontsLoaded) {
@@ -126,8 +126,7 @@ export default function Login({ navigation }) { //navigation não está dando er
           <View style={styles.pickerWrapper}>
             <Picker
                 selectedValue={tipoDeLogin}
-                onValueChange={(itemValue) => setTipoDeLogin(itemValue)}
-                
+                onValueChange={(itemValue) => setTipoDeLogin(itemValue)}  
               >
               <Picker.Item label="Tipo de Login" value="" />
               {renderPerfis()}

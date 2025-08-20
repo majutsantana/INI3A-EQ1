@@ -2,73 +2,86 @@
 
 namespace App\Http\Controllers;
 
+// Imports necessários
 use App\Models\Instituicao;
 use App\Models\Perfil;
 use App\Models\Usuario;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator; // Importar o Validator
+use Throwable; // Importar Throwable para o catch
 
 class InstituicaoController extends Controller
 {
-    public function cadastrarInst(Request $req)
+    /**
+     * Registra uma nova instituição e um usuário associado.
+     */
+    public function cadastrarInst(Request $request)
     {
-        $dados = $req->validate([
+        // 1. VALIDAÇÃO EXPLÍCITA DOS DADOS
+        // Usar Validator::make() nos dá mais controle e garante que a resposta de erro
+        // seja sempre um JSON, evitando os redirecionamentos que causam o erro de CORS.
+        $validator = Validator::make($request->all(), [
             'nome' => 'required|string|max:255',
-            'email' => 'required|string|email|unique:usuarios,email', // Garante que o email seja único na tabela de usuários
+            'email' => 'required|string|email|max:255|unique:usuarios,email',
             'endereco' => 'required|string',
-            'cnpj' => 'required|string|unique:instituicoes,cnpj', // Garante que o CNPJ seja único
-            'telefone' => 'required|string',
+            'cnpj' => 'required|string|max:18|unique:instituicoes,cnpj',
+            'telefone' => 'required|string|max:20',
             'plano' => 'required|in:S,A',
-            'senha' => 'required|string|min:8' // Senha é obrigatória e com no mínimo 8 caracteres
+            'senha' => 'required|string|min:6',
         ]);
 
+        // 2. RETORNO DE ERRO EM JSON (ISTO RESOLVE O CORS)
+        // Se a validação falhar, retorna os erros e para a execução.
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        // 3. TRANSAÇÃO SEGURA NO BANCO DE DADOS
+        // DB::transaction garante que ou TUDO funciona, ou NADA é salvo no banco.
         try {
-            // **MELHORIA: Usando uma transação no banco de dados.**
-            // Isso garante que todas as operações abaixo sejam executadas com sucesso.
-            // Se qualquer uma falhar, todas as anteriores são desfeitas (rollback).
-            $instituicao = DB::transaction(function () use ($dados) {
-                // 1. Cria a Instituição
+            $instituicao = DB::transaction(function () use ($request) {
+                // Passo A: Cria a Instituição
                 $instituicao = Instituicao::create([
-                    "nome" => $dados["nome"],
-                    "endereco" => $dados["endereco"],
-                    "cnpj" => $dados["cnpj"],
-                    "telefone" => $dados["telefone"],
-                    "email" => $dados["email"],
-                    "plano" => $dados["plano"],
+                    "nome" => $request->nome,
+                    "endereco" => $request->endereco,
+                    "cnpj" => $request->cnpj,
+                    "telefone" => $request->telefone,
+                    "email" => $request->email,
+                    "plano" => $request->plano,
                 ]);
 
-                // 2. Cria o Usuário associado
-                $usuario = new Usuario();
-                $usuario->email = $dados["email"];
-                $usuario->login = $dados["email"];
-                // **CORREÇÃO DE SEGURANÇA: Criptografando a senha.**
-                // Nunca salve senhas em texto puro no banco de dados.
-                $usuario->senha = Hash::make($dados["senha"]);
-                $usuario->save();
+                // Passo B: Cria o Usuário associado
+                $usuario = Usuario::create([
+                    'email' => $request->email,
+                    'login' => $request->email, // Usando email como login inicial
+                    'senha' => Hash::make($request->senha), // Criptografa a senha
+                ]);
 
-                // 3. Associa o perfil "inst" ao usuário recém-criado
-                $perfil = Perfil::where("rotulo", "inst")->firstOrFail();
-
-                // **MELHORIA: Usando o método attach() do Eloquent.**
-                // Esta é a forma padrão do Laravel para associar registros em tabelas pivô.
-                // Requer que o model Usuario tenha a relação `belongsToMany(Perfil::class)`.
+                // Passo C: Associa o perfil "inst" ao usuário
+                $perfil = Perfil::where("rotulo", "inst")->first();
+                if (!$perfil) {
+                    // Se o perfil 'inst' não existir no banco, a transação falha.
+                    throw new \Exception("Perfil 'inst' não encontrado no banco de dados.");
+                }
                 $usuario->perfis()->attach($perfil->id);
-                
-                // **IMPORTANTE**: Aqui você poderia associar o usuário à instituição, se houver essa relação no banco.
-                // Ex: $instituicao->usuarios()->save($usuario); ou $usuario->instituicao_id = $instituicao->id;
 
                 return $instituicao;
             });
 
-            // Se tudo correu bem, retorna a instituição criada com status 201 (Created)
+            // 4. RESPOSTA DE SUCESSO
+            // Se a transação foi concluída com sucesso.
             return response()->json($instituicao, 201);
 
         } catch (Throwable $e) {
-            // Se qualquer erro ocorreu dentro da transação, captura aqui.
-            // Isso é útil para debugar.
-            report($e);
-            return response()->json(["error" => "Ocorreu um erro ao cadastrar a instituição."], 500);
+            // 5. RESPOSTA DE ERRO DO SERVIDOR
+            // Se qualquer erro ocorreu dentro da transação.
+            report($e); // Loga o erro para o desenvolvedor
+            return response()->json([
+                "error" => "Ocorreu um erro interno ao cadastrar a instituição.",
+                "message" => $e->getMessage() // Envia a mensagem de erro para debug
+            ], 500);
         }
     }
 
@@ -80,12 +93,10 @@ class InstituicaoController extends Controller
         $dados = $req->validate([
             'nome' => 'required|string|max:255',
             'endereco' => 'required|string',
-            'horario_funcionamento' => 'sometimes|string', // 'sometimes' torna o campo opcional
+            'horario_funcionamento' => 'sometimes|string',
             'telefone' => 'required|string',
         ]);
-
         $instituicao = Instituicao::create($dados);
-
         return response()->json($instituicao, 201);
     }
 
@@ -102,7 +113,6 @@ class InstituicaoController extends Controller
      */
     public function show($id)
     {
-        // findOrFail já retorna 404 automaticamente se não encontrar
         $instituicao = Instituicao::findOrFail($id);
         return response()->json($instituicao, 200);
     }
@@ -113,16 +123,13 @@ class InstituicaoController extends Controller
     public function update(Request $req, $id)
     {
         $dados = $req->validate([
-            // 'sometimes' garante que a validação só ocorra se o campo for enviado
             'nome' => 'sometimes|string|max:255',
             'endereco' => 'sometimes|string',
             'horario_funcionamento' => 'sometimes|string',
             'telefone' => 'sometimes|string',
         ]);
-
         $instituicao = Instituicao::findOrFail($id);
         $instituicao->update($dados);
-
         return response()->json($instituicao, 200);
     }
 
@@ -133,9 +140,6 @@ class InstituicaoController extends Controller
     {
         $instituicao = Instituicao::findOrFail($id);
         $instituicao->delete();
-
-        // Retorna uma resposta vazia com status 204 (No Content), comum para deletes bem-sucedidos.
         return response()->json(null, 204);
     }
 }
-

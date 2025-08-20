@@ -17,6 +17,11 @@ class Usuario extends Authenticatable implements JWTSubject
 
     protected $hidden = ['senha'];
 
+
+        public function getAuthPassword()
+    {
+        return $this->senha; // Isso informa ao Laravel para usar a coluna 'senha'
+    }
     /**
      * Criptografa a senha automaticamente ao salvar.
      */
