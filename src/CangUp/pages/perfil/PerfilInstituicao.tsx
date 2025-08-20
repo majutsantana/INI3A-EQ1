@@ -22,22 +22,15 @@ type Instituicao = {
     id: number;
     nome: string;
     endereco: string;
-    horario_funcionamento: string;
     telefone: string;
-  }  
+} 
 
-
-export default function PerfilInstituicao() {
-    const navigation = useNavigation();
+export default function PerfilInstituicao({navigation}) {
     const [fontsLoaded, setFontsLoaded] = useState(false);
-    const [selectedGenero, setSelectedGenero] = useState('');
-
     const [instituicao, setInstituicao] = useState<Instituicao | null>(null);
     const [editando, setEditando] = useState(false);
-  
     const { url } = useApi();
-  
-    // carregar fontes
+ 
     const loadFonts = async () => {
       await Font.loadAsync({
         'PoppinsRegular': require('../../assets/fonts/PoppinsRegular.ttf'),
@@ -45,29 +38,35 @@ export default function PerfilInstituicao() {
       });
       setFontsLoaded(true);
     };
-  
-    // buscar dados da instituição
+ 
     const fetchInstituicao = async () => {
       try {
         const token = await AsyncStorage.getItem("jwt");
         if (!token) {
           Alert.alert("Erro", "Você precisa estar logado.");
+          navigation.navigate("Login");
           return;
         }
         
         const id = await AsyncStorage.getItem("id_instituicao");
-        const res = await fetch(url + "/api/instituicoes/" + id, {
+        if (!id) {
+            Alert.alert("Erro", "ID da instituição não encontrado. Por favor, faça o login novamente.");
+            navigation.navigate("Login");
+            return;
+        }
+
+        const res = await fetch(`${url}/api/instituicoes/${id}`, {
           method: "GET",
           headers: {
             "Authorization": `Bearer ${token}`
           }
         });
-  
+ 
         if (!res.ok) {
           Alert.alert("Erro", "Falha ao carregar dados.");
           return;
         }
-  
+ 
         const data = await res.json();
         setInstituicao(data);
       } catch (err) {
@@ -75,26 +74,29 @@ export default function PerfilInstituicao() {
         Alert.alert("Erro", "Não foi possível buscar os dados.");
       }
     };
-  
-    // salvar edição
+ 
     const salvarEdicao = async () => {
       if (!instituicao) return;
       try {
         const token = await AsyncStorage.getItem("jwt");
-        const res = await fetch(url + "/api/instituicoes/" + instituicao.id, {
+        const res = await fetch(`${url}/api/instituicoes/${instituicao.id}`, {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
             "Authorization": `Bearer ${token}`
           },
-          body: JSON.stringify(instituicao)
+          body: JSON.stringify({
+              nome: instituicao.nome,
+              endereco: instituicao.endereco,
+              telefone: instituicao.telefone
+          })
         });
-  
+ 
         if (!res.ok) {
           Alert.alert("Erro", "Não foi possível atualizar.");
           return;
         }
-  
+ 
         const atualizado = await res.json();
         setInstituicao(atualizado);
         setEditando(false);
@@ -104,12 +106,19 @@ export default function PerfilInstituicao() {
         Alert.alert("Erro", "Falha ao salvar dados.");
       }
     };
-  
+ 
     useEffect(() => {
       loadFonts();
       fetchInstituicao();
     }, []);
-  
+
+    // Função para lidar com a mudança nos inputs
+    const handleInputChange = (field: keyof Instituicao, value: string) => {
+        if (instituicao) {
+            setInstituicao({ ...instituicao, [field]: value });
+        }
+    };
+ 
     if (!fontsLoaded || !instituicao) {
       return (
         <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
@@ -137,17 +146,44 @@ export default function PerfilInstituicao() {
             <View style={styles.profileBottom}>
                 <TouchableOpacity
                     style={styles.editBtn}
-                    onPress={() => Alert.alert("Função de edição ainda será implementada.")}
+                    onPress={() => setEditando(!editando)} // Alterna o modo de edição
                 >
-                    <Text style={styles.editText}>Editar perfil</Text>
+                    <Text style={styles.editText}>{editando ? 'Cancelar' : 'Editar perfil'}</Text>
                 </TouchableOpacity>
             </View>
 
             <ScrollView contentContainerStyle={styles.formContainer}>
-                <TextInput placeholder="Nome:" style={styles.input} placeholderTextColor="#000" />
-                <TextInput placeholder="Endereço:" style={styles.input} placeholderTextColor="#000" />
-                <TextInput placeholder="Horário de funcionamento:" style={styles.input} placeholderTextColor="#000" />
-                <TextInput placeholder="Telefone para contato:" style={styles.input} placeholderTextColor="#000" />
+                <Text style={styles.label}>Nome:</Text>
+                <TextInput 
+                    style={styles.input}
+                    value={instituicao.nome}
+                    onChangeText={(text) => handleInputChange('nome', text)}
+                    editable={editando}
+                />
+
+                <Text style={styles.label}>Endereço:</Text>
+                <TextInput
+                    style={styles.input}
+                    value={instituicao.endereco}
+                    onChangeText={(text) => handleInputChange('endereco', text)}
+                    editable={editando}
+                />
+
+                <Text style={styles.label}>Telefone para contato:</Text>
+                <TextInput
+                    style={styles.input}
+                    value={instituicao.telefone}
+                    onChangeText={(text) => handleInputChange('telefone', text)}
+                    editable={editando}
+                    keyboardType="phone-pad"
+                />
+
+                {/* Botão de salvar só aparece no modo de edição */}
+                {editando && (
+                    <TouchableOpacity style={styles.saveBtn} onPress={salvarEdicao}>
+                        <Text style={styles.saveText}>Salvar Alterações</Text>
+                    </TouchableOpacity>
+                )}
             </ScrollView>
 
             <FooterComIcones/>
@@ -160,29 +196,25 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: '#FCD28D',
     },
-
     profileTop: {
         backgroundColor: '#FFBE31',
         alignItems: 'center',
         paddingTop: 20,
         paddingBottom: 60,
     },
-
     profileBottom: {
         backgroundColor: '#FCD28D',
         alignItems: 'center',
         paddingTop: 80,
     },
-
     profilePicWrapper: {
         position: 'absolute',
-        top: 160, // ajuste fino da posição vertical
+        top: 160,
         left: 0,
         right: 0,
         alignItems: 'center',
         zIndex: 2,
     },
-
     profilePic: {
         width: 120,
         height: 120,
@@ -190,16 +222,14 @@ const styles = StyleSheet.create({
         backgroundColor: '#D9D9D9',
         justifyContent: 'center',
         alignItems: 'center',
-        // borderWidth: 2,
-        // borderColor: '#3D3D3D',
+        borderWidth: 2,
+        borderColor: '#FFF'
     },
-
     picText: {
         fontFamily: 'PoppinsRegular',
         fontSize: 12,
         color: '#555',
     },
-
     nameTag: {
         backgroundColor: '#fff',
         paddingHorizontal: 20,
@@ -207,33 +237,34 @@ const styles = StyleSheet.create({
         borderRadius: 20,
         marginBottom: 10,
     },
-
     nameText: {
         fontFamily: 'PoppinsBold',
         fontSize: 14,
         color: '#000',
     },
-
-    // Botão de editar Perfil
     editBtn: {
-        backgroundColor: '#FFBE31', //amarelo forte para o botão
-        borderRadius: 20, //borda arredondada
+        backgroundColor: '#FFBE31',
+        borderRadius: 20,
         paddingHorizontal: 20,
         paddingVertical: 6,
     },
-
     editText: {
         fontFamily: 'PoppinsRegular',
         fontSize: 14,
         color: '#000',
     },
-
     formContainer: {
         alignItems: 'center',
         paddingVertical: 20,
         paddingBottom: 100,
     },
-
+    label: {
+        width: '85%',
+        fontFamily: 'PoppinsBold',
+        fontSize: 14,
+        color: '#333',
+        marginTop: 10,
+    },
     input: {
         width: '85%',
         height: 45,
@@ -243,14 +274,20 @@ const styles = StyleSheet.create({
         marginVertical: 8,
         justifyContent: 'center',
         fontFamily: 'PoppinsRegular',
-    },
-
-    // Caixa do gênero 
-    picker: {
-        width: '100%',
-        height: Platform.OS === 'ios' ? undefined : 45,
         color: '#000',
-        backgroundColor: '#F5F5F5',
-        borderWidth: 0,
+        borderWidth: 1,
+        borderColor: '#ddd'
+    },
+    saveBtn: {
+        backgroundColor: '#522a91', // Roxo
+        borderRadius: 20,
+        paddingHorizontal: 30,
+        paddingVertical: 10,
+        marginTop: 20,
+    },
+    saveText: {
+        fontFamily: 'PoppinsBold',
+        fontSize: 16,
+        color: '#fff',
     },
 });

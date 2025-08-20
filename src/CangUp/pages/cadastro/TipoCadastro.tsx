@@ -47,11 +47,11 @@ export default function TipoCadastro({navigation}) {
             <Text style={styles.buttonText}>Instituição</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('CadastroAluno')}>
+          <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('EfetivacaoAluno')}>
             <Text style={styles.buttonText}>Aluno</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('CadastroResponsavel')}>
+          <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('EfetivacaoResponsavel')}>
             <Text style={styles.buttonText}>Responsável</Text>
           </TouchableOpacity>
         </View>

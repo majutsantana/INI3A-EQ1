@@ -28,6 +28,11 @@ type errorType ={
   instituicao : string | undefined,
 };
 
+type _inst = {
+  id : number,
+  nome: string,
+}
+
 export default function EfetivacaoAluno({ navigation }) { //Navigation não é erro
     
     const [fontsLoaded, setFontsLoaded] = useState(false);
@@ -36,7 +41,7 @@ export default function EfetivacaoAluno({ navigation }) { //Navigation não é e
     const [nome, setNome] = useState('');
     const [RA, setRA] = useState('');
     const [CPF, setCPF] = useState('');
-    const [instituicoes, setInstituicoes] = useState<any[]>([]);
+    const [instituicoes, setInstituicoes] = useState<_inst[]>([]);
 
     const validateForm = () => {
      let newErrors : errorType = {CPF:undefined, instituicao:undefined, nome:undefined, RA:undefined};
@@ -85,7 +90,7 @@ export default function EfetivacaoAluno({ navigation }) { //Navigation não é e
         if (validateForm()) {
         try {
             await getDados();
-            navigation.navigate('Login');
+            navigation.navigate('CadastroAluno');
         } catch (error) {
             console.error("Erro no processo de cadastro (handleCadastro):", error);
         }
@@ -110,6 +115,11 @@ export default function EfetivacaoAluno({ navigation }) { //Navigation não é e
             console.error('Erro ao cadastrar aluno:', error);
         }
     };
+
+    const renderInst = () => {
+    return instituicoes.map(i => 
+            <Picker.Item key={i.id} label={i.nome} value={i.nome} />)
+  }
 
     /* useEffect(() => {
       db.transaction((tx) => {

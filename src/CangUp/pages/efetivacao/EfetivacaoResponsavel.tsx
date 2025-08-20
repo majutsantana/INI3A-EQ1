@@ -75,7 +75,7 @@ export default function EfetivacaoAluno({ navigation }) { //Navigation não é e
         if (validateForm()) {
         try {
             await getDados();
-            navigation.navigate('Login');
+            navigation.navigate('CadastroResponsavel');
         } catch (error) {
             console.error("Erro no processo de cadastro (handleCadastro):", error);
         }
