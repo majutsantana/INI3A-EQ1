@@ -7,13 +7,15 @@ import {
   TextInput,
   TouchableOpacity,
   View,
- } from 'react-native';
- import * as Font from 'expo-font';
- import { useEffect, useState } from 'react';
- import { MaterialIcons } from '@expo/vector-icons';
- import Header from '../../components/Header';
- import FooterComIcones from '../../components/FooterComIcones';
- import { TextInputMask } from 'react-native-masked-text'; //Pacote instalado 
+  Alert,
+} from 'react-native';
+import * as Font from 'expo-font';
+import { useEffect, useState } from 'react';
+import { MaterialIcons } from '@expo/vector-icons';
+import Header from '../../components/Header';
+import FooterComIcones from '../../components/FooterComIcones';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { TextInputMask } from 'react-native-masked-text'; //Pacote instalado 
 import useApi from '../../hooks/useApi';
 
 type errorType ={ 
@@ -22,14 +24,19 @@ type errorType ={
   CPF : string | undefined
 };
 
+type Instituicao = {
+    id: number;
+} 
+
 export default function PreCadastroAluno({ navigation }) { 
     
     const [fontsLoaded, setFontsLoaded] = useState(false);
     const [errors, setErrors] = useState<errorType>({nome:undefined, CPF:undefined, RA:undefined});
+    const [instituicao, setInstituicao] = useState<Instituicao | null>(null);
     const [nome, setNome] = useState('');
     const [RA, setRA] = useState('');
     const [CPF, setCPF] = useState('');
-    
+    const { url } = useApi();
 
     const validateForm = () => {
      let newErrors : errorType = {nome:undefined, CPF:undefined, RA:undefined};
@@ -67,15 +74,51 @@ export default function PreCadastroAluno({ navigation }) {
  
      useEffect(() => {
        loadFonts();
+       fetchInstituicao();
      }, []);
 
-    const handleCadastro  = async () => {
+    const fetchInstituicao = async () => {
+      try {
+        const token = await AsyncStorage.getItem("jwt");
+        if (!token) {
+          Alert.alert("Erro", "Você precisa estar logado.");
+          navigation.navigate("Login");
+          return;
+        }
+        
+        const id_inst = await AsyncStorage.getItem("id_instituicao");
+        if (!id_inst) {
+            Alert.alert("Erro", "ID da instituição não encontrado. Por favor, faça o login novamente.");
+            navigation.navigate("Login");
+            return;
+        }
+        const res = await fetch(`${url}/api/instituicoes/${id_inst}`, {
+          method: "GET",
+          headers: {
+            "Authorization": `Bearer ${token}`
+          }
+        });
+  
+        if (!res.ok) {
+          Alert.alert("Erro", "Falha ao carregar dados.");
+          return;
+        }
+  
+        const data = await res.json();
+        setInstituicao(data);
+      }catch (err) {
+        console.error(err);
+        Alert.alert("Erro", "Não foi possível buscar os dados.");
+      }
+    }; 
+
+    const handlePreCadastro  = async () => {
         if (validateForm()) {
         try {
             await getDados();
-            navigation.navigate('Login');
+            navigation.navigate('PerfilInstituicao');
         } catch (error) {
-            console.error("Erro no processo de cadastro (handleCadastro):", error);
+            console.error("Erro no processo de cadastro (handlePreCadastro):", error);
         }
         } else {
         console.log('Formulário inválido, corrigindo erros:', errors);
@@ -84,11 +127,13 @@ export default function PreCadastroAluno({ navigation }) {
 
     const getDados = async () => {
         try{
+            let token = AsyncStorage.getItem('jwt');
             let {url} = useApi();
-            const response = await fetch(url+'/api/cadastrarAluno', { // luiza e maghu arrumem
+            const response = await fetch(url+'/api/preCadastrarAluno', { 
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+                'Authorization': 'Bearer '+token
             },
             body: JSON.stringify({nome, RA, CPF}),
             });
@@ -152,7 +197,7 @@ export default function PreCadastroAluno({ navigation }) {
         </View>
  
         <TouchableOpacity style={styles.button}
-          onPress= {handleCadastro}>
+          onPress= {handlePreCadastro}>
           <Text style={styles.buttonText}>Cadastrar Aluno</Text>
         </TouchableOpacity>
       </View>
