@@ -24,6 +24,10 @@ type errorType ={
   CPF : string | undefined,
   instituicao : string | undefined,
 };
+type _inst = {
+    id : number,
+    nome: string,
+}
 
 export default function EfetivacaoAluno({ navigation }) { //Navigation não é erro
     
@@ -32,6 +36,8 @@ export default function EfetivacaoAluno({ navigation }) { //Navigation não é e
     const [instituicao, setInstituicao] = useState('');
     const [nome, setNome] = useState('');
     const [CPF, setCPF] = useState('');
+    const [instituicoes, setInstituicoes] = useState<_inst[]>([]);
+    const { url } = useApi();
 
     const validateForm = () => {
      let newErrors : errorType = {CPF:undefined, instituicao:undefined, nome:undefined};
@@ -86,7 +92,6 @@ export default function EfetivacaoAluno({ navigation }) { //Navigation não é e
 
     const getDados = async () => {
         try{
-            let {url} = useApi();
             const response = await fetch(url+'/api/cadastrarResponsavel', { // luiza e maghu arrumem
             method: 'POST',
             headers: {
@@ -100,6 +105,21 @@ export default function EfetivacaoAluno({ navigation }) { //Navigation não é e
             console.error('Erro ao cadastrar responsavel:', error);
         }
     };
+
+    const renderInst = () => {
+      return instituicoes.map(i => 
+              <Picker.Item key={i.id} label={i.nome} value={i.nome} />)
+      } 
+      useEffect(() => {
+        loadFonts();
+        fetch(`${url}/api/instituicoes`)
+      .then(r => r.json())
+      .then(r => {
+        console.log("Instituições vindas da API:", r);
+        setInstituicoes(r);
+      })
+      .catch(err => console.error("Erro no fetch:", err));
+      }, []);
     
     return(
       <SafeAreaView style={styles.safeArea}>
@@ -128,13 +148,11 @@ export default function EfetivacaoAluno({ navigation }) { //Navigation não é e
                   ]}
                 >
                   <Picker.Item label="Selecione a instituição" value="" />
-                  <Picker.Item label="CTI" value="cti" />
-                  <Picker.Item label="ETEC" value="etec" />
+                  {renderInst()}
                 </Picker>
               </View>
               {errors.instituicao && <Text style={styles.errorText}>{errors.instituicao}</Text>}
             </View>
-
             <View style={styles.inputGroup}>
                <Text style={styles.label}>Nome:</Text>
                <TextInput

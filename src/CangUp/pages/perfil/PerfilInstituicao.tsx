@@ -183,7 +183,8 @@ export default function PerfilInstituicao({navigation}) {
                     <TouchableOpacity style={styles.saveBtn} onPress={salvarEdicao}>
                         <Text style={styles.saveText}>Salvar Alterações</Text>
                     </TouchableOpacity>
-                )}
+                )} 
+               
             </ScrollView>
 
             <FooterComIcones/>
@@ -290,4 +291,24 @@ const styles = StyleSheet.create({
         fontSize: 16,
         color: '#fff',
     },
+    button: {
+          backgroundColor: '#FFBE31',
+          paddingVertical: '5%',
+          width:'60%',
+          borderRadius: 20,
+          alignItems: 'center',
+          marginTop: '10%',
+          shadowColor: '#000',
+          shadowOffset: {
+          width: 0,
+          height: 3,
+          },
+          shadowOpacity: 0.27,
+          shadowRadius: 4.65,
+          elevation: 6,
+      },
+      buttonText: {
+          fontSize: 18,
+          fontFamily: 'PoppinsRegular',
+      },
 });

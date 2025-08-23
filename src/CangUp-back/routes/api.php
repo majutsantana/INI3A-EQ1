@@ -42,12 +42,6 @@ Route::middleware(['auth:api'])->group(function () {
     // Exemplo: logout (invalida token)
     Route::post('/logout', [LoginController::class, 'logout']);
 
-    Route::get('instituicoes/', [InstituicaoController::class, 'index']);      // listar todas
-    Route::get('instituicoes/{id}', [InstituicaoController::class, 'show']);   // listar uma
-    Route::post('instituicoes/', [InstituicaoController::class, 'store']);     // criar
-    Route::put('instituicoes/{id}', [InstituicaoController::class, 'update']); // atualizar
-    Route::delete('instituicoes/{id}', [InstituicaoController::class, 'destroy']); // deletar
-
 
 
 });
@@ -56,4 +50,13 @@ Route::middleware(['auth:api'])->group(function () {
 // Rota pública de login
 Route::post('/login', [LoginController::class, 'login']);
 
+// ROTAS ESTAO FORA DO LOGIN APENAS PARA TESTE --> COLOCAR DEPOIS DENTRO DNV
 Route::get("/perfis", [PerfilController::class, 'getAll']);
+
+    Route::get('instituicoes/', [InstituicaoController::class, 'index']);      // listar todas
+    Route::get('instituicoes/{id}', [InstituicaoController::class, 'show']);   // listar uma
+    Route::post('instituicoes/', [InstituicaoController::class, 'store']);     // criar
+    Route::put('instituicoes/{id}', [InstituicaoController::class, 'update']); // atualizar
+    Route::delete('instituicoes/{id}', [InstituicaoController::class, 'destroy']); // deletar
+
+

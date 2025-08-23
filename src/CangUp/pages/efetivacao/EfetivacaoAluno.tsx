@@ -95,7 +95,7 @@
 
       const getDados = async () => {
           try{
-              const response = await fetch(url+'/api/cadastrarAlun', { // luiza e maghu arrumem
+              const response = await fetch(url+'/api/preCadastrarAluno', { // luiza e maghu arrumem
               method: 'POST',
               headers: {
                   'Content-Type': 'application/json',
