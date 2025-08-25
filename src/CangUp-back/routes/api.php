@@ -25,13 +25,21 @@ use App\Http\Controllers\PerfilController;
 // });
 
 // Grupo de rotas protegidas por JWT
-Route::middleware(['auth:api'])->group(function () {
+Route::middleware(['jwt.auth'])->group(function () {
 
     Route::post('/preCadastrarAluno', [AlunoController::class, 'preCadastrarAlun']);
 
     Route::post('/cadastrarResp', [ResponsavelController::class, 'cadastrarResp']);
 
-    Route::post('/cadastrarInst', [InstituicaoController::class, 'cadastrarInst']);
+    Route::get("/perfis", [PerfilController::class, 'getAll']);
+
+
+    Route::get('instituicoes/', [InstituicaoController::class, 'index']);      // listar todas
+    Route::get('instituicoes/{id}', [InstituicaoController::class, 'show']);   // listar uma
+    Route::post('instituicoes/', [InstituicaoController::class, 'store']);     // criar
+    Route::put('instituicoes/{id}', [InstituicaoController::class, 'update']); // atualizar
+    Route::delete('instituicoes/{id}', [InstituicaoController::class, 'destroy']); // deletar
+
 
     Route::post('/cadastrarAdmin', [AdminController::class, 'store']);
 
@@ -42,21 +50,14 @@ Route::middleware(['auth:api'])->group(function () {
     // Exemplo: logout (invalida token)
     Route::post('/logout', [LoginController::class, 'logout']);
 
-
-
 });
 
 
 // Rota pública de login
 Route::post('/login', [LoginController::class, 'login']);
 
-// ROTAS ESTAO FORA DO LOGIN APENAS PARA TESTE --> COLOCAR DEPOIS DENTRO DNV
-Route::get("/perfis", [PerfilController::class, 'getAll']);
+Route::post('/cadastrarInst', [InstituicaoController::class, 'cadastrarInst']);
 
-    Route::get('instituicoes/', [InstituicaoController::class, 'index']);      // listar todas
-    Route::get('instituicoes/{id}', [InstituicaoController::class, 'show']);   // listar uma
-    Route::post('instituicoes/', [InstituicaoController::class, 'store']);     // criar
-    Route::put('instituicoes/{id}', [InstituicaoController::class, 'update']); // atualizar
-    Route::delete('instituicoes/{id}', [InstituicaoController::class, 'destroy']); // deletar
+
 
 

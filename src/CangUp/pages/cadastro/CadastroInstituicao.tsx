@@ -77,12 +77,16 @@ import useApi from '../../hooks/useApi';
      }
 
      if (!telefone.trim()) {
-       newErrors.telefone = 'Telefone é obrigatório.';
-       isValid = false;
-     } else if (telefone.length < 11 && telefone.length > 11) { 
-       newErrors.telefone = 'Telefone inválido.';
-       isValid = false;
-     }
+      newErrors.telefone = 'Telefone é obrigatório.';
+      isValid = false;
+    } else {
+      const onlyNumbers = telefone.replace(/\D/g, ''); 
+      
+      if (onlyNumbers.length < 10 || onlyNumbers.length > 11) { 
+        newErrors.telefone = 'Telefone inválido. Deve conter DDD + número.';
+        isValid = false;
+      }
+    }
  
      if (!senha.trim()) {
        newErrors.senha = 'Senha é obrigatória.';
@@ -223,6 +227,7 @@ import useApi from '../../hooks/useApi';
                   value={cnpj}
                   onChangeText={text => setcnpj(text)}
                   placeholder="00.000.000/0000-00"
+                  placeholderTextColor={"#888"}
                   style={styles.input}
                 />
                
@@ -230,13 +235,19 @@ import useApi from '../../hooks/useApi';
               </View>
               <View style={styles.inputGroup}>
                <Text style={styles.label}>Telefone:</Text>
-               <TextInput
-                 style={styles.input}
-                 placeholder="Digite o Telefone"
-                 placeholderTextColor="#888"
-                 value={telefone}
-                 onChangeText={setTelefone}
-               />
+               <TextInputMask
+                  style={styles.input}
+                  type={'cel-phone'}
+                  options={{
+                    maskType: 'BRL',
+                    withDDD: true,
+                    dddMask: '(99) '
+                  }}
+                  placeholder="(99) 99999-9999" 
+                  placeholderTextColor="#888"
+                  value={telefone}
+                  onChangeText={setTelefone}
+                />
                {errors.telefone && <Text style={styles.errorText}>{errors.telefone}</Text>}
               </View>
               <View style={styles.inputGroup}>

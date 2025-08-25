@@ -184,6 +184,14 @@ export default function PerfilInstituicao({navigation}) {
                         <Text style={styles.saveText}>Salvar Alterações</Text>
                     </TouchableOpacity>
                 )} 
+
+                <TouchableOpacity style={styles.button}>
+                    <Text style={styles.buttonText}>Cadastro de responsáveis</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity style={styles.button}>
+                    <Text style={styles.buttonText}>Cadastro de alunos interessados</Text>
+                </TouchableOpacity>
                
             </ScrollView>
 
@@ -293,7 +301,7 @@ const styles = StyleSheet.create({
     },
     button: {
           backgroundColor: '#FFBE31',
-          paddingVertical: '5%',
+          paddingVertical: '3%',
           width:'60%',
           borderRadius: 20,
           alignItems: 'center',
@@ -308,7 +316,7 @@ const styles = StyleSheet.create({
           elevation: 6,
       },
       buttonText: {
-          fontSize: 18,
+          fontSize: 14,
           fontFamily: 'PoppinsRegular',
       },
 });
