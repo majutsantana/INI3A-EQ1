@@ -12,14 +12,14 @@ import CadastroInstituicao from './pages/cadastro/CadastroInstituicao';
 import CadastroResponsavel from './pages/cadastro/CadastroResponsavel';
 import EfetivacaoAluno from './pages/efetivacao/EfetivacaoAluno';
 import EfetivacaoResponsavel from './pages/efetivacao/EfetivacaoResponsavel';
-
+import FuncionalidadesAlunoResponsavel from './pages/funcionalidades/FuncionalidadesAlunoResponsavel';
 
 const Stack = createNativeStackNavigator();
 
 export default function App() {
   //Direciona a tela que será aberta inicialmente 
   return <NavigationContainer> 
-    <Stack.Navigator initialRouteName='PerfilInstituicao'> 
+    <Stack.Navigator initialRouteName='Login'> 
       <Stack.Screen
         name="Login"
         component={Login}
@@ -80,7 +80,11 @@ export default function App() {
         component={EfetivacaoResponsavel}
         options={{ headerShown: false }}
       />
-
+      <Stack.Screen
+        name="FuncionalidadesAlunoResponsavel"
+        component={FuncionalidadesAlunoResponsavel}
+        options={{ headerShown: false }}
+      />
 
     </Stack.Navigator>
   </NavigationContainer>
