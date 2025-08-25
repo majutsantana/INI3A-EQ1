@@ -12,7 +12,6 @@ import {
 import * as Font from 'expo-font';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
 import Header from '../../components/Header';
 import FooterComIcones from '../../components/FooterComIcones';
 
