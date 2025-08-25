@@ -7,11 +7,16 @@ import {
     TouchableOpacity,
     ScrollView,
     ActivityIndicator,
+    Alert,
 } from 'react-native';
 import * as Font from 'expo-font';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 import Header from '../../components/Header';
 import FooterComIcones from '../../components/FooterComIcones';
+
+const STORAGE_KEY = '@horarios_config';
 
 export default function FuncionalidadesAlunoResponsavel({ navigation }) {
     const [fontsLoaded, setFontsLoaded] = useState(false);
@@ -38,14 +43,41 @@ export default function FuncionalidadesAlunoResponsavel({ navigation }) {
             });
         } catch (error) {
             console.error("Erro ao carregar as fontes:", error);
-        } finally {
+        }
+    };
+    
+    const carregarConfiguracoes = async () => {
+        try {
+            const configsSalvas = await AsyncStorage.getItem(STORAGE_KEY);
+            if (configsSalvas !== null) {
+                setDias(JSON.parse(configsSalvas));
+            }
+        } catch (error) {
+            console.error("Erro ao carregar as configurações:", error);
+            Alert.alert("Erro", "Não foi possível carregar as configurações salvas.");
+        }
+    };
+    
+    useEffect(() => {
+        async function inicializar() {
+            await loadFonts();
+            await carregarConfiguracoes();
             setFontsLoaded(true);
+        }
+        inicializar();
+    }, []);
+
+    const salvarConfiguracoes = async () => {
+        try {
+            const jsonValue = JSON.stringify(dias);
+            await AsyncStorage.setItem(STORAGE_KEY, jsonValue);
+            Alert.alert("Sucesso!", "Suas configurações de horário foram salvas.");
+        } catch (error) {
+            console.error("Erro ao salvar as configurações:", error);
+            Alert.alert("Erro", "Não foi possível salvar as configurações.");
         }
     };
 
-    useEffect(() => {
-        loadFonts();
-    }, []);
 
     const onTimeChange = (event, selectedDate) => {
         setShowPicker(false);
@@ -98,7 +130,6 @@ export default function FuncionalidadesAlunoResponsavel({ navigation }) {
                             </View>
                             
                             <View style={styles.secaoHorarios}>
-                                {/* Seção de Início */}
                                 <View style={styles.blocoHorario}>
                                     <Text style={styles.labelHorario}>Início</Text>
                                     <View style={styles.circuloHorario}>
@@ -112,7 +143,6 @@ export default function FuncionalidadesAlunoResponsavel({ navigation }) {
                                     </TouchableOpacity>
                                 </View>
                                 
-                                {/* Seção de Fim */}
                                 <View style={styles.blocoHorario}>
                                     <Text style={styles.labelHorario}>Fim</Text>
                                     <View style={styles.circuloHorario}>
@@ -128,6 +158,11 @@ export default function FuncionalidadesAlunoResponsavel({ navigation }) {
                             </View>
                         </View>
                     ))}
+
+                    <TouchableOpacity style={styles.botaoSalvar} onPress={salvarConfiguracoes}>
+                        <Text style={styles.textoBotaoSalvar}>Salvar Configurações</Text>
+                    </TouchableOpacity>
+
                 </View>
             </ScrollView>
 
@@ -228,5 +263,17 @@ const styles = StyleSheet.create({
         fontFamily: 'PoppinsRegular',
         fontSize: 14,
         color: '#3D3D3D',
+    },
+    botaoSalvar: {
+        backgroundColor: '#4CAF50',
+        padding: 15,
+        borderRadius: 20,
+        marginTop: 20,
+        alignItems: 'center',
+    },
+    textoBotaoSalvar: {
+        fontFamily: 'PoppinsBold',
+        fontSize: 16,
+        color: '#FFFFFF',
     },
 });
