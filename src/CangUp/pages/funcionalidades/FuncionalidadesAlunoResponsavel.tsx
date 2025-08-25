@@ -17,18 +17,19 @@ import FooterComIcones from '../../components/FooterComIcones';
 
 const STORAGE_KEY = '@horarios_config';
 
+const initialStateDias = [
+    { id: 1, nome: 'SEGUNDA', inicio: null, fim: null },
+    { id: 2, nome: 'TERÇA', inicio: null, fim: null },
+    { id: 3, nome: 'QUARTA', inicio: null, fim: null },
+    { id: 4, nome: 'QUINTA', inicio: null, fim: null },
+    { id: 5, nome: 'SEXTA', inicio: null, fim: null },
+    { id: 6, nome: 'SÁBADO', inicio: null, fim: null },
+];
+
 export default function FuncionalidadesAlunoResponsavel({ navigation }) {
     const [fontsLoaded, setFontsLoaded] = useState(false);
-    
-    const [dias, setDias] = useState([
-        { id: 1, nome: 'SEGUNDA', inicio: null, fim: null },
-        { id: 2, nome: 'TERÇA', inicio: null, fim: null },
-        { id: 3, nome: 'QUARTA', inicio: null, fim: null },
-        { id: 4, nome: 'QUINTA', inicio: null, fim: null },
-        { id: 5, nome: 'SEXTA', inicio: null, fim: null },
-        { id: 6, nome: 'SÁBADO', inicio: null, fim: null },
-    ]);
-
+    const [dias, setDias] = useState(initialStateDias);
+    const [horariosOriginais, setHorariosOriginais] = useState(initialStateDias);
     const [showPicker, setShowPicker] = useState(false);
     const [currentDiaId, setCurrentDiaId] = useState(null);
     const [currentTipo, setCurrentTipo] = useState(null);
@@ -49,7 +50,11 @@ export default function FuncionalidadesAlunoResponsavel({ navigation }) {
         try {
             const configsSalvas = await AsyncStorage.getItem(STORAGE_KEY);
             if (configsSalvas !== null) {
-                setDias(JSON.parse(configsSalvas));
+                const parsedConfigs = JSON.parse(configsSalvas);
+                setDias(parsedConfigs);
+                setHorariosOriginais(JSON.parse(JSON.stringify(parsedConfigs)));
+            } else {
+                setHorariosOriginais(JSON.parse(JSON.stringify(initialStateDias)));
             }
         } catch (error) {
             console.error("Erro ao carregar as configurações:", error);
@@ -70,6 +75,7 @@ export default function FuncionalidadesAlunoResponsavel({ navigation }) {
         try {
             const jsonValue = JSON.stringify(dias);
             await AsyncStorage.setItem(STORAGE_KEY, jsonValue);
+            setHorariosOriginais(JSON.parse(JSON.stringify(dias)));
             Alert.alert("Sucesso!", "Suas configurações de horário foram salvas.");
         } catch (error) {
             console.error("Erro ao salvar as configurações:", error);
@@ -77,17 +83,18 @@ export default function FuncionalidadesAlunoResponsavel({ navigation }) {
         }
     };
 
+    const cancelarAlteracoes = () => {
+        setDias(horariosOriginais);
+        Alert.alert("Cancelado", "As alterações foram descartadas.");
+    };
 
     const onTimeChange = (event, selectedDate) => {
         setShowPicker(false);
-
         if (event.type === 'set' && selectedDate) {
             const selectedTime = selectedDate || time;
-            
             const hours = selectedTime.getHours().toString().padStart(2, '0');
             const minutes = selectedTime.getMinutes().toString().padStart(2, '0');
             const formattedTime = `${hours}:${minutes}`;
-
             setDias(diasAtuais =>
                 diasAtuais.map(dia => {
                     if (dia.id === currentDiaId) {
@@ -121,13 +128,11 @@ export default function FuncionalidadesAlunoResponsavel({ navigation }) {
             <ScrollView contentContainerStyle={styles.scrollViewContainer}>
                 <View style={styles.containerPrincipal}>
                     <Text style={styles.tituloAba}>Horários</Text>
-                    
                     {dias.map(dia => (
                         <View key={dia.id} style={styles.cardDia}>
                             <View style={styles.headerDia}>
                                 <Text style={styles.textoDia}>{dia.nome}</Text>
-                            </View>
-                            
+                            </View>    
                             <View style={styles.secaoHorarios}>
                                 <View style={styles.blocoHorario}>
                                     <Text style={styles.labelHorario}>Início</Text>
@@ -141,7 +146,6 @@ export default function FuncionalidadesAlunoResponsavel({ navigation }) {
                                         <Text style={styles.textoBotao}>{dia.inicio ? 'alterar' : 'adicionar'}</Text>
                                     </TouchableOpacity>
                                 </View>
-                                
                                 <View style={styles.blocoHorario}>
                                     <Text style={styles.labelHorario}>Fim</Text>
                                     <View style={styles.circuloHorario}>
@@ -157,14 +161,16 @@ export default function FuncionalidadesAlunoResponsavel({ navigation }) {
                             </View>
                         </View>
                     ))}
-
-                    <TouchableOpacity style={styles.botaoSalvar} onPress={salvarConfiguracoes}>
-                        <Text style={styles.textoBotaoSalvar}>Salvar Configurações</Text>
-                    </TouchableOpacity>
-
+                    <View style={styles.botoesAcaoContainer}>
+                        <TouchableOpacity style={[styles.botaoAcao, styles.botaoCancelar]} onPress={cancelarAlteracoes}>
+                            <Text style={styles.textoBotaoAcao}>Cancelar</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity style={[styles.botaoAcao, styles.botaoSalvar]} onPress={salvarConfiguracoes}>
+                            <Text style={styles.textoBotaoAcao}>Salvar</Text>
+                        </TouchableOpacity>
+                    </View>
                 </View>
             </ScrollView>
-
             <FooterComIcones />
 
             {showPicker && (
@@ -263,14 +269,25 @@ const styles = StyleSheet.create({
         fontSize: 14,
         color: '#3D3D3D',
     },
-    botaoSalvar: {
-        backgroundColor: '#4CAF50',
+    botoesAcaoContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        marginTop: 20,
+    },
+    botaoAcao: {
+        flex: 1,
         padding: 15,
         borderRadius: 20,
-        marginTop: 20,
         alignItems: 'center',
+        marginHorizontal: 5,
     },
-    textoBotaoSalvar: {
+    botaoSalvar: {
+        backgroundColor: '#4CAF50',
+    },
+    botaoCancelar: {
+        backgroundColor: '#f44336',
+    },
+    textoBotaoAcao: {
         fontFamily: 'PoppinsBold',
         fontSize: 16,
         color: '#FFFFFF',
