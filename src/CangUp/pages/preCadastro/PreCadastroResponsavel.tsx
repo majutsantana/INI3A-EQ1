@@ -11,7 +11,7 @@ import {
  import * as Font from 'expo-font';
  import { useEffect, useState } from 'react';
  import { MaterialIcons } from '@expo/vector-icons';
- import Header from '../../components/Header';
+ import HeaderComLogout from '../../components/HeaderComLogout';
  import FooterComIcones from '../../components/FooterComIcones';
  import { useSafeAreaInsets } from 'react-native-safe-area-context';
  import { TextInputMask } from 'react-native-masked-text';
@@ -98,7 +98,7 @@ export default function PreCadastroResponsavel({ navigation }) {
         paddingLeft: insets.left,
         paddingRight: insets.right,}}>
         <StatusBar backgroundColor="#B9A6DA" barStyle="dark-content" />
-        <Header/>
+        <HeaderComLogout/>
 
         <View style={styles.content}>
           <View style={styles.formContainer}>

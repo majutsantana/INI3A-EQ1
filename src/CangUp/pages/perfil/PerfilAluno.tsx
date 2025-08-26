@@ -14,7 +14,7 @@ import {
 } from 'react-native';
 import * as Font from 'expo-font';
 import { Picker } from '@react-native-picker/picker';
-import Header from '../../components/Header';
+import HeaderComLogout from '../../components/HeaderComLogout';
 import FooterComIcones from '../../components/FooterComIcones';
 
 export default function PerfilAluno() {
@@ -44,7 +44,7 @@ export default function PerfilAluno() {
 
     return (
         <SafeAreaView style={styles.safeArea}>
-            <Header/>
+            <HeaderComLogout/>
 
             <View style={styles.profileTop}>
                 <View style={styles.nameTag}>

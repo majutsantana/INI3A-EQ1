@@ -20,7 +20,7 @@ const Stack = createNativeStackNavigator();
 export default function App() {
   //Direciona a tela que será aberta inicialmente 
   return <NavigationContainer> 
-    <Stack.Navigator initialRouteName='Login'> 
+    <Stack.Navigator initialRouteName='PerfilAluno'> 
       <Stack.Screen
         name="Login"
         component={Login}
