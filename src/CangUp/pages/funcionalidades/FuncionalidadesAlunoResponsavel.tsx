@@ -282,10 +282,10 @@ const styles = StyleSheet.create({
         marginHorizontal: 5,
     },
     botaoSalvar: {
-        backgroundColor: '#4CAF50',
+        backgroundColor: '#522a91',
     },
     botaoCancelar: {
-        backgroundColor: '#f44336',
+        backgroundColor: '#FFBE31',
     },
     textoBotaoAcao: {
         fontFamily: 'PoppinsBold',
