@@ -12,7 +12,7 @@ import {
     ScrollView,
 } from 'react-native';
 import * as Font from 'expo-font';
-import Header from '../../components/Header';
+import HeaderComLogout from '../../components/HeaderComLogout';
 import FooterComIcones from '../../components/FooterComIcones';
 
 
@@ -42,7 +42,7 @@ export default function PerfilResponsavel({navigation}) { //Navigation n√£o est√
 
     return (
         <SafeAreaView style={styles.safeArea}>
-            <Header/>
+            <HeaderComLogout/>
 
             <View style={styles.profileTop}>
                 <View style={styles.nameTag}>

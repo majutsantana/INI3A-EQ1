@@ -323,18 +323,17 @@ const styles = StyleSheet.create({
     fontFamily: 'PoppinsRegular',
     backgroundColor: '#d9d9d9',
     borderWidth:0,
+    borderRadius: 30,
+
   },
   pickerWrapper: {
-    // Estilos para alinhar com os outros inputs
     width: '90%',
-    height: 50, // Definir uma altura fixa é a melhor solução
-    borderRadius: 30, // Igual ao `input` e `passwordContainer`
+    height: 50,
+    borderRadius: 30,
     marginTop: '10%',
-    // Estilos visuais
     fontFamily: 'PoppinsRegular',
-    justifyContent: 'center', // Centraliza o item do Picker verticalmente
+    justifyContent: 'center',
     
-    // Sombra (copiada do seu estilo de input)
     shadowColor: "#000",
     shadowOffset: {
       width: 0,

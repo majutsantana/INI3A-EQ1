@@ -13,7 +13,7 @@ import {
     Platform
 } from 'react-native';
 import * as Font from 'expo-font';
-import Header from '../../components/Header';
+import HeaderComLogout from '../../components/HeaderComLogout';
 import FooterComIcones from '../../components/FooterComIcones';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import useApi from '../../hooks/useApi';
@@ -129,7 +129,7 @@ export default function PerfilInstituicao({navigation}) {
 
     return (
         <SafeAreaView style={styles.safeArea}>
-            <Header/>
+            <HeaderComLogout/>
 
             <View style={styles.profileTop}>
                 <View style={styles.nameTag}>

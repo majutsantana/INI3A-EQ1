@@ -12,7 +12,7 @@ import {
 import * as Font from 'expo-font';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import Header from '../../components/Header';
+import HeaderComLogout from '../../components/HeaderComLogout';
 import FooterComIcones from '../../components/FooterComIcones';
 
 const STORAGE_KEY = '@horarios_config';
@@ -123,7 +123,7 @@ export default function FuncionalidadesAlunoResponsavel({ navigation }) {
 
     return (
         <SafeAreaView style={styles.safeArea}>
-            <Header />
+            <HeaderComLogout/>
 
             <ScrollView contentContainerStyle={styles.scrollViewContainer}>
                 <View style={styles.containerPrincipal}>

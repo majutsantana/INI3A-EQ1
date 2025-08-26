@@ -46,7 +46,7 @@ import useApi from '../../hooks/useApi';
      if (validateForm()) {
        try {
          await getDados();
-         navigation.navigate('Login');
+         navigation.navigate('Login'); //implemetar direcionamento para ir pra tela funcionalidadesAlunoResponsavel 
        } catch (error) {
          console.error("Erro no processo de cadastro (handleCadastro):", error);
        }

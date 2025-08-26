@@ -17,6 +17,7 @@ import FooterComIcones from '../../components/FooterComIcones';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { TextInputMask } from 'react-native-masked-text'; //Pacote instalado 
 import useApi from '../../hooks/useApi';
+import HeaderComLogout from '../../components/HeaderComLogout';
 
 type errorType ={ 
   nome : string | undefined,
@@ -147,7 +148,7 @@ export default function PreCadastroAluno({ navigation }) {
     return(
       <SafeAreaView style={styles.safeArea}>
       <StatusBar backgroundColor="#B9A6DA" barStyle="dark-content" />
-      <Header/>
+      <HeaderComLogout/>
 
       <View style={styles.content}>
         <View style={styles.formContainer}>
