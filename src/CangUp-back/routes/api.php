@@ -31,7 +31,6 @@ Route::middleware(['jwt.auth'])->group(function () {
 
     Route::post('/cadastrarResp', [ResponsavelController::class, 'cadastrarResp']);
 
-    Route::get("/perfis", [PerfilController::class, 'getAll']);
 
 
     Route::get('instituicoes/', [InstituicaoController::class, 'index']);      // listar todas
@@ -55,9 +54,11 @@ Route::middleware(['jwt.auth'])->group(function () {
 
 // Rota pública de login
 Route::post('/login', [LoginController::class, 'login']);
+Route::post('/recuperar-senha', [LoginController::class, 'recuperarSenha']);
 
 Route::post('/cadastrarInst', [InstituicaoController::class, 'cadastrarInst']);
 
+Route::get("/perfis", [PerfilController::class, 'getAll']);
 
 
 

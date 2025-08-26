@@ -1,11 +1,10 @@
-import { Image, StyleSheet, Text, TextInput, View, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
+import { Image, StyleSheet, Text, TextInput, View, TouchableOpacity, ActivityIndicator, Alert, Modal } from 'react-native';
 import * as Font from 'expo-font';
 import { useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Feather, Ionicons } from '@expo/vector-icons';
+import { Feather } from '@expo/vector-icons';
 import FooterSemIcones from '../components/FooterSemIcones';
- import { Picker } from '@react-native-picker/picker';
-import useApi from '../hooks/useApi';
+import { Picker } from '@react-native-picker/picker';
 
 type _perfil = {
   rotulo: string,
@@ -13,33 +12,33 @@ type _perfil = {
   id: number
 }
 
-export default function Login({ navigation }) { //navigation não está dando erro, é erro do vscode 
-
+export default function Login({ navigation }) { //bug, não está dando erro 
   const [fontsLoaded, setFontsLoaded] = useState<boolean>(false);
   const [username, setusername] = useState<string>('');
   const [senha, setSenha] = useState<string>('');
   const [senhaVisivel, setSenhaVisivel] = useState(false);
   const [tipoDeLogin, setTipoDeLogin] = useState<string>('');
   const [perfis, setPerfis] = useState<_perfil[]>([]);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [emailRecuperacao, setEmailRecuperacao] = useState('');
+
   const toggleSenhaVisibilidade = () => {
     setSenhaVisivel(!senhaVisivel);
   };
 
-
   const login = async () => {
     if (!username || !senha) {
-      Alert.alert("Erro", "Preencha todos os campos."); 
+      Alert.alert("Erro", "Preencha todos os campos.");
       return;
     }
 
     try {
-      let {url} = useApi();
-      const response = await fetch(url+"/api/login", {
-        method: "POST", 
+      const response = await fetch("http://127.0.0.1:8000/api/login", {
+        method: "POST",
         headers: {
           "Content-Type": "application/json"
         },
-        body: JSON.stringify({ login: username, senha, perfil:tipoDeLogin })
+        body: JSON.stringify({ login: username, senha, perfil: tipoDeLogin })
       });
 
       if (!response.ok) {
@@ -50,14 +49,11 @@ export default function Login({ navigation }) { //navigation não está dando er
 
       const data = await response.json();
       const token = data.token;
-      const InstId = data.id_instituicao;
 
       if (token) {
         await AsyncStorage.setItem("jwt", token);
-        if (tipoDeLogin === "inst" && InstId){
-          await AsyncStorage.setItem("id_instituicao", String(InstId));
-          navigation.navigate("PreCadastroAluno");
-        }
+        if (tipoDeLogin === "inst")
+          navigation.navigate("PerfilInstituicao");
         else if (tipoDeLogin === "alun")
           navigation.navigate("PerfilAluno");
         else
@@ -71,7 +67,6 @@ export default function Login({ navigation }) { //navigation não está dando er
     }
   };
 
-
   const loadFonts = async () => {
     await Font.loadAsync({
       'PoppinsRegular': require('../assets/fonts/PoppinsRegular.ttf'),
@@ -82,27 +77,20 @@ export default function Login({ navigation }) { //navigation não está dando er
 
   useEffect(() => {
     loadFonts();
-    // fetch("http://127.0.0.1:8000/")
-    //   .then(r=> r.json())
-    //   .then(r=> {alert(r.Hello); Alert.alert(r.Hello)})
-    let {url} = useApi();
-    fetch(url+"/api/perfis", {
+    fetch("http://127.0.0.1:8000/api/perfis", {
       method: 'GET'
     }).then(r => r.json())
       .then(r => setPerfis(r))
   }, []);
 
-  async function getDados() {
-    // let r = await fetch("http://localhost:8000/cadastrar");
-    // let dados =  await r.json();
-    // alert(dados.Hello);
-
-    navigation.navigate("ForgotPswdScreen");
+  function getDados() {
+    setModalVisible(true);
   }
 
   const renderPerfis = () => {
-    return perfis.map(p => 
-            <Picker.Item key={p.id} label={p.nome} value={p.rotulo} />)
+    return perfis.map(p =>
+      <Picker.Item key={p.id} label={p.nome} value={p.rotulo} />
+    )
   }
 
   if (!fontsLoaded) {
@@ -115,6 +103,7 @@ export default function Login({ navigation }) { //navigation não está dando er
 
   return (
     <View style={styles.container}>
+      {/*HEADER COM IMAGEM*/}
       <View style={styles.header}>
         <Image
           source={require('../assets/logocangUp-horizontal-claro.png')}
@@ -122,30 +111,30 @@ export default function Login({ navigation }) { //navigation não está dando er
         />
       </View>
 
+      {/*BODY*/}
       <View style={styles.body}>
         <Text style={styles.title}>Bem-vindo de volta!</Text>
-        <View style={styles.inputgroup}>
-          <View style={styles.pickerWrapper}>
-            <Picker
-              selectedValue={tipoDeLogin}
-              onValueChange={(itemValue) => setTipoDeLogin(itemValue)}
-              style={[
+        <View style={styles.pickerWrapper}>
+          <Picker
+            selectedValue={tipoDeLogin}
+            onValueChange={(itemValue) => setTipoDeLogin(itemValue)}
+            style={[
               styles.picker,
-              { color: tipoDeLogin === '' ? '#888' : '#000' } // preto para placeholder, cinza para os demais
-              ]}
-            >
+              { color: tipoDeLogin === '' ? '#888' : '#000' }
+            ]}
+          >
             <Picker.Item label="Selecione o tipo de Login" value="" />
             {renderPerfis()}
           </Picker>
-          </View>
-        
+        </View>
+
         <TextInput
           style={styles.input}
           placeholder="Email"
           placeholderTextColor="#888"
           value={username}
           onChangeText={setusername}
-        /> 
+        />
         <View style={styles.passwordContainer}>
           <TextInput
             style={styles.passwordInput}
@@ -162,7 +151,6 @@ export default function Login({ navigation }) { //navigation não está dando er
               color="#888"
             />
           </TouchableOpacity>
-          </View>
         </View>
 
         <TouchableOpacity style={styles.button} onPress={login}>
@@ -177,12 +165,83 @@ export default function Login({ navigation }) { //navigation não está dando er
           Não tem uma conta?
         </Text>
 
-        <TouchableOpacity onPress={()=>navigation.navigate('TipoCadastro')}>
+        <TouchableOpacity onPress={() => navigation.navigate('TipoCadastro')}>
           <Text style={styles.linkText}> Criar conta</Text>
         </TouchableOpacity>
       </View>
 
-      <FooterSemIcones/>
+      {/* MODAL DE ESQUECI MINHA SENHA */}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View style={{
+          flex: 1,
+          backgroundColor: 'rgba(0,0,0,0.5)',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}>
+          <View style={{
+            width: '85%',
+            backgroundColor: '#fff',
+            borderRadius: 20,
+            padding: 20,
+            alignItems: 'center',
+            shadowColor: '#000',
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.25,
+            shadowRadius: 4,
+            elevation: 5,
+          }}>
+            <Text style={{ fontSize: 18, fontFamily: 'PoppinsBold', marginBottom: 10 }}>
+              Recuperar Senha
+            </Text>
+
+            <TextInput
+              style={{
+                width: '100%',
+                backgroundColor: '#d9d9d9',
+                padding: 12,
+                borderRadius: 10,
+                fontFamily: 'PoppinsRegular',
+                marginBottom: 15
+              }}
+              placeholder="Digite seu e-mail"
+              placeholderTextColor="#888"
+              value={emailRecuperacao}
+              onChangeText={setEmailRecuperacao}
+            />
+
+            <TouchableOpacity
+              style={{
+                backgroundColor: '#FFBE31',
+                paddingVertical: 10,
+                paddingHorizontal: 20,
+                borderRadius: 10,
+                width: '100%',
+                alignItems: 'center',
+                marginBottom: 10,
+              }}
+              onPress={() => {
+                fetch("/api/recuperar-senha", { method: "post", body: emailRecuperacao });
+                Alert.alert("Solicitação enviada", "Se o e-mail existir, você receberá instruções.");
+                setModalVisible(false);
+                setEmailRecuperacao('');
+              }}
+            >
+              <Text style={{ fontFamily: 'PoppinsBold', color: '#000' }}>Enviar</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity onPress={() => setModalVisible(false)}>
+              <Text style={{ fontFamily: 'PoppinsRegular', color: '#522a91' }}>Cancelar</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
+      <FooterSemIcones />
     </View>
   );
 }
@@ -213,7 +272,6 @@ const styles = StyleSheet.create({
     elevation: 1,
   },
   title: {
-    
     fontSize: 20,
     fontFamily: 'PoppinsBold',
   },
@@ -226,10 +284,7 @@ const styles = StyleSheet.create({
     paddingLeft: '5%',
     fontFamily: 'PoppinsRegular',
     shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 3,
-    },
+    shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.27,
     shadowRadius: 4.65,
     elevation: 6,
@@ -248,7 +303,7 @@ const styles = StyleSheet.create({
     elevation: 6,
   },
   passwordInput: {
-    flex: 1, 
+    flex: 1,
     padding: '5%',
     paddingLeft: '5%',
     fontFamily: 'PoppinsRegular',
@@ -266,10 +321,7 @@ const styles = StyleSheet.create({
     marginTop: '10%',
     marginBottom: '10%',
     shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 3,
-    },
+    shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.27,
     shadowRadius: 4.65,
     elevation: 6,
@@ -302,39 +354,36 @@ const styles = StyleSheet.create({
     width: '80%',
     height: '100%',
   },
-  inputgroup:{
-    width:'100%',
+  inputgroup: {
+    width: '100%',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingBottom:'5%',
+    paddingBottom: '5%',
   },
   iconButton: {
-    padding:5,
+    padding: 5,
     fontFamily: 'PoppinsRegular',
-    flexDirection:'row',
+    flexDirection: 'row',
     columnGap: 10,
     fontSize: 14,
-    alignItems:'center',
-    color:'#888',
+    alignItems: 'center',
+    color: '#888',
   },
   picker: {
-    width:'100%',
+    width: '100%',
     fontSize: 16,
     fontFamily: 'PoppinsRegular',
     backgroundColor: '#d9d9d9',
-    borderWidth:0,
+    borderWidth: 0,
   },
   pickerWrapper: {
-    // Estilos para alinhar com os outros inputs
-    width: '90%',
-    height: 50, // Definir uma altura fixa é a melhor solução
-    borderRadius: 30, // Igual ao `input` e `passwordContainer`
-    marginTop: '10%',
-    // Estilos visuais
-    fontFamily: 'PoppinsRegular',
-    justifyContent: 'center', // Centraliza o item do Picker verticalmente
-    
-    // Sombra (copiada do seu estilo de input)
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: '5%',
+    paddingVertical: '5%',
+    borderRadius: 25,
+    overflow: 'hidden',
+    backgroundColor: '#d9d9d9',
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
@@ -343,6 +392,5 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.27,
     shadowRadius: 4.65,
     elevation: 6,
-    backgroundColor: '#d9d9d9', 
   },
 });

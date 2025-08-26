@@ -1,6 +1,7 @@
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Login from './pages/Login';
+import EsqueciSenha from './pages/EsqueciSenha';
 import TipoCadastro from './pages/cadastro/TipoCadastro';
 import CadastroAluno from './pages/cadastro/CadastroAluno';
 import PerfilInstituicao from './pages/perfil/PerfilInstituicao';
@@ -84,6 +85,12 @@ export default function App() {
         name="FuncionalidadesAlunoResponsavel"
         component={FuncionalidadesAlunoResponsavel}
         options={{ headerShown: false }}
+      />
+
+      <Stack.Screen
+        name="RedefinirSenha"
+        component={EsqueciSenha}
+        options={{ title: 'Redefinir Senha' }}
       />
 
     </Stack.Navigator>
