@@ -374,7 +374,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: 'PoppinsRegular',
     backgroundColor: '#d9d9d9',
-<<<<<<< HEAD
     borderWidth: 0,
   },
   pickerWrapper: {
@@ -385,20 +384,6 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     overflow: 'hidden',
     backgroundColor: '#d9d9d9',
-=======
-    borderWidth:0,
-    borderRadius: 30,
-
-  },
-  pickerWrapper: {
-    width: '90%',
-    height: 50,
-    borderRadius: 30,
-    marginTop: '10%',
-    fontFamily: 'PoppinsRegular',
-    justifyContent: 'center',
-    
->>>>>>> aeb25fa2515fbf248fbdcbf317c50a7bd6014493
     shadowColor: "#000",
     shadowOffset: {
       width: 0,

@@ -19,6 +19,7 @@ import Header from '../../components/Header';
 import FooterSemIcones from '../../components/FooterSemIcones';
 import { Feather} from '@expo/vector-icons';
 import useApi from '../../hooks/useApi';
+import { TextInputMask } from 'react-native-masked-text';
  
  
  export default function CadastroResponsavel({navigation}) { //Não é erro, é só o vscode dando trabalho
@@ -28,6 +29,7 @@ import useApi from '../../hooks/useApi';
    const [email, setEmail] = useState('');
    const [senha, setSenha] = useState('');
    const [confSenha, setconfSenha] = useState('');
+   const [telefone, setTelefone] = useState('');
    const [sexo, setSexo] = useState(''); 
    const [check, setCheck] = useState(false);
    const [errors, setErrors] = useState({});
@@ -95,6 +97,17 @@ import useApi from '../../hooks/useApi';
        newErrors.confSenha = 'As senhas não coincidem.';
        isValid = false;
      }
+     if (!telefone.trim()) {
+      newErrors.telefone = 'Telefone é obrigatório.';
+      isValid = false;
+    } 
+    else {
+      const onlyNumbers = telefone.replace(/\D/g, ''); 
+      if (onlyNumbers.length < 10 || onlyNumbers.length > 11) { 
+        newErrors.telefone = 'Telefone inválido. Deve conter DDD + número.';
+        isValid = false;
+        }
+    }
  
      if (!sexo) {
        newErrors.sexo = 'Selecione o sexo.';
@@ -219,8 +232,25 @@ import useApi from '../../hooks/useApi';
                 </TouchableOpacity>
                 </View>
                 {errors.confSenha && <Text style={styles.errorText}>{errors.confSenha}</Text>}
-              </View>
 
+                <View style={styles.inputGroup}>
+                  <Text style={styles.label}>Telefone:</Text>
+                  <TextInputMask
+                    style={styles.input}
+                    type={'cel-phone'}
+                    options={{
+                      maskType: 'BRL',
+                      withDDD: true,
+                      dddMask: '(99) '
+                    }}
+                    placeholder="(99) 99999-9999" 
+                    placeholderTextColor="#888"
+                    value={telefone}
+                    onChangeText={setTelefone}
+                  />
+                  {errors.telefone && <Text style={styles.errorText}>{errors.telefone}</Text>}
+                </View>
+              </View>
           </ScrollView>
         </View>
  

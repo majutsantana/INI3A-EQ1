@@ -19,6 +19,7 @@ import Header from '../../components/Header';
 import FooterSemIcones from '../../components/FooterSemIcones';
 import { Feather} from '@expo/vector-icons';
 import useApi from '../../hooks/useApi';
+import { TextInputMask } from 'react-native-masked-text';
 
 export default function CadastroAluno({ navigation }) { // Não é erro, é só o vscode dando trabalho
   
@@ -29,6 +30,7 @@ export default function CadastroAluno({ navigation }) { // Não é erro, é só 
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
   const [confSenha, setconfSenha] = useState('');
+  const [telefone, setTelefone] = useState('');
   const [endereco, setEndereco] = useState('');
   const [sexo, setSexo] = useState('');
   const [instituicao, setInstituicao] = useState('');
@@ -85,6 +87,18 @@ export default function CadastroAluno({ navigation }) { // Não é erro, é só 
     } else if (senha !== confSenha) {
       newErrors.confSenha = 'As senhas não coincidem.';
       isValid = false;
+    }
+
+    if (!telefone.trim()) {
+      newErrors.telefone = 'Telefone é obrigatório.';
+      isValid = false;
+    } 
+    else {
+      const onlyNumbers = telefone.replace(/\D/g, ''); 
+      if (onlyNumbers.length < 10 || onlyNumbers.length > 11) { 
+        newErrors.telefone = 'Telefone inválido. Deve conter DDD + número.';
+        isValid = false;
+        }
     }
 
     if (!endereco.trim()) {
@@ -214,6 +228,23 @@ export default function CadastroAluno({ navigation }) { // Não é erro, é só 
               </TouchableOpacity>
               </View> 
               {errors.confSenha && <Text style={styles.errorText}>{errors.confSenha}</Text>}
+            </View>
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>Telefone:</Text>
+              <TextInputMask
+                style={styles.input}
+                type={'cel-phone'}
+                options={{
+                  maskType: 'BRL',
+                  withDDD: true,
+                  dddMask: '(99) '
+                }}
+                placeholder="(99) 99999-9999" 
+                placeholderTextColor="#888"
+                value={telefone}
+                onChangeText={setTelefone}
+              />
+              {errors.telefone && <Text style={styles.errorText}>{errors.telefone}</Text>}
             </View>
             <View style={styles.inputGroup}>
               <Text style={styles.label}>Endereço:</Text>
