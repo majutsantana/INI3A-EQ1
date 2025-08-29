@@ -5,6 +5,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Feather } from '@expo/vector-icons';
 import FooterSemIcones from '../components/FooterSemIcones';
 import { Picker } from '@react-native-picker/picker';
+import useApi from '../hooks/useApi';
 
 type _perfil = {
   rotulo: string,
@@ -33,7 +34,8 @@ export default function Login({ navigation }) { //bug, não está dando erro
     }
 
     try {
-      const response = await fetch("http://127.0.0.1:8000/api/login", {
+      let {url} = useApi();
+      const response = await fetch(url + "/api/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -49,11 +51,15 @@ export default function Login({ navigation }) { //bug, não está dando erro
 
       const data = await response.json();
       const token = data.token;
+      const IdInst = data.id_instituicao;
 
       if (token) {
         await AsyncStorage.setItem("jwt", token);
-        if (tipoDeLogin === "inst")
+        await AsyncStorage.setItem("perfil", tipoDeLogin); 
+        if (tipoDeLogin === "inst"){
+          await AsyncStorage.setItem("id_instituicao", IdInst);
           navigation.navigate("PerfilInstituicao");
+        }
         else if (tipoDeLogin === "alun")
           navigation.navigate("PerfilAluno");
         else
@@ -76,8 +82,9 @@ export default function Login({ navigation }) { //bug, não está dando erro
   };
 
   useEffect(() => {
+    let {url} = useApi();
     loadFonts();
-    fetch("http://127.0.0.1:8000/api/perfis", {
+    fetch(url + "/api/perfis", {
       method: 'GET'
     }).then(r => r.json())
       .then(r => setPerfis(r))
