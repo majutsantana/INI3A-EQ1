@@ -49,11 +49,14 @@ export default function Login({ navigation }) { //bug, não está dando erro
 
       const data = await response.json();
       const token = data.token;
+      const IdInst = data.id_instituicao;
 
       if (token) {
         await AsyncStorage.setItem("jwt", token);
-        if (tipoDeLogin === "inst")
+        if (tipoDeLogin === "inst"){
+          await AsyncStorage.setItem("id_instituicao", IdInst);
           navigation.navigate("PerfilInstituicao");
+        }
         else if (tipoDeLogin === "alun")
           navigation.navigate("PerfilAluno");
         else

@@ -25,7 +25,7 @@ class AlunoController extends Controller
            // 'email' => 'email',
            // 'sexo' => 'in:Masculino,Feminino,Neutro,Prefiro não informar',
            // 'endereco' => 'string',
-           // 'id_inst' => 'required|exists:instituicoes,id',
+           'id_inst' => 'required|exists:instituicoes,id',
            // 'senha' => 'string'
         ]);
         

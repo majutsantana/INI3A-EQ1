@@ -163,8 +163,8 @@ export default function PerfilInstituicao({ navigation }) {
                 />
                 {errors.telefone && <Text style={styles.errorText}>{errors.telefone}</Text>}
                 {editando && <TouchableOpacity style={styles.saveBtn} onPress={salvarEdicao}><Text style={styles.saveText}>Salvar Alterações</Text></TouchableOpacity>}
-                <TouchableOpacity style={styles.button}><Text style={styles.buttonText}>Cadastro de responsáveis</Text></TouchableOpacity>
-                <TouchableOpacity style={styles.button}><Text style={styles.buttonText}>Cadastro de alunos interessados</Text></TouchableOpacity>
+                <TouchableOpacity style={styles.button} onPress={()=>navigation.navigate(`PreCadastroReponsavel`)}><Text style={styles.buttonText}>Cadastro de responsáveis</Text></TouchableOpacity>
+                <TouchableOpacity style={styles.button} onPress={()=>navigation.navigate(`PreCadastroAluno`)}><Text style={styles.buttonText}>Cadastro de alunos</Text></TouchableOpacity>
             </ScrollView>
             <FooterComIcones />
         </SafeAreaView>
