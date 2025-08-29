@@ -76,15 +76,15 @@ class LoginController extends Controller
 
         $token = Str::random(60);
 
-        DB::table('password_resets')->updateOrInsert(
-            ['email' => $request->email],
+        DB::table('password_reset_tokens')->updateOrInsert(
             [
+                'email' => $request->email,
                 'token' => $token,
                 'created_at' => now()
             ]
         );
 
-        Mail::to($request->email)->send(new ResetSenhaMail($request->email, $token));
+        Mail::to($request->email)->send(new ResetSenhaMail($request->email, $usuario->nome, $token));
 
         return response()->json(['message' => 'E-mail de recuperação enviado com sucesso.']);
     }
@@ -100,7 +100,7 @@ class LoginController extends Controller
             'senha' => 'required|min:6|confirmed',
         ]);
 
-        $registro = DB::table('password_resets')
+        $registro = DB::table('password_reset_tokens')
             ->where('email', $request->email)
             ->where('token', $request->token)
             ->first();
@@ -118,7 +118,7 @@ class LoginController extends Controller
         $usuario->senha = Hash::make($request->senha);
         $usuario->save();
 
-        DB::table('password_resets')->where('email', $request->email)->delete();
+        DB::table('password_reset_tokens')->where('email', $request->email)->delete();
 
         return response()->json(['message' => 'Senha redefinida com sucesso.']);
     }

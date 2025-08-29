@@ -225,7 +225,7 @@ export default function Login({ navigation }) { //bug, não está dando erro
                 marginBottom: 10,
               }}
               onPress={() => {
-                fetch("/api/recuperar-senha", { method: "post", body: emailRecuperacao });
+                fetch("http://localhost:8000/api/recuperar-senha", { method: "post", body: emailRecuperacao });
                 Alert.alert("Solicitação enviada", "Se o e-mail existir, você receberá instruções.");
                 setModalVisible(false);
                 setEmailRecuperacao('');
@@ -374,18 +374,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: 'PoppinsRegular',
     backgroundColor: '#d9d9d9',
-<<<<<<< HEAD
-    borderWidth: 0,
-  },
-  pickerWrapper: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: '5%',
-    paddingVertical: '5%',
-    borderRadius: 25,
-    overflow: 'hidden',
-    backgroundColor: '#d9d9d9',
-=======
     borderWidth:0,
     borderRadius: 30,
 
@@ -398,7 +386,6 @@ const styles = StyleSheet.create({
     fontFamily: 'PoppinsRegular',
     justifyContent: 'center',
     
->>>>>>> aeb25fa2515fbf248fbdcbf317c50a7bd6014493
     shadowColor: "#000",
     shadowOffset: {
       width: 0,

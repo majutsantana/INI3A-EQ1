@@ -20,45 +20,37 @@ use App\Http\Controllers\UserController;
 // ROTAS PÚBLICAS (Não precisam de autenticação)
 //======================================================================
 
-<<<<<<< HEAD
-    Route::post('/cadastrarResp', [ResponsavelController::class, 'cadastrarResp']);
+Route::post('/cadastrarResp', [ResponsavelController::class, 'cadastrarResp']);
 
 
 
-    Route::get('instituicoes/', [InstituicaoController::class, 'index']);      // listar todas
-    Route::get('instituicoes/{id}', [InstituicaoController::class, 'show']);   // listar uma
-    Route::post('instituicoes/', [InstituicaoController::class, 'store']);     // criar
-    Route::put('instituicoes/{id}', [InstituicaoController::class, 'update']); // atualizar
-    Route::delete('instituicoes/{id}', [InstituicaoController::class, 'destroy']); // deletar
+Route::get('instituicoes/', [InstituicaoController::class, 'index']);      // listar todas
+Route::get('instituicoes/{id}', [InstituicaoController::class, 'show']);   // listar uma
+Route::post('instituicoes/', [InstituicaoController::class, 'store']);     // criar
+Route::put('instituicoes/{id}', [InstituicaoController::class, 'update']); // atualizar
+Route::delete('instituicoes/{id}', [InstituicaoController::class, 'destroy']); // deletar
 
 
-    Route::post('/cadastrarAdmin', [AdminController::class, 'store']);
+Route::post('/cadastrarAdmin', [AdminController::class, 'store']);
 
 
-    // Exemplo: pegar dados do usuário autenticado
-    Route::get('/usuario', [UserController::class, 'me']);
+// Exemplo: pegar dados do usuário autenticado
+Route::get('/usuario', [UserController::class, 'me']);
 
-    // Exemplo: logout (invalida token)
-    Route::post('/logout', [LoginController::class, 'logout']);
+// Exemplo: logout (invalida token)
+Route::post('/logout', [LoginController::class, 'logout']);
 
-});
 
 
 // Rota pública de login
-=======
-// --- Autenticação ---
->>>>>>> aeb25fa2515fbf248fbdcbf317c50a7bd6014493
 Route::post('/login', [LoginController::class, 'login']);
 Route::post('/recuperar-senha', [LoginController::class, 'recuperarSenha']);
 
 // --- Cadastros Públicos ---
 Route::post('/cadastrarInst', [InstituicaoController::class, 'cadastrarInst']);
 
-<<<<<<< HEAD
-=======
 // --- Consultas Públicas ---
 Route::get('instituicoes/', [InstituicaoController::class, 'index']); // Listar todas as instituições
->>>>>>> aeb25fa2515fbf248fbdcbf317c50a7bd6014493
 Route::get("/perfis", [PerfilController::class, 'getAll']);
 
 
