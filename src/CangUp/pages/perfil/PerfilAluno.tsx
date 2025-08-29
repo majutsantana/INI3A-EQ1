@@ -70,6 +70,7 @@ export default function PerfilAluno() {
             <ScrollView contentContainerStyle={styles.formContainer}>
                 <TextInput placeholder="Nome:" style={styles.input} placeholderTextColor="#000" />
                 <TextInput placeholder="CPF:" style={styles.input} placeholderTextColor="#000" />
+                <TextInput placeholder="Telefone:" style={styles.input} placeholderTextColor="#000" />
                 <View style={styles.input}>
                     <Picker
                         selectedValue={selectedGenero}
@@ -193,5 +194,6 @@ const styles = StyleSheet.create({
         color: '#000',
         backgroundColor: '#F5F5F5',
         borderWidth: 0,
+        fontFamily: 'PoppinsRegular',
     },
 });

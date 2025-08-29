@@ -1,11 +1,11 @@
 <?php
 return [
 
-    'paths' => ['api/*'],
+    'paths' => ['*'],
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => ['http://localhost:8081'], 
+    'allowed_origins' => ['*'], 
 
     'allowed_origins_patterns' => [],
 

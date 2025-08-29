@@ -25,7 +25,7 @@ class AlunoController extends Controller
            // 'email' => 'email',
            // 'sexo' => 'in:Masculino,Feminino,Neutro,Prefiro não informar',
            // 'endereco' => 'string',
-           // 'id_inst' => 'required|exists:instituicoes,id',
+           'id_inst' => 'required|exists:instituicoes,id',
            // 'senha' => 'string'
         ]);
         
@@ -58,4 +58,72 @@ class AlunoController extends Controller
 
         return response()->json($aluno, 201);
     }
+
+    public function efetivarAluno(Request $req){
+        $dados = $req->validate([
+            'cpf' => 'required|string',
+            'nome'=>'required|string',
+            'id_inst'=>'required|int'
+        ]);
+
+        $aluno = Aluno::where('cpf', $dados['cpf'])
+                ->where('nome', $dados['nome'])
+                ->where('id_inst', $dados['id_inst'])
+                ->first();
+
+            
+        if (!$aluno) {
+            return response()->json(['message' => 'Aluno não encontrado.'], 404);
+        }
+
+        return response()->json([
+            'message' => 'Aluno Efetivado',
+            'aluno' => $aluno
+        ], 200);
+    }
+
+    public function cadastrarAluno(Request $req){
+        $dados = $req->validate([
+            'cpf' => 'required|string|exists:alunos,cpf', 
+            'email' => 'required|string|email|max:255|unique:usuarios,email',
+            'sexo' => 'in:Masculino,Feminino,Neutro,Prefiro não informar',
+            'endereco' => 'string',
+            'senha' => 'required|string|min:6'
+        ]);
+        
+        $aluno = Aluno::where('cpf', $dados['cpf'])->first();
+
+        
+        
+        if (!$aluno) {
+            return response()->json(['message' => 'Aluno não encontrado para cadastro.'], 404);
+        }
+
+        $usuario = new Usuario();
+        $usuario->email = $dados['email'];
+        $usuario->login = $dados['email'];
+        $usuario->senha = $dados['senha'];
+        $usuario->save();
+
+        $perfil = Perfil::where("rotulo", "aluno")->first();
+        DB::table("perfil_usuario")->insert([
+            "usuario_id" => $usuario->id,
+            "perfil_id" => $perfil->id
+        ]);
+
+        $aluno->email = $dados['email'];
+        $aluno->sexo = $dados['sexo'];
+        $aluno->endereco = $dados['endereco'];
+
+        $aluno->update();
+
+        return response()->json([
+            'message' => 'Aluno cadastrado com sucesso',
+            'aluno' => $aluno,
+            'usuario' => $usuario
+        ], 201);
+    }
+
+
 }
+

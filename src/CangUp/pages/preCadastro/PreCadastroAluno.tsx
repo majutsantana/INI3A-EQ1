@@ -128,7 +128,8 @@ export default function PreCadastroAluno({ navigation }) {
 
     const getDados = async () => {
         try{
-            let token = AsyncStorage.getItem('jwt');
+            const token = await AsyncStorage.getItem('jwt');
+            const id_inst = await AsyncStorage.getItem("id_instituicao");
             let {url} = useApi();
             const response = await fetch(url+'/api/preCadastrarAluno', { 
             method: 'POST',
@@ -136,7 +137,7 @@ export default function PreCadastroAluno({ navigation }) {
                 'Content-Type': 'application/json',
                 'Authorization': 'Bearer '+token
             },
-            body: JSON.stringify({nome, RA, CPF}),
+            body: JSON.stringify({nome, ra: RA, cpf: CPF, id_inst}),
             });
             const text = await response.text();
             console.log('Resposta da API (texto):', text);

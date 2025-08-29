@@ -14,7 +14,6 @@ const Header = () => {
    }
  ];
 
-
  return (
    <View style={styles.header}>
      <TouchableOpacity onPress={() => setVisible(true)}>
