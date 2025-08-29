@@ -20,33 +20,9 @@ use App\Http\Controllers\ResponsavelController; // Importação adicionada
 // ROTAS PÚBLICAS (Não precisam de autenticação)
 //======================================================================
 
-<<<<<<< HEAD
-Route::post('/cadastrarResp', [ResponsavelController::class, 'cadastrarResp']);
-
-
-
-Route::get('instituicoes/', [InstituicaoController::class, 'index']);      // listar todas
-Route::get('instituicoes/{id}', [InstituicaoController::class, 'show']);   // listar uma
-Route::post('instituicoes/', [InstituicaoController::class, 'store']);     // criar
-Route::put('instituicoes/{id}', [InstituicaoController::class, 'update']); // atualizar
-Route::delete('instituicoes/{id}', [InstituicaoController::class, 'destroy']); // deletar
-
-
-Route::post('/cadastrarAdmin', [AdminController::class, 'store']);
-
-
-// Exemplo: pegar dados do usuário autenticado
-Route::get('/usuario', [UserController::class, 'me']);
-
-// Exemplo: logout (invalida token)
-Route::post('/logout', [LoginController::class, 'logout']);
-
-
 
 // Rota pública de login
-=======
 // --- Autenticação e Recuperação de Senha ---
->>>>>>> 5392999ccd141e063647a6fc1c126fd0ccf01c64
 Route::post('/login', [LoginController::class, 'login']);
 Route::post('/recuperar-senha', [LoginController::class, 'recuperarSenha']);
 
@@ -58,13 +34,8 @@ Route::post('/cadastrarAluno', [AlunoController::class, 'cadastrarAluno']);
 
 
 // --- Consultas Públicas ---
-<<<<<<< HEAD
 Route::get('instituicoes/', [InstituicaoController::class, 'index']); // Listar todas as instituições
 Route::get("/perfis", [PerfilController::class, 'getAll']);
-=======
-Route::get('/instituicoes', [InstituicaoController::class, 'index']); // Listar todas as instituições
-Route::get('/perfis', [PerfilController::class, 'getAll']);
->>>>>>> 5392999ccd141e063647a6fc1c126fd0ccf01c64
 
 
 //======================================================================

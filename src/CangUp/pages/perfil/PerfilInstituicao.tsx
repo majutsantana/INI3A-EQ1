@@ -39,13 +39,11 @@ export default function PerfilInstituicao({ navigation }) {
             const token = await AsyncStorage.getItem("jwt");
             if (!token) {
                 Alert.alert("Erro", "Você precisa estar logado.");
-                navigation.navigate("Login");
                 return;
             }
             const id = await AsyncStorage.getItem("id_instituicao");
             if (!id) {
                 Alert.alert("Erro", "ID da instituição não encontrado.");
-                navigation.navigate("Login");
                 return;
             }
             const res = await fetch(`${url}/api/instituicoes/${id}`, {
@@ -69,7 +67,7 @@ export default function PerfilInstituicao({ navigation }) {
     const validateForm = () => {
         const newErrors: { telefone?: string } = {};
         let isValid = true;
-        
+
         if (rawTelefone.length < 10 || rawTelefone.length > 11) {
             newErrors.telefone = 'Telefone inválido. Precisa ter 10 ou 11 dígitos.';
             isValid = false;
@@ -140,9 +138,9 @@ export default function PerfilInstituicao({ navigation }) {
             </View>
             <ScrollView contentContainerStyle={styles.formContainer}>
                 <Text style={styles.label}>Nome:</Text>
-                <TextInput style={styles.input} value={instituicao.nome} editable={false} />
+                <TextInput style={styles.input} value={instituicao.nome} editable={editando} onChangeText={(text) => handleInputChange('nome', text)} />
                 <Text style={styles.label}>Endereço:</Text>
-                <TextInput style={styles.input} value={instituicao.endereco} editable={false} />
+                <TextInput style={styles.input} value={instituicao.endereco} editable={editando} onChangeText={(text) => handleInputChange('endereco', text)} />
                 <Text style={styles.label}>Telefone para contato:</Text>
                 <TextInputMask
                     style={[styles.input, errors.telefone && styles.inputError]}
@@ -153,9 +151,11 @@ export default function PerfilInstituicao({ navigation }) {
                     placeholder="(99) 99999-9999"
                     placeholderTextColor="#888"
                     value={instituicao.telefone}
-                    onChangeText={(maskedText, rawText) => {
-                        handleInputChange('telefone', maskedText);
-                        setRawTelefone(rawText || '');
+                    onChangeText={(maskedText) => {
+                        const newRawText = maskedText.replace(/\D/g, '');
+                        handleInputChange('telefone', maskedText); 
+                        setRawTelefone(newRawText); 
+
                         if (errors.telefone) setErrors({});
                     }}
                     editable={editando}
@@ -163,8 +163,8 @@ export default function PerfilInstituicao({ navigation }) {
                 />
                 {errors.telefone && <Text style={styles.errorText}>{errors.telefone}</Text>}
                 {editando && <TouchableOpacity style={styles.saveBtn} onPress={salvarEdicao}><Text style={styles.saveText}>Salvar Alterações</Text></TouchableOpacity>}
-                <TouchableOpacity style={styles.button} onPress={()=>navigation.navigate(`PreCadastroReponsavel`)}><Text style={styles.buttonText}>Cadastro de responsáveis</Text></TouchableOpacity>
-                <TouchableOpacity style={styles.button} onPress={()=>navigation.navigate(`PreCadastroAluno`)}><Text style={styles.buttonText}>Cadastro de alunos</Text></TouchableOpacity>
+                <TouchableOpacity style={styles.button} onPress={() => navigation.navigate(`PreCadastroResponsavel`)}><Text style={styles.buttonText}>Cadastro de responsáveis</Text></TouchableOpacity>
+                <TouchableOpacity style={styles.button} onPress={() => navigation.navigate(`PreCadastroAluno`)}><Text style={styles.buttonText}>Cadastro de alunos</Text></TouchableOpacity>
             </ScrollView>
             <FooterComIcones />
         </SafeAreaView>

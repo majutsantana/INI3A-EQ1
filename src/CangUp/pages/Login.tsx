@@ -1,11 +1,12 @@
 import { Image, StyleSheet, Text, TextInput, View, TouchableOpacity, ActivityIndicator, Alert, Modal } from 'react-native';
 import * as Font from 'expo-font';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Feather } from '@expo/vector-icons';
 import FooterSemIcones from '../components/FooterSemIcones';
 import { Picker } from '@react-native-picker/picker';
 import useApi from '../hooks/useApi';
+import { AuthContext } from '../components/AuthContext';
 
 type _perfil = {
   rotulo: string,
@@ -22,6 +23,7 @@ export default function Login({ navigation }) { //bug, não está dando erro
   const [perfis, setPerfis] = useState<_perfil[]>([]);
   const [modalVisible, setModalVisible] = useState(false);
   const [emailRecuperacao, setEmailRecuperacao] = useState('');
+  const { login: contextLogin } = useContext(AuthContext);
 
   const toggleSenhaVisibilidade = () => {
     setSenhaVisivel(!senhaVisivel);
@@ -34,7 +36,7 @@ export default function Login({ navigation }) { //bug, não está dando erro
     }
 
     try {
-      let {url} = useApi();
+      let { url } = useApi();
       const response = await fetch(url + "/api/login", {
         method: "POST",
         headers: {
@@ -52,18 +54,18 @@ export default function Login({ navigation }) { //bug, não está dando erro
       const data = await response.json();
       const token = data.token;
       const IdInst = data.id_instituicao;
+      const IdAlun = data.id_aluno;
+      const IdResp = data.id_responsavel;
 
       if (token) {
-        await AsyncStorage.setItem("jwt", token);
-        await AsyncStorage.setItem("perfil", tipoDeLogin); 
-        if (tipoDeLogin === "inst"){
+        await contextLogin(token, tipoDeLogin);
+        if (tipoDeLogin === "inst" && IdInst) {
           await AsyncStorage.setItem("id_instituicao", IdInst);
-          navigation.navigate("PerfilInstituicao");
         }
         else if (tipoDeLogin === "alun")
-          navigation.navigate("PerfilAluno");
+          await AsyncStorage.setItem("id_aluno", IdAlun);
         else
-          navigation.navigate("PerfilResponsavel");
+          await AsyncStorage.setItem("id_responsavel", IdResp);
       } else {
         Alert.alert("Erro", "Token não recebido.");
       }
@@ -82,7 +84,7 @@ export default function Login({ navigation }) { //bug, não está dando erro
   };
 
   useEffect(() => {
-    let {url} = useApi();
+    let { url } = useApi();
     loadFonts();
     fetch(url + "/api/perfis", {
       method: 'GET'

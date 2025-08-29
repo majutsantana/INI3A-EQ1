@@ -14,187 +14,75 @@ import CadastroResponsavel from './pages/cadastro/CadastroResponsavel';
 import EfetivacaoAluno from './pages/efetivacao/EfetivacaoAluno';
 import EfetivacaoResponsavel from './pages/efetivacao/EfetivacaoResponsavel';
 import FuncionalidadesAlunoResponsavel from './pages/funcionalidades/FuncionalidadesAlunoResponsavel';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { AuthContext, AuthProvider } from './components/AuthContext';
+import { ActivityIndicator, View } from 'react-native';
 
 const Stack = createNativeStackNavigator();
 
-export default function App() {
-<<<<<<< HEAD
-  //Direciona a tela que será aberta inicialmente 
-  return <NavigationContainer> 
-    <Stack.Navigator initialRouteName='Login'> 
-      <Stack.Screen
-        name="Login"
-        component={Login}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="TipoCadastro"
-        component={TipoCadastro}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="PreCadastroAluno"
-        component={PreCadastroAluno}
-        options={{ headerShown: false }} // MUDAR DIRECIONAMENTO
-      />
-      <Stack.Screen
-        name="PreCadastroResponsavel"
-        component={PreCadastroResponsavel}
-        options={{ headerShown: false }} // MUDAR DIRECIONAMENTO
-      />
-      <Stack.Screen
-        name="CadastroAluno"
-        component={CadastroAluno}
-        options={{ headerShown: false }} // MUDAR DIRECIONAMENTO
-      />
-      <Stack.Screen
-        name="CadastroInstituicao"
-        component={CadastroInstituicao}
-        options={{ headerShown: false }} // MUDAR DIRECIONAMENTO
-      />
-      <Stack.Screen
-        name="CadastroResponsavel"
-        component={CadastroResponsavel}
-        options={{ headerShown: false }} // MUDAR DIRECIONAMENTO
-      />
-      <Stack.Screen
-        name="PerfilInstituicao"
-        component={PerfilInstituicao}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="PerfilAluno"
-        component={PerfilAluno}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="PerfilResponsavel"
-        component={PerfilResponsavel}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="EfetivacaoAluno"
-        component={EfetivacaoAluno}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="EfetivacaoResponsavel"
-        component={EfetivacaoResponsavel}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="FuncionalidadesAlunoResponsavel"
-        component={FuncionalidadesAlunoResponsavel}
-        options={{ headerShown: false }}
-      />
-=======
-  const [initialRoute, setInititalRoute] = useState("Login");
-  const [carregando, setCarregando] = useState(true);
->>>>>>> 5392999ccd141e063647a6fc1c126fd0ccf01c64
+const AuthStack = () => (
+  <Stack.Navigator>
+    <Stack.Screen name="Login" component={Login} options={{ headerShown: false }} />
+    <Stack.Screen name="TipoCadastro" component={TipoCadastro} options={{ headerShown: false }} />
+    <Stack.Screen name="CadastroAluno" component={CadastroAluno} options={{ headerShown: false }} />
+    <Stack.Screen name="CadastroInstituicao" component={CadastroInstituicao} options={{ headerShown: false }} />
+    <Stack.Screen name="CadastroResponsavel" component={CadastroResponsavel} options={{ headerShown: false }} />
+    <Stack.Screen name="RedefinirSenha" component={EsqueciSenha} options={{ title: 'Redefinir Senha' }} />
+  </Stack.Navigator>
+);
 
-  useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const token = await AsyncStorage.getItem("jwt");
-        const perfil = await AsyncStorage.getItem("perfil");
+const AppStack = () => {
+  const { userProfile } = useContext(AuthContext);
 
-        if (token && perfil) {
-          if (perfil == "inst")
-            setInititalRoute("PerfilInstituicao");
-          else if (perfil == "alun")
-            setInititalRoute("PerfilAluno");
-          else if (perfil == "resp")
-            setInititalRoute("PerfilResponsavel");
-        }
-      } catch (e) {
-        console.error("Erro ao verificar autenticação: ", e);
-        setInititalRoute("Login");
-      } finally {
-        setCarregando(false);
-      }
-    };
-    checkAuth();
-  }, []);
+  const getInitialRoute = () => {
+    if (userProfile === "inst")
+      return "PerfilInstituicao";
+    if (userProfile === "alun")
+      return "PerfilAluno";
+    if (userProfile === "resp")
+      return "PerfilResponsavel";
+    return "Login";
+  };
 
-  if (!carregando)
-    return <NavigationContainer>
-      <Stack.Navigator initialRouteName={initialRoute}>
-        <Stack.Screen
-          name="Login"
-          component={Login}
-          options={{ headerShown: false }}
-        />
-        <Stack.Screen
-          name="TipoCadastro"
-          component={TipoCadastro}
-          options={{ headerShown: false }}
-        />
-        <Stack.Screen
-          name="PreCadastroAluno"
-          component={PreCadastroAluno}
-          options={{ headerShown: false }} // MUDAR DIRECIONAMENTO
-        />
-        <Stack.Screen
-          name="PreCadastroResponsavel"
-          component={PreCadastroResponsavel}
-          options={{ headerShown: false }} // MUDAR DIRECIONAMENTO
-        />
-        <Stack.Screen
-          name="CadastroAluno"
-          component={CadastroAluno}
-          options={{ headerShown: false }} // MUDAR DIRECIONAMENTO
-        />
-        <Stack.Screen
-          name="CadastroInstituicao"
-          component={CadastroInstituicao}
-          options={{ headerShown: false }} // MUDAR DIRECIONAMENTO
-        />
-        <Stack.Screen
-          name="CadastroResponsavel"
-          component={CadastroResponsavel}
-          options={{ headerShown: false }} // MUDAR DIRECIONAMENTO
-        />
-        <Stack.Screen
-          name="PerfilInstituicao"
-          component={PerfilInstituicao}
-          options={{ headerShown: false }}
-        />
-        <Stack.Screen
-          name="PerfilAluno"
-          component={PerfilAluno}
-          options={{ headerShown: false }}
-        />
-        <Stack.Screen
-          name="PerfilResponsavel"
-          component={PerfilResponsavel}
-          options={{ headerShown: false }}
-        />
-        <Stack.Screen
-          name="EfetivacaoAluno"
-          component={EfetivacaoAluno}
-          options={{ headerShown: false }}
-        />
-        <Stack.Screen
-          name="EfetivacaoResponsavel"
-          component={EfetivacaoResponsavel}
-          options={{ headerShown: false }}
-        />
-        <Stack.Screen
-          name="FuncionalidadesAlunoResponsavel"
-          component={FuncionalidadesAlunoResponsavel}
-          options={{ headerShown: false }}
-        />
+  return (
+    <Stack.Navigator initialRouteName={getInitialRoute()}>
+      <Stack.Screen name="PerfilInstituicao" component={PerfilInstituicao} options={{ headerShown: false }} />
+      <Stack.Screen name="PerfilAluno" component={PerfilAluno} options={{ headerShown: false }} />
+      <Stack.Screen name="PerfilResponsavel" component={PerfilResponsavel} options={{ headerShown: false }} />
+      <Stack.Screen name="PreCadastroAluno" component={PreCadastroAluno} options={{ headerShown: false }} />
+      <Stack.Screen name="PreCadastroResponsavel" component={PreCadastroResponsavel} options={{ headerShown: false }} />
+      <Stack.Screen name="EfetivacaoAluno" component={EfetivacaoAluno} options={{ headerShown: false }} />
+      <Stack.Screen name="EfetivacaoResponsavel" component={EfetivacaoResponsavel} options={{ headerShown: false }} />
+      <Stack.Screen name="FuncionalidadesAlunoResponsavel" component={FuncionalidadesAlunoResponsavel} options={{ headerShown: false }} />
+    </Stack.Navigator>
+  );
+};
 
-        <Stack.Screen
-          name="RedefinirSenha"
-          component={EsqueciSenha}
-          options={{ title: 'Redefinir Senha' }}
-        />
+const AppNavigator = () => {
+  const { userToken, isLoading } = useContext(AuthContext);
 
-      </Stack.Navigator>
+  if (isLoading) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" color="#B9A6DA" />
+      </View>
+    );
+  }
+
+  return (
+    <NavigationContainer>
+      {userToken !== null ? <AppStack /> : <AuthStack />}
     </NavigationContainer>
+  );
+};
+
+export default function App() {
+  return (
+    <AuthProvider>
+      <AppNavigator />
+    </AuthProvider>
+  );
 }
 
 // Fazer para o PerfilResponsavel depois
