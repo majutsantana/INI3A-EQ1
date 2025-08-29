@@ -31,6 +31,8 @@ use App\Http\Controllers\ResponsavelController;
 // ROTAS PÚBLICAS (Não precisam de autenticação)
 //======================================================================
 
+
+// Rota pública de login
 // --- Autenticação e Recuperação de Senha ---
 Route::post('/login', [LoginController::class, 'login']);
 Route::post('/recuperar-senha', [LoginController::class, 'recuperarSenha']);
