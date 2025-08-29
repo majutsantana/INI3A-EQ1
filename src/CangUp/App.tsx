@@ -16,83 +16,14 @@ import EfetivacaoResponsavel from './pages/efetivacao/EfetivacaoResponsavel';
 import FuncionalidadesAlunoResponsavel from './pages/funcionalidades/FuncionalidadesAlunoResponsavel';
 import { useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import CadastroVeiculo from './pages/cadastro/CadastroVeiculo';
 
 const Stack = createNativeStackNavigator();
 
 export default function App() {
-<<<<<<< HEAD
-  //Direciona a tela que será aberta inicialmente 
-  return <NavigationContainer> 
-    <Stack.Navigator initialRouteName='Login'> 
-      <Stack.Screen
-        name="Login"
-        component={Login}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="TipoCadastro"
-        component={TipoCadastro}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="PreCadastroAluno"
-        component={PreCadastroAluno}
-        options={{ headerShown: false }} // MUDAR DIRECIONAMENTO
-      />
-      <Stack.Screen
-        name="PreCadastroResponsavel"
-        component={PreCadastroResponsavel}
-        options={{ headerShown: false }} // MUDAR DIRECIONAMENTO
-      />
-      <Stack.Screen
-        name="CadastroAluno"
-        component={CadastroAluno}
-        options={{ headerShown: false }} // MUDAR DIRECIONAMENTO
-      />
-      <Stack.Screen
-        name="CadastroInstituicao"
-        component={CadastroInstituicao}
-        options={{ headerShown: false }} // MUDAR DIRECIONAMENTO
-      />
-      <Stack.Screen
-        name="CadastroResponsavel"
-        component={CadastroResponsavel}
-        options={{ headerShown: false }} // MUDAR DIRECIONAMENTO
-      />
-      <Stack.Screen
-        name="PerfilInstituicao"
-        component={PerfilInstituicao}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="PerfilAluno"
-        component={PerfilAluno}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="PerfilResponsavel"
-        component={PerfilResponsavel}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="EfetivacaoAluno"
-        component={EfetivacaoAluno}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="EfetivacaoResponsavel"
-        component={EfetivacaoResponsavel}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="FuncionalidadesAlunoResponsavel"
-        component={FuncionalidadesAlunoResponsavel}
-        options={{ headerShown: false }}
-      />
-=======
+  /*
   const [initialRoute, setInititalRoute] = useState("Login");
   const [carregando, setCarregando] = useState(true);
->>>>>>> 5392999ccd141e063647a6fc1c126fd0ccf01c64
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -116,11 +47,12 @@ export default function App() {
       }
     };
     checkAuth();
-  }, []);
+  }, []); 
+  */
 
-  if (!carregando)
+  //if (!carregando)
     return <NavigationContainer>
-      <Stack.Navigator initialRouteName={initialRoute}>
+      <Stack.Navigator initialRouteName='CadastroVeiculo' /* initialRoute */> 
         <Stack.Screen
           name="Login"
           component={Login}
@@ -134,27 +66,32 @@ export default function App() {
         <Stack.Screen
           name="PreCadastroAluno"
           component={PreCadastroAluno}
-          options={{ headerShown: false }} // MUDAR DIRECIONAMENTO
+          options={{ headerShown: false }} 
         />
         <Stack.Screen
           name="PreCadastroResponsavel"
           component={PreCadastroResponsavel}
-          options={{ headerShown: false }} // MUDAR DIRECIONAMENTO
+          options={{ headerShown: false }} 
         />
         <Stack.Screen
           name="CadastroAluno"
           component={CadastroAluno}
-          options={{ headerShown: false }} // MUDAR DIRECIONAMENTO
+          options={{ headerShown: false }} 
         />
         <Stack.Screen
           name="CadastroInstituicao"
           component={CadastroInstituicao}
-          options={{ headerShown: false }} // MUDAR DIRECIONAMENTO
+          options={{ headerShown: false }} 
         />
         <Stack.Screen
           name="CadastroResponsavel"
           component={CadastroResponsavel}
-          options={{ headerShown: false }} // MUDAR DIRECIONAMENTO
+          options={{ headerShown: false }} 
+        />
+        <Stack.Screen
+          name="CadastroVeiculo"
+          component={CadastroVeiculo}
+          options={{ headerShown: false }} 
         />
         <Stack.Screen
           name="PerfilInstituicao"
