@@ -27,6 +27,9 @@ Route::post('/recuperar-senha', [LoginController::class, 'recuperarSenha']);
 // --- Cadastros Públicos ---
 Route::post('/cadastrarInst', [InstituicaoController::class, 'cadastrarInst']);
 Route::post('/cadastrarResp', [ResponsavelController::class, 'cadastrarResp']);
+Route::post('/efetivarAluno', [AlunoController::class, 'efetivarAluno']);
+Route::post('/cadastrarAluno', [AlunoController::class, 'cadastrarAluno']);
+
 
 // --- Consultas Públicas ---
 Route::get('/instituicoes', [InstituicaoController::class, 'index']); // Listar todas as instituições

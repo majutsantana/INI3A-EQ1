@@ -34,7 +34,7 @@
       
       const [fontsLoaded, setFontsLoaded] = useState(false);
       const [errors, setErrors] = useState<errorType>({CPF:undefined, instituicao:undefined, nome:undefined, RA:undefined});
-      const [instituicao, setInstituicao] = useState('');
+      const [instituicao, setInstituicao] = useState<number | null>(null);
       const [nome, setNome] = useState('');
       const [RA, setRA] = useState('');
       const [CPF, setCPF] = useState('');
@@ -95,12 +95,12 @@
 
       const getDados = async () => {
           try{
-              const response = await fetch(url+'/api/preCadastrarAluno', { // luiza e maghu arrumem
+              const response = await fetch(url+'/api/efetivarAluno', { // luiza e maghu arrumem
               method: 'POST',
               headers: {
                   'Content-Type': 'application/json',
               },
-              body: JSON.stringify({nome, RA, CPF}),
+              body: JSON.stringify({nome, RA, CPF, id_inst: instituicao}),
               });
               const text = await response.text();
               console.log('Resposta da API (texto):', text);
@@ -147,7 +147,7 @@
                     onValueChange={(itemValue) => setInstituicao(itemValue)}
                     style={[
                       styles.picker,
-                      { color: instituicao === '' ? '#888' : '#000' } 
+                      { color: instituicao === null ? '#888' : '#000' } 
                     ]}
                   >
                     <Picker.Item label="Selecione a instituição" value="" />
