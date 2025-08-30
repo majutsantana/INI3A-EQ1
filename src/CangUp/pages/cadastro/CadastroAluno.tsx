@@ -1,5 +1,6 @@
 import {
   ActivityIndicator,
+  Alert,
   SafeAreaView,
   ScrollView,
   StatusBar,
@@ -17,27 +18,25 @@ import { MaterialIcons } from '@expo/vector-icons';
 import { CheckBox } from 'react-native-elements';
 import Header from '../../components/Header';
 import FooterSemIcones from '../../components/FooterSemIcones';
-import { Feather} from '@expo/vector-icons';
+import { Feather } from '@expo/vector-icons';
 import useApi from '../../hooks/useApi';
 import { TextInputMask } from 'react-native-masked-text';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function CadastroAluno({ navigation }) { // Não é erro, é só o vscode dando trabalho
-  
+
   const [fontsLoaded, setFontsLoaded] = useState(false);
-  const [nome, setNome] = useState('');
-  const [cpf, setCpf] = useState('');
-  const [ra, setRa] = useState('');
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
   const [confSenha, setconfSenha] = useState('');
   const [telefone, setTelefone] = useState('');
   const [endereco, setEndereco] = useState('');
   const [sexo, setSexo] = useState('');
-  const [instituicao, setInstituicao] = useState('');
   const [check, setCheck] = useState(false);
   const [errors, setErrors] = useState({});
   const [senhaVisivel, setSenhaVisivel] = useState(false);
   const [confSenhaVisivel, setConfSenhaVisivel] = useState(false);
+  const [cpf,setCpf] = useState('');
 
   const toggleSenhaVisibilidade = () => {
     setSenhaVisivel(!senhaVisivel);
@@ -48,11 +47,12 @@ export default function CadastroAluno({ navigation }) { // Não é erro, é só 
   };
 
 
-  const handleCadastro = async () => {
+   const handleCadastro = async () => {
     if (validateForm()) {
       try {
         await getDados();
-        navigation.navigate('Login'); //implemetar direcionamento para ir pra tela funcionalidadesAlunoResponsavel 
+        // A navegação só deve acontecer após o sucesso do cadastro
+        // navigation.navigate('Login'); 
       } catch (error) {
         console.error("Erro no processo de cadastro (handleCadastro):", error);
       }
@@ -92,13 +92,13 @@ export default function CadastroAluno({ navigation }) { // Não é erro, é só 
     if (!telefone.trim()) {
       newErrors.telefone = 'Telefone é obrigatório.';
       isValid = false;
-    } 
+    }
     else {
-      const onlyNumbers = telefone.replace(/\D/g, ''); 
-      if (onlyNumbers.length < 10 || onlyNumbers.length > 11) { 
+      const onlyNumbers = telefone.replace(/\D/g, '');
+      if (onlyNumbers.length < 10 || onlyNumbers.length > 11) {
         newErrors.telefone = 'Telefone inválido. Deve conter DDD + número.';
         isValid = false;
-        }
+      }
     }
 
     if (!endereco.trim()) {
@@ -129,26 +129,55 @@ export default function CadastroAluno({ navigation }) { // Não é erro, é só 
   };
 
   useEffect(() => {
+    fetchAluno();
     loadFonts();
   }, []);
 
   const getDados = async () => {
     try {
-      let {url} = useApi();
-      const response = await fetch(url + '/api/cadastrar', {
+      let { url } = useApi();
+      const response = await fetch(url + '/api/cadastrarAluno', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ nome, cpf, ra, email, senha, endereco, sexo, instituicao }),
+        body: JSON.stringify({ cpf, email, senha, endereco, sexo }),
       });
-      const dados = await response.json();
+      console.log("Status:", response.status);
 
-      navigation.navigate("Login");
+      // Verificação se a resposta foi bem-sucedida (status 200-299)
+      if (response.ok) {
+        // Tenta parsear a resposta como JSON
+        const data = await response.json();
+        console.log("Resposta JSON:", data);
+        Alert.alert('Sucesso', 'Aluno cadastrado com sucesso!');
+        navigation.navigate('Login'); // Navegar após sucesso
+      } else {
+        // Se a resposta não for 2xx, tenta obter o texto do erro
+        const errorText = await response.text();
+        console.error("Erro na resposta do servidor:", errorText);
+        Alert.alert('Erro', `Falha ao cadastrar. Resposta do servidor: ${response.status} ${response.statusText}`);
+      }
     } catch (error) {
       console.error('Erro ao cadastrar aluno:', error);
+      Alert.alert('Erro', 'Não foi possível conectar ao servidor. Verifique sua conexão.');
     }
   };
+
+
+  const fetchAluno = async () => {
+    try {
+      const cpf = await AsyncStorage.getItem("cpf");
+      if (!cpf) {
+        Alert.alert("Erro", "cfp nao encontrado.");
+        return;
+      }
+    } catch (err) {
+      console.error(err);
+      Alert.alert("Erro", "Não foi possível buscar os dados.");
+    }
+  };
+
 
   if (!fontsLoaded) {
     return (
@@ -161,7 +190,7 @@ export default function CadastroAluno({ navigation }) { // Não é erro, é só 
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar backgroundColor="#B9A6DA" barStyle="dark-content" />
-      <Header/>
+      <Header />
 
 
       <View style={styles.content}>
@@ -188,45 +217,45 @@ export default function CadastroAluno({ navigation }) { // Não é erro, é só 
             <View style={styles.inputGroup}>
               <Text style={styles.label}>Senha:</Text>
               <View style={styles.passwordContainer}>
-              
-              <TextInput
-                style={styles.passwordInput}
-                placeholder="Digite a senha"
-                placeholderTextColor="#888"
-                value={senha}
-                onChangeText={setSenha}
-                secureTextEntry={!senhaVisivel}
-              />
-              <TouchableOpacity onPress={toggleSenhaVisibilidade} style={styles.eyeIcon}>
-                <Feather
-                  name={senhaVisivel ? 'eye' : 'eye-off'}
-                  size={20}
-                  color="#888"
+
+                <TextInput
+                  style={styles.passwordInput}
+                  placeholder="Digite a senha"
+                  placeholderTextColor="#888"
+                  value={senha}
+                  onChangeText={setSenha}
+                  secureTextEntry={!senhaVisivel}
                 />
-              </TouchableOpacity>
+                <TouchableOpacity onPress={toggleSenhaVisibilidade} style={styles.eyeIcon}>
+                  <Feather
+                    name={senhaVisivel ? 'eye' : 'eye-off'}
+                    size={20}
+                    color="#888"
+                  />
+                </TouchableOpacity>
               </View>
               {errors.senha && <Text style={styles.errorText}>{errors.senha}</Text>}
             </View>
             <View style={styles.inputGroup}>
               <Text style={styles.label}>Confirme a senha:</Text>
               <View style={styles.passwordContainer}>
-              
-              <TextInput
-                style={styles.passwordInput}
-                placeholder="Redigite a senha"
-                placeholderTextColor="#888"
-                value={confSenha}
-                onChangeText={setconfSenha}
-                secureTextEntry={!confSenhaVisivel}
-              />
-              <TouchableOpacity onPress={toggleConfSenhaVisibilidade} style={styles.eyeIcon}>
-                <Feather
-                  name={confSenhaVisivel ? 'eye' : 'eye-off'}
-                  size={20}
-                  color="#888"
+
+                <TextInput
+                  style={styles.passwordInput}
+                  placeholder="Redigite a senha"
+                  placeholderTextColor="#888"
+                  value={confSenha}
+                  onChangeText={setconfSenha}
+                  secureTextEntry={!confSenhaVisivel}
                 />
-              </TouchableOpacity>
-              </View> 
+                <TouchableOpacity onPress={toggleConfSenhaVisibilidade} style={styles.eyeIcon}>
+                  <Feather
+                    name={confSenhaVisivel ? 'eye' : 'eye-off'}
+                    size={20}
+                    color="#888"
+                  />
+                </TouchableOpacity>
+              </View>
               {errors.confSenha && <Text style={styles.errorText}>{errors.confSenha}</Text>}
             </View>
             <View style={styles.inputGroup}>
@@ -239,7 +268,7 @@ export default function CadastroAluno({ navigation }) { // Não é erro, é só 
                   withDDD: true,
                   dddMask: '(99) '
                 }}
-                placeholder="(99) 99999-9999" 
+                placeholder="(99) 99999-9999"
                 placeholderTextColor="#888"
                 value={telefone}
                 onChangeText={setTelefone}
@@ -283,7 +312,7 @@ export default function CadastroAluno({ navigation }) { // Não é erro, é só 
               <CheckBox
                 checked={check}
                 onPress={() => setCheck(!check)} />
-              <TouchableOpacity> 
+              <TouchableOpacity>
                 <Text style={styles.textCheck}>Termos de uso</Text>
               </TouchableOpacity>
             </View>
@@ -297,7 +326,7 @@ export default function CadastroAluno({ navigation }) { // Não é erro, é só 
         </TouchableOpacity>
       </View>
 
-      <FooterSemIcones/>
+      <FooterSemIcones />
     </SafeAreaView>
   );
 }
@@ -353,8 +382,8 @@ const styles = StyleSheet.create({
     elevation: 6,
   },
   passwordInput: {
-    fontSize:16,
-    flex: 1, 
+    fontSize: 16,
+    flex: 1,
     padding: '5%',
     paddingLeft: '5%',
     fontFamily: 'PoppinsRegular',
@@ -472,12 +501,12 @@ const styles = StyleSheet.create({
     fontFamily: 'PoppinsRegular',
   },
   iconButton: {
-    padding:5,
+    padding: 5,
     fontFamily: 'PoppinsRegular',
-    flexDirection:'row',
+    flexDirection: 'row',
     columnGap: 10,
     fontSize: 14,
-    alignItems:'center',
-    color:'#888',
+    alignItems: 'center',
+    color: '#888',
   },
 }); 

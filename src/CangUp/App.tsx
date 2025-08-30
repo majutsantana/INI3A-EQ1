@@ -30,6 +30,8 @@ const AuthStack = () => (
     <Stack.Screen name="CadastroInstituicao" component={CadastroInstituicao} options={{ headerShown: false }} />
     <Stack.Screen name="CadastroResponsavel" component={CadastroResponsavel} options={{ headerShown: false }} />
     <Stack.Screen name="RedefinirSenha" component={EsqueciSenha} options={{ title: 'Redefinir Senha' }} />
+    <Stack.Screen name="EfetivacaoAluno" component={EfetivacaoAluno} options={{ headerShown: false }} />
+    <Stack.Screen name="EfetivacaoResponsavel" component={EfetivacaoResponsavel} options={{ headerShown: false }} />
   </Stack.Navigator>
 );
 
@@ -53,8 +55,6 @@ const AppStack = () => {
       <Stack.Screen name="PerfilResponsavel" component={PerfilResponsavel} options={{ headerShown: false }} />
       <Stack.Screen name="PreCadastroAluno" component={PreCadastroAluno} options={{ headerShown: false }} />
       <Stack.Screen name="PreCadastroResponsavel" component={PreCadastroResponsavel} options={{ headerShown: false }} />
-      <Stack.Screen name="EfetivacaoAluno" component={EfetivacaoAluno} options={{ headerShown: false }} />
-      <Stack.Screen name="EfetivacaoResponsavel" component={EfetivacaoResponsavel} options={{ headerShown: false }} />
       <Stack.Screen name="FuncionalidadesAlunoResponsavel" component={FuncionalidadesAlunoResponsavel} options={{ headerShown: false }} />
       <Stack.Screen name="CadastroVeiculo" component={CadastroVeiculo} options={{ headerShown: false }} />
     </Stack.Navigator>
