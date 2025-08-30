@@ -46,7 +46,7 @@ export default function EfetivacaoAluno({ navigation }) { //Navigation não é e
     let newErrors: errorType = { CPF: undefined, instituicao: undefined, nome: undefined, RA: undefined };
     let isValid = true;
 
-    if (!instituicao.trim()) {
+    if (!instituicao) {
       newErrors.instituicao = 'Instituição é obrigatória.';
       isValid = false;
     }
@@ -85,12 +85,12 @@ export default function EfetivacaoAluno({ navigation }) { //Navigation não é e
     if (validateForm()) {
       try {
         const data = await getDados();
-        const cpf = data.cpf;
-        if (data && data.aluno) {
-          await AsyncStorage.setItem("cpf", cpf);
+        if (data?.aluno?.cpf) {
+          await AsyncStorage.setItem("cpf", data.aluno.cpf);
           navigation.navigate('CadastroAluno');
+        } else {
+          console.log("Dados do aluno não encontrados.");
         }
-        else { console.log("Dados do aluno não encontrados.") }
       } catch (error) {
         console.error("Erro no processo de cadastro (handleCadastro):", error);
       }
@@ -105,6 +105,7 @@ export default function EfetivacaoAluno({ navigation }) { //Navigation não é e
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Accept': 'application/json', 
         },
         body: JSON.stringify({ nome, ra: RA, cpf: CPF, id_inst: instituicao ? Number(instituicao) : null }),
       });

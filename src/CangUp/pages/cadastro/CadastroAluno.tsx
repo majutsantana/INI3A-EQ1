@@ -36,7 +36,7 @@ export default function CadastroAluno({ navigation }) { // Não é erro, é só 
   const [errors, setErrors] = useState({});
   const [senhaVisivel, setSenhaVisivel] = useState(false);
   const [confSenhaVisivel, setConfSenhaVisivel] = useState(false);
-  const [cpf,setCpf] = useState('');
+  const [cpf, setCpf] = useState('');
 
   const toggleSenhaVisibilidade = () => {
     setSenhaVisivel(!senhaVisivel);
@@ -47,7 +47,7 @@ export default function CadastroAluno({ navigation }) { // Não é erro, é só 
   };
 
 
-   const handleCadastro = async () => {
+  const handleCadastro = async () => {
     if (validateForm()) {
       try {
         await getDados();
@@ -133,13 +133,14 @@ export default function CadastroAluno({ navigation }) { // Não é erro, é só 
     loadFonts();
   }, []);
 
+  let { url } = useApi();
   const getDados = async () => {
     try {
-      let { url } = useApi();
       const response = await fetch(url + '/api/cadastrarAluno', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Accept': 'application/json',
         },
         body: JSON.stringify({ cpf, email, senha, endereco, sexo }),
       });
@@ -167,14 +168,15 @@ export default function CadastroAluno({ navigation }) { // Não é erro, é só 
 
   const fetchAluno = async () => {
     try {
-      const cpf = await AsyncStorage.getItem("cpf");
-      if (!cpf) {
-        Alert.alert("Erro", "cfp nao encontrado.");
+      const cpfValue = await AsyncStorage.getItem("cpf");
+      if (!cpfValue) {
+        Alert.alert("Erro", "CPF não encontrado...");
+        navigation.goBack();
         return;
       }
+      setCpf(cpfValue);
     } catch (err) {
-      console.error(err);
-      Alert.alert("Erro", "Não foi possível buscar os dados.");
+      console.error("Erro ao buscar CPF do AsyncStorage:", err);
     }
   };
 

@@ -13,23 +13,24 @@ use Illuminate\Support\Facades\Auth;
 
 class AlunoController extends Controller
 {
-    public function preCadastrarAlun(Request $req){
+    public function preCadastrarAlun(Request $req)
+    {
 
         $user = Auth::user();
         $inst = Instituicao::where('email', $user->email)->first();
-       // dd($inst);
+        // dd($inst);
         $dados = $req->validate([
             'nome' => 'required|string',
             'cpf' => 'required|string',
             'ra' => 'required|string',
-           // 'email' => 'email',
-           // 'sexo' => 'in:Masculino,Feminino,Neutro,Prefiro não informar',
-           // 'endereco' => 'string',
-           'id_inst' => 'required|exists:instituicoes,id',
-           // 'senha' => 'string'
+            // 'email' => 'email',
+            // 'sexo' => 'in:Masculino,Feminino,Neutro,Prefiro não informar',
+            // 'endereco' => 'string',
+            'id_inst' => 'required|exists:instituicoes,id',
+            // 'senha' => 'string'
         ]);
-        
-        $aluno=new Aluno();
+
+        $aluno = new Aluno();
         $aluno->nome = $dados["nome"];
         $aluno->cpf = $dados["cpf"];
         $aluno->ra = $dados["ra"];
@@ -59,19 +60,20 @@ class AlunoController extends Controller
         return response()->json($aluno, 201);
     }
 
-    public function efetivarAluno(Request $req){
+    public function efetivarAluno(Request $req)
+    {
         $dados = $req->validate([
             'cpf' => 'required|string',
-            'nome'=>'required|string',
-            'id_inst'=>'required|int'
+            'nome' => 'required|string',
+            'id_inst' => 'required|integer',
         ]);
 
         $aluno = Aluno::where('cpf', $dados['cpf'])
-                ->where('nome', $dados['nome'])
-                ->where('id_inst', $dados['id_inst'])
-                ->first();
+            ->where('nome', $dados['nome'])
+            ->where('id_inst', $dados['id_inst'])
+            ->first();
 
-            
+
         if (!$aluno) {
             return response()->json(['message' => 'Aluno não encontrado.'], 404);
         }
@@ -82,47 +84,57 @@ class AlunoController extends Controller
         ], 200);
     }
 
-    public function cadastrarAluno(Request $req){
-        $dados = $req->validate([
-            'cpf' => 'required|string|exists:alunos,cpf', 
-            'email' => 'required|string|email|max:255|unique:usuarios,email',
-            'sexo' => 'in:Masculino,Feminino,Neutro,Prefiro não informar',
-            'endereco' => 'string',
-            'senha' => 'required|string|min:6'
-        ]);
-        
-        $aluno = Aluno::where('cpf', $dados['cpf'])->first();
+    public function cadastrarAluno(Request $req)
+{
+    $dados = $req->validate([
+        'cpf' => 'required|string|exists:alunos,cpf',
+        'email' => 'required|string|email|max:255|unique:usuarios,email',
+        'sexo' => 'nullable|in:Masculino,Feminino,Neutro,Prefiro não informar',
+        'endereco' => 'nullable|string',
+        'senha' => 'required|string|min:6'
+    ]);
 
-        
-        
-        if (!$aluno) {
-            return response()->json(['message' => 'Aluno não encontrado para cadastro.'], 404);
-        }
+    $aluno = Aluno::where('cpf', $dados['cpf'])->first();
 
-        $usuario = new Usuario();
-        $usuario->email = $dados['email'];
-        $usuario->login = $dados['email'];
-        $usuario->senha = $dados['senha'];
-        $usuario->save();
-
-        $perfil = Perfil::where("rotulo", "aluno")->first();
-        DB::table("perfil_usuario")->insert([
-            "usuario_id" => $usuario->id,
-            "perfil_id" => $perfil->id
-        ]);
-
-        $aluno->email = $dados['email'];
-        $aluno->sexo = $dados['sexo'];
-        $aluno->endereco = $dados['endereco'];
-
-        $aluno->update();
-
+    if (!$aluno) {
         return response()->json([
-            'message' => 'Aluno cadastrado com sucesso',
-            'aluno' => $aluno,
-            'usuario' => $usuario
-        ], 201);
+            'error' => 'Aluno não encontrado para o CPF informado',
+            'cpf' => $dados['cpf']
+        ], 404);
     }
+
+    $usuario = new Usuario();
+    $usuario->email = $dados['email'];
+    $usuario->login = $dados['email'];
+    $usuario->senha =  $dados['senha']; 
+    $usuario->save();
+
+    if (!$usuario->id) {
+        return response()->json(['error' => 'Erro ao criar usuário'], 500);
+    }
+
+    $perfil = Perfil::where('rotulo', 'alun')->first();
+
+    if (!$perfil) {
+        return response()->json(['error' => 'Perfil "aluno" não encontrado'], 500);
+    }
+
+    DB::table('perfil_usuario')->insert([
+        'usuario_id' => $usuario->id,
+        'perfil_id' => $perfil->id
+    ]);
+
+    $aluno->email = $dados['email'];
+    $aluno->sexo = $dados['sexo'];
+    $aluno->endereco = $dados['endereco'];
+    $aluno->update();
+
+    return response()->json([
+        'message' => 'Aluno cadastrado com sucesso',
+        'aluno' => $aluno,
+        'usuario' => $usuario
+    ], 201);
+}
 
 
 }
