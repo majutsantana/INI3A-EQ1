@@ -18,44 +18,40 @@ import {
   import useApi from '../../hooks/useApi';
   import { TextInputMask } from 'react-native-masked-text';
   
-  // Componente personalizado para substituir o NumericInput
-  const CustomNumericInput = ({ value, onChange, minValue, maxValue }) => {
-    const handleIncrement = () => {
-      if (value < maxValue) {
-        onChange(value + 1);
-      }
-    };
-  
-    const handleDecrement = () => {
-      if (value > minValue) {
-        onChange(value - 1);
-      }
-    };
-  
-    return (
-      <View style={styles.customNumericContainer}>
-        <TouchableOpacity onPress={handleDecrement} style={styles.customNumericButton}>
-          <Text style={styles.customNumericButtonText}>-</Text>
-        </TouchableOpacity>
-        <TextInput
-          style={styles.customNumericInput}
-          value={String(value)}
-          keyboardType="numeric"
-          textAlign="center"
-          editable={false} // Impede a digitação direta para simplificar
-        />
-        <TouchableOpacity onPress={handleIncrement} style={styles.customNumericButton}>
-          <Text style={styles.customNumericButtonText}>+</Text>
-        </TouchableOpacity>
-      </View>
-    );
-  };
+   const CustomNumericInput = ({ value, onChange, minValue, maxValue }) => {
+    const handleIncrement = () => {
+      if (value < maxValue) {
+        onChange(value + 1);
+      }
+    };
+  
+    const handleDecrement = () => {
+      if (value > minValue) {
+        onChange(value - 1);
+      }
+    };
+  
+    return (
+      <View style={styles.customNumericContainer}>
+        <TouchableOpacity onPress={handleDecrement} style={styles.customNumericButton}>
+          <Text style={styles.customNumericButtonText}>-</Text>
+        </TouchableOpacity>
+        <View style={styles.customNumericInputView}>
+          <Text style={styles.customNumericValueText}>{value}</Text>
+        </View>
+        <TouchableOpacity onPress={handleIncrement} style={styles.customNumericButton}>
+          <Text style={styles.customNumericButtonText}>+</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  };
   
   
   export default function CadastroVeiculo({ navigation }) {
     const [fontsLoaded, setFontsLoaded] = useState(false);
     const [modelo, setModelo] = useState('');
     const [placa, setPlaca] = useState('');
+    const [placaMask, setPlacaMask] = useState('AAA-9999'); 
     const [cor, setCor] = useState('');
     const [assentos, setAssentos] = useState(1);
     const [errors, setErrors] = useState({});
@@ -70,6 +66,25 @@ import {
       } else {
         console.log('Formulário inválido, corrigindo erros:', errors);
       }
+    };
+
+    const handlePlacaChange = (maskedText, rawText) => {
+        const text = rawText || '';
+        // Verifica o 5º caractere para decidir entre o padrão antigo e o Mercosul
+        if (text.length >= 5) {
+            const fifthChar = text.charAt(4);
+            if (/[a-zA-Z]/.test(fifthChar)) {
+                // Se for letra, usa a máscara Mercosul
+                setPlacaMask('AAA9A99');
+            } else {
+                // Se for número, usa a máscara antiga
+                setPlacaMask('AAA-9999');
+            }
+        } else {
+            // Volta para a máscara padrão se o texto for curto
+            setPlacaMask('AAA-9999');
+        }
+        setPlaca(maskedText.toUpperCase()); // Armazena o valor com máscara e em maiúsculas
     };
   
     const validateForm = () => {
@@ -152,15 +167,19 @@ import {
   
         <View style={styles.content}>
           <View style={styles.formContainer}>
-            <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+            <View style={styles.topo}>
+              <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
               <MaterialIcons name="arrow-back" size={28} color="#000" />
-            </TouchableOpacity>
+              </TouchableOpacity>
+              <Text style={styles.tituloAba}>Veículo</Text>
+            </View>
+            
             <ScrollView
               contentContainerStyle={styles.scrollContent}
               keyboardShouldPersistTaps="handled"
               showsVerticalScrollIndicator={false}
             >
-              <Text style={styles.tituloAba}>Veículo</Text>
+              
               <View style={styles.inputGroup}>
                 <Text style={styles.label}>Modelo:</Text>
                 <TextInput
@@ -178,15 +197,17 @@ import {
                     style={styles.input}
                     type={'custom'}
                     options={{
-                        mask: placa.length > 7 ? 'XXX-1234' : 'XXX-1X23' //OLIVIA ARRUMAR
-                    }}
-                    placeholder="XXX-1234 / XXX-1X23"
-                    placeholderTextColor="#888"
-                    value={placa}
-                    onChangeText={setPlaca}
+                    // 'S' aceita letras e números, permitindo ambos os formatos de placa
+                        mask: 'AAA-9S99' 
+                      }}
+                      placeholder="ABC-1234 ou ABC-1D23"
+                      placeholderTextColor="#888"
+                      value={placa}
+                      onChangeText={text => setPlaca(text.toUpperCase())}
+                      autoCapitalize="characters"
                 />
-                {errors.placa && <Text style={styles.errorText}>{errors.placa}</Text>}
               </View>
+              {errors.placa && <Text style={styles.errorText}>{errors.placa}</Text>}
               <View style={styles.inputGroup}>
                 <Text style={styles.label}>Cor:</Text>
                 <TextInput
@@ -200,15 +221,15 @@ import {
               </View>
               
               <View style={styles.inputGroup}>
-                <Text style={styles.label}>Assentos:</Text>
-                <CustomNumericInput
-                  value={assentos}
-                  onChange={setAssentos}
-                  minValue={1}
+                <Text style={styles.label}>Assentos Disponíveis:</Text>
+                <CustomNumericInput
+                  value={assentos}  
+                  onChange={setAssentos}
+                  minValue={1}
                   maxValue={7}
-                />
-                {errors.assentos && <Text style={styles.errorText}>{errors.assentos}</Text>}
-              </View>
+                />
+              </View>
+              {errors.assentos && <Text style={styles.errorText}>{errors.assentos}</Text>}
   
             </ScrollView>
           </View>
@@ -256,15 +277,19 @@ import {
       margin: '5%',
     },
     inputGroup: {
-      padding: '1%',
       marginBottom: '2%',
+      padding:'1%'
     },
     label: {
       fontWeight: 'bold',
       fontSize: 16,
-      marginBottom: '5%',
+      marginBottom: '3%',
       fontFamily: 'PoppinsRegular',
       textAlign: 'center',
+    },
+    topo: {
+      flexDirection:'row',
+      gap: '24.6%',
     },
     input: {
       backgroundColor: '#d9d9d9',
@@ -284,10 +309,9 @@ import {
     },
     tituloAba: {
       fontFamily: 'PoppinsBold',
-      fontSize: 16,
-      color: '#3D3D3D',
-      textAlign: 'center',
-      marginBottom: 20,
+      fontSize: 20,
+      color: '#333',
+      marginBottom: 10,
     },
     button: {
       backgroundColor: '#FFBE31',
@@ -320,45 +344,44 @@ import {
       fontFamily: 'PoppinsRegular',
       textAlign: 'center',
     },
-    // Estilos para o novo componente customizado
     customNumericContainer: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'center',
-      alignSelf: 'center',
-      backgroundColor: '#d9d9d9',
-      borderRadius: 25,
-      height: 50,
-      width: 200,
-      shadowColor: "#000",
-      shadowOffset: {
-        width: 0,
-        height: 3,
-      },
-      shadowOpacity: 0.27,
-      shadowRadius: 4.65,
-      elevation: 6,
-    },
-    customNumericButton: {
-      width: 60,
-      height: '100%',
-      justifyContent: 'center',
-      alignItems: 'center',
-    },
-    customNumericButtonText: {
-      fontSize: 24,
-      fontWeight: 'bold',
-      color: '#3D3D3D',
-    },
-    customNumericInput: {
-      flex: 1,
-      height: '100%',
-      fontSize: 20,
-      fontFamily: 'PoppinsBold',
-      color: '#3D3D3D',
-      borderLeftWidth: 1,
-      borderRightWidth: 1,
-      borderColor: '#c4c4c4'
-    },
+  		flexDirection: 'row',
+  		alignItems: 'center',
+  		justifyContent: 'center',
+  		alignSelf: 'center',
+  		backgroundColor: '#d9d9d9',
+  		borderRadius: 25,
+  		height: 50,
+  		width: '60%',
+  		shadowColor: "#000",
+  		shadowOffset: {
+  			width: 0,
+  			height: 3,
+  		},
+  		shadowOpacity: 0.27,
+  		shadowRadius: 4.65,
+  		elevation: 6,
+  	},
+  	customNumericButton: {
+  		width: '40%',
+  		height: '100%',
+  		justifyContent: 'center',
+  		alignItems: 'center',
+  	},
+  	customNumericButtonText: {
+  		fontSize: 24,
+  		fontWeight: 'bold',
+  		color: '#3D3D3D',
+  	},
+  	customNumericInputView: {
+  		height: '100%',
+  		justifyContent: 'center',
+      alignItems:'center'
+  	},
+  	customNumericValueText: {
+  		fontSize: 20,
+  		fontFamily: 'PoppinsBold',
+  		color: '#3D3D3D',
+  	},
   });
   
