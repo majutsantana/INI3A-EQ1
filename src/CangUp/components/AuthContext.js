@@ -32,9 +32,12 @@ export const AuthProvider = ({ children }) => {
             setIsLoading(true);
             const token = await AsyncStorage.getItem('jwt');
             const perfil = await AsyncStorage.getItem('perfil');
-            if (token && perfil) {
+            if (token) {
                 setUserToken(token);
                 setUserProfile(perfil);
+            }else {
+            setUserToken(null);
+            setUserProfile(null);
             }
         } catch (e) {
             console.log(`Erro ao verificar login: ${e}`);

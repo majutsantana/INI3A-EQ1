@@ -36,15 +36,14 @@ const AuthStack = () => (
 );
 
 const AppStack = () => {
-  const { userProfile } = useContext(AuthContext);
+
+  const { userProfile, userToken } = useContext(AuthContext);
 
   const getInitialRoute = () => {
-    if (userProfile === "inst")
-      return "PerfilInstituicao";
-    if (userProfile === "alun")
-      return "PerfilAluno";
-    if (userProfile === "resp")
-      return "PerfilResponsavel";
+    if (!userToken) return "Login";
+    if (userProfile === "inst") return "PerfilInstituicao";
+    if (userProfile === "alun") return "PerfilAluno";
+    if (userProfile === "resp") return "PerfilResponsavel";
     return "Login";
   };
 
