@@ -65,18 +65,24 @@ class AlunoController extends Controller
         $dados = $req->validate([
             'cpf' => 'required|string',
             'nome' => 'required|string',
+            'ra' => 'required|string',
             'id_inst' => 'required|integer',
         ]);
 
+
         $aluno = Aluno::where('cpf', $dados['cpf'])
             ->where('nome', $dados['nome'])
+            ->where('ra', $dados['ra'])
             ->where('id_inst', $dados['id_inst'])
             ->first();
+
+
 
 
         if (!$aluno) {
             return response()->json(['message' => 'Aluno não encontrado.'], 404);
         }
+
 
         return response()->json([
             'message' => 'Aluno Efetivado',

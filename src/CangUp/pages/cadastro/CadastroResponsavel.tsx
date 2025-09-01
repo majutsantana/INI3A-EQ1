@@ -1,5 +1,6 @@
 import {
   ActivityIndicator,
+  Alert,
   SafeAreaView,
   ScrollView,
   StatusBar,
@@ -20,6 +21,7 @@ import FooterSemIcones from '../../components/FooterSemIcones';
 import { Feather} from '@expo/vector-icons';
 import useApi from '../../hooks/useApi';
 import { TextInputMask } from 'react-native-masked-text';
+import AsyncStorage from '@react-native-async-storage/async-storage';
  
  
  export default function CadastroResponsavel({navigation}) { //Não é erro, é só o vscode dando trabalho
@@ -61,19 +63,6 @@ import { TextInputMask } from 'react-native-masked-text';
      let newErrors = {};
      let isValid = true;
  
-     if (!nome.trim()) {
-       newErrors.nome = 'Nome é obrigatório.';
-       isValid = false;
-     }
- 
-     if (!cpf.trim()) {
-       newErrors.cpf = 'CPF é obrigatório.';
-       isValid = false;
-     } else if (!/^\d{11}$/.test(cpf)) {
-       newErrors.cpf = 'CPF inválido. Deve conter 11 dígitos numéricos.';
-       isValid = false;
-     }
- 
      if (!email.trim()) {
        newErrors.email = 'Email é obrigatório.';
        isValid = false;
@@ -109,7 +98,7 @@ import { TextInputMask } from 'react-native-masked-text';
         }
     }
  
-     if (!sexo) {
+   /*  if (!sexo) {
        newErrors.sexo = 'Selecione o sexo.';
        isValid = false;
      }
@@ -118,7 +107,7 @@ import { TextInputMask } from 'react-native-masked-text';
        newErrors.check = 'Você deve aceitar os termos de uso.';
        isValid = false;
      }
- 
+ */
      setErrors(newErrors);
      return isValid;
    };
@@ -133,25 +122,57 @@ import { TextInputMask } from 'react-native-masked-text';
  
  
   useEffect(() => {
+    fetchResponsavel();
     loadFonts();
   }, []);
  
+  let { url } = useApi();
   const getDados = async () => {
    try{
      let {url} = useApi();
-     const response = await fetch(url+'/api/cadastrar', {
+     const response = await fetch(url+'/api/cadastrarResponsavel', {
        method: 'POST',
        headers: {
          'Content-Type': 'application/json',
+         'Accept': 'application/json',
        },
-       body: JSON.stringify({nome, cpf, email, senha, confSenha, sexo, check }),
+       body: JSON.stringify({ cpf, email, senha, telefone}),
      });
-      const dados = await response.json();
-   } catch(error){
-     console.error('Erro ao cadastrar responsável:', error);
-   }
+      console.log("Status:", response.status);
+      
+      // Verificação se a resposta foi bem-sucedida (status 200-299)
+      if (response.ok) {
+        // Tenta parsear a resposta como JSON
+        const data = await response.json();
+        console.log("Resposta JSON:", data);
+        Alert.alert('Sucesso', 'Responsavel cadastrado com sucesso!');
+        navigation.navigate('Login'); // Navegar após sucesso
+      } else {
+        // Se a resposta não for 2xx, tenta obter o texto do erro
+        const errorText = await response.text();
+        console.error("Erro na resposta do servidor:", errorText);
+        Alert.alert('Erro', `Falha ao cadastrar. Resposta do servidor: ${response.status} ${response.statusText}`);
+      }
+    } catch (error) {
+      console.error('Erro ao cadastrar responsavel:', error);
+      Alert.alert('Erro', 'Não foi possível conectar ao servidor. Verifique sua conexão.');
+    }
   };
  
+  const fetchResponsavel = async () => {
+    try {
+      const cpfValue = await AsyncStorage.getItem("cpf");
+      if (!cpfValue) {
+        Alert.alert("Erro", "CPF não encontrado...");
+        navigation.goBack();
+        return;
+      }
+      setCpf(cpfValue);
+    } catch (err) {
+      console.error("Erro ao buscar CPF do AsyncStorage:", err);
+    }
+  };
+
  
   if (!fontsLoaded) {
     return (

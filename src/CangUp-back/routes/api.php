@@ -1,5 +1,6 @@
 <?php
 
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AdminController;
@@ -9,6 +10,7 @@ use App\Http\Controllers\LoginController;
 use App\Http\Controllers\PerfilController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ResponsavelController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -21,10 +23,13 @@ use App\Http\Controllers\ResponsavelController;
 |
 */
 
+
 // A rota padrão do Sanctum foi comentada pois não está em uso no projeto.
 // Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 //     return $request->user();
 // });
+
+
 
 
 //======================================================================
@@ -32,20 +37,27 @@ use App\Http\Controllers\ResponsavelController;
 //======================================================================
 
 
+
+
 // Rota pública de login
 // --- Autenticação e Recuperação de Senha ---
 Route::post('/login', [LoginController::class, 'login']);
 Route::post('/recuperar-senha', [LoginController::class, 'recuperarSenha']);
 
+
 // --- Cadastros Públicos ---
 Route::post('/cadastrarInst', [InstituicaoController::class, 'cadastrarInst']);
-Route::post('/cadastrarResp', [ResponsavelController::class, 'cadastrarResp']);
+Route::post('/cadastrarResponsavel', [ResponsavelController::class, 'cadastrarResponsavel']);
 Route::post('/cadastrarAluno', [AlunoController::class, 'cadastrarAluno']);
 Route::post('/efetivarAluno', [AlunoController::class, 'efetivarAluno']);
+Route::post('/efetivarResponsavel', [ResponsavelController::class, 'efetivarResponsavel']);
+
 
 // --- Consultas Públicas ---
 Route::get('/instituicoes', [InstituicaoController::class, 'index']); // Listar todas as instituições
 Route::get('/perfis', [PerfilController::class, 'getAll']);
+
+
 
 
 //======================================================================
@@ -53,11 +65,14 @@ Route::get('/perfis', [PerfilController::class, 'getAll']);
 //======================================================================
 Route::middleware(['jwt.auth'])->group(function () {
 
+
     // --- Autenticação (dentro da área protegida) ---
     Route::post('/logout', [LoginController::class, 'logout']);
 
+
     // --- Usuário Autenticado ---
     Route::get('/usuario', [UserController::class, 'me']); // Pega dados do usuário logado
+
 
     // --- Gerenciamento de Instituições (CRUD completo para usuários autenticados) ---
     Route::get('/instituicoes/{id}', [InstituicaoController::class, 'show']);      // Listar uma instituição
@@ -65,8 +80,10 @@ Route::middleware(['jwt.auth'])->group(function () {
     Route::put('/instituicoes/{id}', [InstituicaoController::class, 'update']);    // Atualizar instituição
     Route::delete('/instituicoes/{id}', [InstituicaoController::class, 'destroy']);  // Deletar instituição
 
+
     // --- Cadastros Protegidos ---
     Route::post('/cadastrarAdmin', [AdminController::class, 'store']);
     Route::post('/preCadastrarAluno', [AlunoController::class, 'preCadastrarAlun']);
-    
+    Route::post('/preCadastrarResponsavel', [ResponsavelController::class, 'preCadastrarResp']);
+   
 });

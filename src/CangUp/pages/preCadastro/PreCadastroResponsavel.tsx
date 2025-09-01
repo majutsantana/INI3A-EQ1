@@ -7,6 +7,7 @@ import {
   TextInput,
   TouchableOpacity,
   View,
+  Alert,
  } from 'react-native';
  import * as Font from 'expo-font';
  import { useEffect, useState } from 'react';
@@ -15,14 +16,31 @@ import {
  import FooterComIcones from '../../components/FooterComIcones';
  import { useSafeAreaInsets } from 'react-native-safe-area-context';
  import { TextInputMask } from 'react-native-masked-text';
+ import AsyncStorage from '@react-native-async-storage/async-storage';
 import useApi from '../../hooks/useApi';
 
+
+type errorType ={
+  nome : string | undefined,
+  RA : string | undefined,
+  CPF : string | undefined
+};
+
+
+type Instituicao = {
+    id: number;
+}
+
+
 export default function PreCadastroResponsavel({ navigation }) {
-    
+   
     const [fontsLoaded, setFontsLoaded] = useState(false);
     const [errors, setErrors] = useState({});
+    const [instituicao, setInstituicao] = useState<Instituicao | null>(null);
     const [nome, setNome] = useState('');
     const [CPF, setCPF] = useState('');
+    const { url } = useApi();
+
 
     const validateForm = () => {
      let newErrors = {};
@@ -33,17 +51,19 @@ export default function PreCadastroResponsavel({ navigation }) {
        isValid = false;
      }
 
+
      if (!CPF.trim()) {
        newErrors.CPF = 'CPF é obrigatório.';
        isValid = false;
-     } else if (!/^\d{11}$/.test(CPF)) {
-       newErrors.CPF = 'CPF inválido. Deve conter 11 dígitos numéricos.';
-       isValid = false;
+      } else if (CPF.length < 14) {
+        newErrors.CPF = 'CPF inválido. Deve conter 14 dígitos numéricos.';
+        isValid = false;
      }
  
      setErrors(newErrors);
      return isValid;
    };
+
 
    const loadFonts = async () => {
        await Font.loadAsync({
@@ -55,41 +75,83 @@ export default function PreCadastroResponsavel({ navigation }) {
  
      useEffect(() => {
        loadFonts();
+       fetchInstituicao();
      }, []);
 
-    const handleCadastro  = async () => {
+
+     const fetchInstituicao = async () => {
+      try {
+        const token = await AsyncStorage.getItem("jwt");
+        if (!token) {
+          Alert.alert("Erro", "Você precisa estar logado.");
+          navigation.navigate("Login");
+          return;
+        }
+       
+        const id_inst = await AsyncStorage.getItem("id_instituicao");
+        if (!id_inst) {
+            Alert.alert("Erro", "ID da instituição não encontrado. Por favor, faça o login novamente.");
+            navigation.navigate("Login");
+            return;
+        }
+        const res = await fetch(`${url}/api/instituicoes/${id_inst}`, {
+          method: "GET",
+          headers: {
+            "Authorization": `Bearer ${token}`
+          }
+        });
+ 
+        if (!res.ok) {
+          Alert.alert("Erro", "Falha ao carregar dados.");
+          return;
+        }
+ 
+        const data = await res.json();
+        setInstituicao(data);
+      }catch (err) {
+        console.error(err);
+        Alert.alert("Erro", "Não foi possível buscar os dados.");
+      }
+    };
+
+
+    const handlePreCadastro  = async () => {
         if (validateForm()) {
         try {
             await getDados();
-            navigation.navigate('Login');
+            navigation.navigate('PerfilInstituicao');
         } catch (error) {
-            console.error("Erro no processo de cadastro (handleCadastro):", error);
+            console.error("Erro no processo de cadastro (handlePreCadastro):", error);
         }
         } else {
         console.log('Formulário inválido, corrigindo erros:', errors);
         }
     };
 
+
     const getDados = async () => {
-        try{
-            let {url} = useApi();
-            const response = await f
-            fetch(url+'/api/cadastrarResponsavel', { // luiza e maghu arrumem
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({nome, CPF}),
-            });
-            const text = await response.text();
-            console.log('Resposta da API (texto):', text);
-        } catch(error){
-            console.error('Erro ao cadastrar responsáveis:', error);
-        }
+      try{
+        const token = await AsyncStorage.getItem('jwt');
+        const id_inst = await AsyncStorage.getItem("id_instituicao");
+        let {url} = useApi();
+        const response = await fetch(url+'/api/preCadastrarResponsavel', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer '+token
+        },
+        body: JSON.stringify({nome, cpf: CPF, id_inst}),
+        });
+        const text = await response.text();
+        console.log('Resposta da API (texto):', text);
+      }catch(error){
+        console.error('Erro ao cadastrar responsavel:', error);
+      }
     };
 
+
     const insets = useSafeAreaInsets();
-    
+   
     return(
       <SafeAreaView style={{flex: 1,
         backgroundColor: '#FFD88D',
@@ -99,6 +161,7 @@ export default function PreCadastroResponsavel({ navigation }) {
         paddingRight: insets.right,}}>
         <StatusBar backgroundColor="#B9A6DA" barStyle="dark-content" />
         <HeaderComLogout/>
+
 
         <View style={styles.content}>
           <View style={styles.formContainer}>
@@ -135,9 +198,9 @@ export default function PreCadastroResponsavel({ navigation }) {
                 </View>
             </ScrollView>
           </View>
-  
+ 
           <TouchableOpacity style={styles.button}
-            onPress= {handleCadastro}>
+            onPress= {handlePreCadastro}>
             <Text style={styles.buttonText}>Cadastrar Responsável</Text>
           </TouchableOpacity>
         </View>
@@ -147,7 +210,7 @@ export default function PreCadastroResponsavel({ navigation }) {
 }
 const styles = StyleSheet.create({
   safeArea: {
-    
+   
   },
   content: {
     flex: 1,
@@ -156,7 +219,7 @@ const styles = StyleSheet.create({
     paddingBottom: '25%',
     justifyContent: 'space-between',
     alignItems: 'center',
-    
+   
   },
   formContainer: {
     flex: 1,
@@ -243,4 +306,3 @@ const styles = StyleSheet.create({
      color:'#888',
    },
  });
- 

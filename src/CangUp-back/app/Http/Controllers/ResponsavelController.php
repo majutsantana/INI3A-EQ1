@@ -1,46 +1,128 @@
 <?php
 
+
 namespace App\Http\Controllers;
+
 
 use App\Models\Responsavel;
 use App\Models\Perfil;
 use App\Models\Usuario;
+use App\Models\Instituicao;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
+
 
 class ResponsavelController extends Controller
 {
-    public function cadastrarResp(Request $req){
+    public function preCadastrarResp(Request $req)
+    {
+        $user = Auth::user();
+        $inst = Instituicao::where('email', $user->email)->first();
+
         $dados = $req->validate([
             'nome' => 'required|string',
             'cpf' => 'required|string',
-            'email' => 'required|email',
-            'telefone' => 'required|string',
-            'senha' => 'string'
+            'id_inst' => 'required|exists:instituicoes,id',
         ]);
+
 
         $responsavel=new Responsavel();
         $responsavel->nome = $dados["nome"];
         $responsavel->cpf = $dados["cpf"];
-        $responsavel->email = $dados["email"];
-        $responsavel->telefone = $dados["telefone"];
+        $responsavel->id_inst = $dados["id_inst"];
         $responsavel->save();
 
-        $usuario = new Usuario();
-        $usuario->email = $dados["email"];
-        $usuario->login = $dados["email"];
-        $usuario->senha = $dados["senha"];
-        $usuario->save();
-
-        $perfil = Perfil::where("rotulo", "resp")->first();
-
-        DB::table("perfil_usuario")->insert([
-            "usuario_id" => $usuario->id,
-            "perfil_id" => $perfil->id
-        ]);
 
         return response()->json($responsavel, 201);
     }
+
+
+    public function efetivarResponsavel(Request $req)
+    {
+        $dados = $req->validate([
+            'cpf' => 'required|string',
+            'nome' => 'required|string',
+            'id_inst' => 'required|integer',
+        ]);
+
+
+        $responsavel = Responsavel::where('cpf', $dados['cpf'])
+            ->where('nome', $dados['nome'])
+            ->where('id_inst', $dados['id_inst'])
+            ->first();
+
+        if (!$responsavel) {
+            return response()->json(['message' => 'Responsavel não encontrado.'], 404);
+        }
+
+
+        return response()->json([
+            'message' => 'Responsavel Efetivado',
+            'responsavel' => $responsavel
+        ], 200);
+    }
+
+
+    public function cadastrarResponsavel(Request $req)
+    {
+    $dados = $req->validate([
+        'cpf' => 'required|string|exists:responsaveis,cpf',
+        'email' => 'required|string|email|max:255|unique:usuarios,email',
+        'telefone' => 'nullable|string',
+        'senha' => 'required|string|min:6'
+    ]);
+
+
+    $responsavel = Responsavel::where('cpf', $dados['cpf'])->first();
+
+
+    if (!$responsavel) {
+        return response()->json([
+            'error' => 'Responsavel não encontrado para o CPF informado',
+            'cpf' => $dados['cpf']
+        ], 404);
+    }
+
+
+    $usuario = new Usuario();
+    $usuario->email = $dados['email'];
+    $usuario->login = $dados['email'];
+    $usuario->senha =  $dados['senha'];
+    $usuario->save();
+
+
+    if (!$usuario->id) {
+        return response()->json(['error' => 'Erro ao criar usuário'], 500);
+    }
+
+
+    $perfil = Perfil::where('rotulo', 'resp')->first();
+
+
+    if (!$perfil) {
+        return response()->json(['error' => 'Perfil "responsavel" não encontrado'], 500);
+    }
+
+
+    DB::table('perfil_usuario')->insert([
+        'usuario_id' => $usuario->id,
+        'perfil_id' => $perfil->id
+    ]);
+
+
+    $responsavel->email = $dados['email'];
+    $responsavel->telefone = $dados['telefone'];
+    $responsavel->update();
+
+
+    return response()->json([
+        'message' => 'Responsavel cadastrado com sucesso',
+        'responsavel' => $responsavel,
+        'usuario' => $usuario
+    ], 201);
+    }
+
 
 }

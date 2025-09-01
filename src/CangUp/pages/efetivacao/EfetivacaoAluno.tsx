@@ -65,7 +65,7 @@ export default function EfetivacaoAluno({ navigation }) { //Navigation não é e
       newErrors.CPF = 'CPF é obrigatório.';
       isValid = false;
     } else if (CPF.length < 14) {
-      newErrors.CPF = 'CPF inválido. Deve conter 11 dígitos numéricos.';
+      newErrors.CPF = 'CPF inválido. Deve conter 14 dígitos numéricos.';
       isValid = false;
     }
 
@@ -92,7 +92,7 @@ export default function EfetivacaoAluno({ navigation }) { //Navigation não é e
           console.log("Dados do aluno não encontrados.");
         }
       } catch (error) {
-        console.error("Erro no processo de cadastro (handleCadastro):", error);
+        console.error("Erro no processo de efetivacao (handleEfetivar):", error);
       }
     } else {
       console.log('Formulário inválido, corrigindo erros:', errors);
