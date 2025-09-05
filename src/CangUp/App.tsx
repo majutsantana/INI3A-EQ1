@@ -37,14 +37,12 @@ const AuthStack = () => (
 
 const AppStack = () => {
 
-  const { userProfile, userToken } = useContext(AuthContext);
+  const { userProfile} = useContext(AuthContext);
 
   const getInitialRoute = () => {
-    if (!userToken) return "Login";
     if (userProfile === "inst") return "PerfilInstituicao";
     if (userProfile === "alun") return "PerfilAluno";
     if (userProfile === "resp") return "PerfilResponsavel";
-    return "Login";
   };
 
   return (
@@ -73,7 +71,7 @@ const AppNavigator = () => {
 
   return (
     <NavigationContainer>
-      {userToken !== null ? <AppStack /> : <AuthStack />}
+      {userToken ? <AppStack /> : <AuthStack />}
     </NavigationContainer>
   );
 };

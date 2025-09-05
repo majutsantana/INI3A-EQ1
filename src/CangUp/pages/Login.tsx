@@ -179,7 +179,6 @@ export default function Login({ navigation }) { //bug, não está dando erro
         </TouchableOpacity>
       </View>
 
-      {/* MODAL DE ESQUECI MINHA SENHA */}
       <Modal
         animationType="slide"
         transparent={true}
@@ -283,6 +282,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 20,
     fontFamily: 'PoppinsBold',
+    paddingBottom:'5%',
   },
   input: {
     backgroundColor: '#d9d9d9',
@@ -386,10 +386,11 @@ const styles = StyleSheet.create({
     borderWidth: 0,
   },
   pickerWrapper: {
+
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: '5%',
-    paddingVertical: '5%',
+    paddingVertical:'4%',
+    paddingHorizontal:'2%',
     borderRadius: 25,
     overflow: 'hidden',
     backgroundColor: '#d9d9d9',
