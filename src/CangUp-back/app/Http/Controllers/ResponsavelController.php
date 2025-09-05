@@ -71,12 +71,12 @@ class ResponsavelController extends Controller
         'cpf' => 'required|string|exists:responsaveis,cpf',
         'email' => 'required|string|email|max:255|unique:usuarios,email',
         'telefone' => 'nullable|string',
+        'sexo' => 'nullable|in:Masculino,Feminino,Neutro,Prefiro não informar',
+        'endereco' => 'nullable|string',
         'senha' => 'required|string|min:6'
     ]);
 
-
     $responsavel = Responsavel::where('cpf', $dados['cpf'])->first();
-
 
     if (!$responsavel) {
         return response()->json([
@@ -84,7 +84,6 @@ class ResponsavelController extends Controller
             'cpf' => $dados['cpf']
         ], 404);
     }
-
 
     $usuario = new Usuario();
     $usuario->email = $dados['email'];
@@ -113,6 +112,8 @@ class ResponsavelController extends Controller
 
 
     $responsavel->email = $dados['email'];
+    $responsavel->sexo = $dados['sexo'];
+    $responsavel->endereco = $dados['endereco'];
     $responsavel->telefone = $dados['telefone'];
     $responsavel->update();
 
@@ -123,6 +124,5 @@ class ResponsavelController extends Controller
         'usuario' => $usuario
     ], 201);
     }
-
 
 }

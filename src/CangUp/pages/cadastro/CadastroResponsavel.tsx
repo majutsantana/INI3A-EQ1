@@ -26,13 +26,13 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
  
  export default function CadastroResponsavel({navigation}) { //Não é erro, é só o vscode dando trabalho
    const [fontsLoaded, setFontsLoaded] = useState(false);
-   const [nome, setNome] = useState('');
-   const [cpf, setCpf] = useState('');
    const [email, setEmail] = useState('');
    const [senha, setSenha] = useState('');
    const [confSenha, setconfSenha] = useState('');
    const [telefone, setTelefone] = useState('');
+   const [cpf, setCpf] = useState('');
    const [sexo, setSexo] = useState(''); 
+   const [endereco, setEndereco] = useState('');
    const [check, setCheck] = useState(false);
    const [errors, setErrors] = useState({});
    const [senhaVisivel, setSenhaVisivel] = useState(false);
@@ -89,25 +89,29 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
      if (!telefone.trim()) {
       newErrors.telefone = 'Telefone é obrigatório.';
       isValid = false;
-    } 
-    else {
-      const onlyNumbers = telefone.replace(/\D/g, ''); 
-      if (onlyNumbers.length < 10 || onlyNumbers.length > 11) { 
-        newErrors.telefone = 'Telefone inválido. Deve conter DDD + número.';
-        isValid = false;
-        }
-    }
- 
-   /*  if (!sexo) {
+      } 
+      else {
+        const onlyNumbers = telefone.replace(/\D/g, ''); 
+        if (onlyNumbers.length < 10 || onlyNumbers.length > 11) { 
+          newErrors.telefone = 'Telefone inválido. Deve conter DDD + número.';
+          isValid = false;
+          }
+      }
+     if (!sexo) {
        newErrors.sexo = 'Selecione o sexo.';
        isValid = false;
      }
+
+     if (!endereco.trim()) {
+      newErrors.endereco = 'Endereço é obrigatório.';
+      isValid = false;
+    }
  
      if (!check) {
        newErrors.check = 'Você deve aceitar os termos de uso.';
        isValid = false;
      }
- */
+
      setErrors(newErrors);
      return isValid;
    };
@@ -136,7 +140,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
          'Content-Type': 'application/json',
          'Accept': 'application/json',
        },
-       body: JSON.stringify({ cpf, email, senha, telefone}),
+       body: JSON.stringify({ cpf, email, senha, endereco, sexo, telefone}),
      });
       console.log("Status:", response.status);
       
@@ -210,6 +214,54 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
                />
                {errors.email && <Text style={styles.errorText}>{errors.email}</Text>}
              </View>
+             <View style={styles.inputGroup}>
+                <Text style={styles.label}>Endereço:</Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder="Digite o endereço"
+                  placeholderTextColor="#888"
+                  value={endereco}
+                  onChangeText={setEndereco}
+                />
+                {errors.endereco && <Text style={styles.errorText}>{errors.endereco}</Text>}
+              </View>
+              <View style={styles.inputGroup}>
+                <Text style={styles.label}>Sexo:</Text>
+                <View style={styles.pickerWrapper}>
+                  <Picker
+                    selectedValue={sexo}
+                    onValueChange={(itemValue) => setSexo(itemValue)}
+                    style={[
+                      styles.picker,
+                      { color: sexo === '' ? '#888' : '#000' } // preto para placeholder, cinza para os demais
+                    ]}
+                  >
+                    <Picker.Item label="Selecione o sexo" value="" />
+                    <Picker.Item label="Masculino" value="Masculino" />
+                    <Picker.Item label="Feminino" value="Feminino" />
+                    <Picker.Item label="Neutro" value="Neutro" />
+                    <Picker.Item label="Prefiro não informar" value="Prefiro não informar" />
+                  </Picker>
+                </View>
+                {errors.sexo && <Text style={styles.errorText}>{errors.sexo}</Text>}
+              </View>
+              <View style={styles.inputGroup}>
+                <Text style={styles.label}>Telefone:</Text>
+                <TextInputMask
+                  style={styles.input}
+                  type={'cel-phone'}
+                  options={{
+                    maskType: 'BRL',
+                    withDDD: true,
+                    dddMask: '(99) '
+                  }}
+                  placeholder="(99) 99999-9999" 
+                  placeholderTextColor="#888"
+                  value={telefone}
+                  onChangeText={setTelefone}
+                />
+                {errors.telefone && <Text style={styles.errorText}>{errors.telefone}</Text>}
+              </View>
               <View style={styles.inputGroup}>
                 <Text style={styles.label}>Senha:</Text>
                 <View style={styles.passwordContainer}>
@@ -253,25 +305,16 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
                 </TouchableOpacity>
                 </View>
                 {errors.confSenha && <Text style={styles.errorText}>{errors.confSenha}</Text>}
-
-                <View style={styles.inputGroup}>
-                  <Text style={styles.label}>Telefone:</Text>
-                  <TextInputMask
-                    style={styles.input}
-                    type={'cel-phone'}
-                    options={{
-                      maskType: 'BRL',
-                      withDDD: true,
-                      dddMask: '(99) '
-                    }}
-                    placeholder="(99) 99999-9999" 
-                    placeholderTextColor="#888"
-                    value={telefone}
-                    onChangeText={setTelefone}
-                  />
-                  {errors.telefone && <Text style={styles.errorText}>{errors.telefone}</Text>}
-                </View>
               </View>
+              <View style={styles.check}>
+                <CheckBox
+                  checked={check}
+                  onPress={() => setCheck(!check)} />
+                <TouchableOpacity>
+                  <Text style={styles.textCheck}>Termos de uso</Text>
+                </TouchableOpacity>
+              </View>
+              {errors.check && <Text style={styles.errorText}>{errors.check}</Text>}
           </ScrollView>
         </View>
  

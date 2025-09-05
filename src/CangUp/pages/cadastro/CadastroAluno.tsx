@@ -217,7 +217,7 @@ export default function CadastroAluno({ navigation }) { // Não é erro, é só 
               {errors.email && <Text style={styles.errorText}>{errors.email}</Text>}
             </View>
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>Senha:</Text>
+              <Text style={styles.label}>Nova senha:</Text>
               <View style={styles.passwordContainer}>
 
                 <TextInput
@@ -239,7 +239,7 @@ export default function CadastroAluno({ navigation }) { // Não é erro, é só 
               {errors.senha && <Text style={styles.errorText}>{errors.senha}</Text>}
             </View>
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>Confirme a senha:</Text>
+              <Text style={styles.label}>Confirme a nova senha:</Text>
               <View style={styles.passwordContainer}>
 
                 <TextInput

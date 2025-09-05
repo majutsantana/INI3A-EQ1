@@ -17,6 +17,8 @@ return new class extends Migration
             $table->string('cpf');
             $table->string('email')->nullable();
             $table->string('telefone')->nullable();
+            $table->string('sexo')->nullable();
+            $table->string('endereco')->nullable();
             $table->unsignedInteger('id_inst');
             $table->foreign('id_inst')->references('id')->on('instituicoes')->onDelete('cascade');
             $table->timestamps();

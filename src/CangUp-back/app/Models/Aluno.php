@@ -12,7 +12,7 @@ class Aluno extends Model
     protected $table = 'alunos';
 
     protected $fillable = [
-        'nome', 'cpf', 'ra', 'email', 'sexo', 'endereco', 'id_inst'     
+        'nome', 'cpf', 'ra', 'email', 'sexo', 'endereco', 'telefone', 'id_inst'     
     ];
 
     public function instituicao()

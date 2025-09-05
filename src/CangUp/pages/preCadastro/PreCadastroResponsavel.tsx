@@ -23,7 +23,7 @@ import useApi from '../../hooks/useApi';
 type errorType ={
   nome : string | undefined,
   RA : string | undefined,
-  CPF : string | undefined
+  CPF : string | undefined,
 };
 
 
@@ -40,7 +40,6 @@ export default function PreCadastroResponsavel({ navigation }) {
     const [nome, setNome] = useState('');
     const [CPF, setCPF] = useState('');
     const { url } = useApi();
-
 
     const validateForm = () => {
      let newErrors = {};
@@ -195,7 +194,7 @@ export default function PreCadastroResponsavel({ navigation }) {
                   style={styles.input}
                 />
                 {errors.CPF && <Text style={styles.errorText}>{errors.CPF}</Text>}
-                </View>
+              </View>
             </ScrollView>
           </View>
  
