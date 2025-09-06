@@ -14,7 +14,10 @@ import { TextInputMask } from 'react-native-masked-text';
 type Instituicao = {
     id: number;
     nome: string;
+    cnpj: string;
+    email: string;
     endereco: string;
+    plano: string;
     telefone: string;
 }
 
@@ -39,7 +42,7 @@ export default function PerfilInstituicao({ navigation }) {
             const token = await AsyncStorage.getItem("jwt");
             if (!token) {
                 Alert.alert("Erro", "Você precisa estar logado.");
-                return;
+                return; 
             }
             const id = await AsyncStorage.getItem("id_instituicao");
             if (!id) {
@@ -138,9 +141,13 @@ export default function PerfilInstituicao({ navigation }) {
             </View>
             <ScrollView contentContainerStyle={styles.formContainer}>
                 <Text style={styles.label}>Nome:</Text>
-                <TextInput style={styles.input} value={instituicao.nome} editable={editando} onChangeText={(text) => handleInputChange('nome', text)} />
+                <TextInput style={styles.input} value={instituicao.nome} editable={false} onChangeText={(text) => handleInputChange('nome', text)} />
+                <Text style={styles.label}>Email:</Text>
+                <TextInput style={styles.input} value={instituicao.email} editable={false} onChangeText={(text) => handleInputChange('email', text)} />
                 <Text style={styles.label}>Endereço:</Text>
-                <TextInput style={styles.input} value={instituicao.endereco} editable={editando} onChangeText={(text) => handleInputChange('endereco', text)} />
+                <TextInput style={styles.input} value={instituicao.endereco} editable={false} onChangeText={(text) => handleInputChange('endereco', text)} />
+                <Text style={styles.label}>CNPJ:</Text>
+                <TextInput style={styles.input} value={instituicao.cnpj} editable={false} onChangeText={(text) => handleInputChange('cnpj', text)} />
                 <Text style={styles.label}>Telefone para contato:</Text>
                 <TextInputMask
                     style={[styles.input, errors.telefone && styles.inputError]}
@@ -162,6 +169,8 @@ export default function PerfilInstituicao({ navigation }) {
                     keyboardType="phone-pad"
                 />
                 {errors.telefone && <Text style={styles.errorText}>{errors.telefone}</Text>}
+                <Text style={styles.label}>Plano:</Text>
+                <TextInput style={styles.input} value={instituicao.plano} editable={false} onChangeText={(text) => handleInputChange('plano', text)} />
                 {editando && <TouchableOpacity style={styles.saveBtn} onPress={salvarEdicao}><Text style={styles.saveText}>Salvar Alterações</Text></TouchableOpacity>}
                 <TouchableOpacity style={styles.button} onPress={() => navigation.navigate(`PreCadastroResponsavel`)}><Text style={styles.buttonText}>Cadastro de responsáveis</Text></TouchableOpacity>
                 <TouchableOpacity style={styles.button} onPress={() => navigation.navigate(`PreCadastroAluno`)}><Text style={styles.buttonText}>Cadastro de alunos</Text></TouchableOpacity>

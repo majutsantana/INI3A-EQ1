@@ -83,34 +83,25 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: '#FCD28D',
     },
-
-    header: {
-        height: 100,
-        backgroundColor: '#BEACDE',
-    },
-
     profileTop: {
         backgroundColor: '#FFBE31',
         alignItems: 'center',
         paddingTop: 20,
         paddingBottom: 60,
     },
-
     profileBottom: {
         backgroundColor: '#FCD28D',
         alignItems: 'center',
         paddingTop: 80,
     },
-
     profilePicWrapper: {
         position: 'absolute',
-        top: 160, // ajuste fino da posição vertical
+        top: 160,
         left: 0,
         right: 0,
         alignItems: 'center',
         zIndex: 2,
     },
-
     profilePic: {
         width: 120,
         height: 120,
@@ -118,16 +109,14 @@ const styles = StyleSheet.create({
         backgroundColor: '#D9D9D9',
         justifyContent: 'center',
         alignItems: 'center',
-        //borderWidth: 2,
-        //borderColor: '#3D3D3D',
+        borderWidth: 2,
+        borderColor: '#FFF',
     },
-
     picText: {
         fontFamily: 'PoppinsRegular',
         fontSize: 12,
         color: '#555',
     },
-
     nameTag: {
         backgroundColor: '#fff',
         paddingHorizontal: 20,
@@ -135,33 +124,34 @@ const styles = StyleSheet.create({
         borderRadius: 20,
         marginBottom: 10,
     },
-
     nameText: {
         fontFamily: 'PoppinsBold',
         fontSize: 14,
         color: '#000',
     },
-
-    // Botão de editar Perfil
     editBtn: {
-        backgroundColor: '#FFBE31', //amarelo forte para o botão 
-        borderRadius: 20, //borda arredondada
+        backgroundColor: '#FFBE31',
+        borderRadius: 20,
         paddingHorizontal: 20,
         paddingVertical: 6,
     },
-
     editText: {
         fontFamily: 'PoppinsRegular',
         fontSize: 14,
         color: '#000',
     },
-
     formContainer: {
         alignItems: 'center',
         paddingVertical: 20,
         paddingBottom: 100,
     },
-
+    label: {
+        width: '85%',
+        fontFamily: 'PoppinsBold',
+        fontSize: 14,
+        color: '#333',
+        marginTop: 10,
+    },
     input: {
         width: '85%',
         height: 45,
@@ -171,16 +161,51 @@ const styles = StyleSheet.create({
         marginVertical: 8,
         justifyContent: 'center',
         fontFamily: 'PoppinsRegular',
+        color: '#000',
+        borderWidth: 1,
+        borderColor: '#ddd',
     },
-
-    footer: {
-        flexDirection: 'row',
-        justifyContent: 'space-around',
+    inputError: {
+        borderColor: '#d9534f',
+    },
+    errorText: {
+        width: '85%',
+        color: '#d9534f',
+        fontSize: 12,
+        fontFamily: 'PoppinsRegular',
+        marginTop: -4,
+        marginBottom: 8,
+    },
+    saveBtn: {
+        backgroundColor: '#522a91',
+        borderRadius: 20,
+        paddingHorizontal: 30,
+        paddingVertical: 10,
+        marginTop: 20,
+    },
+    saveText: {
+        fontFamily: 'PoppinsBold',
+        fontSize: 16,
+        color: '#fff',
+    },
+    button: {
+        backgroundColor: '#FFBE31',
+        paddingVertical: '3%',
+        width: '60%',
+        borderRadius: 20,
         alignItems: 'center',
-        backgroundColor: '#BEACDE',
-        paddingVertical: 12,
-        position: 'absolute',
-        bottom: 0,
-        width: '100%',
+        marginTop: '10%',
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 0,
+            height: 3,
+        },
+        shadowOpacity: 0.27,
+        shadowRadius: 4.65,
+        elevation: 6,
+    },
+    buttonText: {
+        fontSize: 14,
+        fontFamily: 'PoppinsRegular',
     },
 });
