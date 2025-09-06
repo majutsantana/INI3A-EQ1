@@ -22,7 +22,6 @@ import useApi from '../../hooks/useApi';
 
 type errorType ={
   nome : string | undefined,
-  RA : string | undefined,
   CPF : string | undefined,
 };
 

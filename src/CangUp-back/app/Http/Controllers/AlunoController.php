@@ -24,14 +24,12 @@ class AlunoController extends Controller
             'cpf' => 'required|string',
             'ra' => 'required|string',
             'id_inst' => 'required|exists:instituicoes,id',
-            'senha' => 'string'
         ]);
 
         $aluno = new Aluno();
         $aluno->nome = $dados["nome"];
         $aluno->cpf = $dados["cpf"];
         $aluno->ra = $dados["ra"];
-        $aluno->senha = $dados["senha"];
 
         $aluno->id_inst = $dados["id_inst"];
         $aluno->save();
@@ -45,7 +43,6 @@ class AlunoController extends Controller
             'cpf' => 'required|string',
             'nome' => 'required|string',
             'ra' => 'required|string',
-            'senha' => 'required|string',
             'id_inst' => 'required|integer',
         ]);
 
@@ -53,7 +50,6 @@ class AlunoController extends Controller
         $aluno = Aluno::where('cpf', $dados['cpf'])
             ->where('nome', $dados['nome'])
             ->where('ra', $dados['ra'])
-            ->where('senha', $dados['senha'])
             ->where('id_inst', $dados['id_inst'])
             ->first();
 
@@ -113,7 +109,6 @@ class AlunoController extends Controller
     $aluno->sexo = $dados['sexo'];
     $aluno->endereco = $dados['endereco'];
     $aluno->telefone = $dados['telefone'];
-    $aluno->senha = $dados['senha'];
     $aluno->update();
 
     return response()->json([

@@ -142,7 +142,7 @@ export default function CadastroAluno({ navigation }) { // Não é erro, é só 
           'Content-Type': 'application/json',
           'Accept': 'application/json',
         },
-        body: JSON.stringify({ cpf, email, senha, endereco, sexo }),
+        body: JSON.stringify({ cpf, email, senha, endereco, sexo, telefone }),
       });
       console.log("Status:", response.status);
 
@@ -217,7 +217,56 @@ export default function CadastroAluno({ navigation }) { // Não é erro, é só 
               {errors.email && <Text style={styles.errorText}>{errors.email}</Text>}
             </View>
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>Nova senha:</Text>
+              <Text style={styles.label}>Endereço:</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Digite o endereço"
+                placeholderTextColor="#888"
+                value={endereco}
+                onChangeText={setEndereco}
+              />
+              {errors.endereco && <Text style={styles.errorText}>{errors.endereco}</Text>}
+            </View>
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>Telefone:</Text>
+              <TextInputMask
+                style={styles.input}
+                type={'cel-phone'}
+                options={{
+                  maskType: 'BRL',
+                  withDDD: true,
+                  dddMask: '(99) '
+                }}
+                placeholder="(99) 99999-9999"
+                placeholderTextColor="#888"
+                value={telefone}
+                onChangeText={setTelefone}
+              />
+              {errors.telefone && <Text style={styles.errorText}>{errors.telefone}</Text>}
+            </View>
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>Sexo:</Text>
+              <View style={styles.pickerWrapper}>
+                <Picker
+                  selectedValue={sexo}
+                  onValueChange={(itemValue) => setSexo(itemValue)}
+                  style={[
+                    styles.picker,
+                    { color: sexo === '' ? '#888' : '#000' } // preto para placeholder, cinza para os demais
+                  ]}
+                >
+                  <Picker.Item label="Selecione o sexo" value="" />
+                  <Picker.Item label="Masculino" value="Masculino" />
+                  <Picker.Item label="Feminino" value="Feminino" />
+                  <Picker.Item label="Neutro" value="Neutro" />
+                  <Picker.Item label="Prefiro não informar" value="Prefiro não informar" />
+                </Picker>
+              </View>
+              {errors.sexo && <Text style={styles.errorText}>{errors.sexo}</Text>}
+            </View>
+
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>Senha:</Text>
               <View style={styles.passwordContainer}>
 
                 <TextInput
@@ -239,7 +288,7 @@ export default function CadastroAluno({ navigation }) { // Não é erro, é só 
               {errors.senha && <Text style={styles.errorText}>{errors.senha}</Text>}
             </View>
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>Confirme a nova senha:</Text>
+              <Text style={styles.label}>Confirme a senha:</Text>
               <View style={styles.passwordContainer}>
 
                 <TextInput
@@ -259,55 +308,6 @@ export default function CadastroAluno({ navigation }) { // Não é erro, é só 
                 </TouchableOpacity>
               </View>
               {errors.confSenha && <Text style={styles.errorText}>{errors.confSenha}</Text>}
-            </View>
-            <View style={styles.inputGroup}>
-              <Text style={styles.label}>Telefone:</Text>
-              <TextInputMask
-                style={styles.input}
-                type={'cel-phone'}
-                options={{
-                  maskType: 'BRL',
-                  withDDD: true,
-                  dddMask: '(99) '
-                }}
-                placeholder="(99) 99999-9999"
-                placeholderTextColor="#888"
-                value={telefone}
-                onChangeText={setTelefone}
-              />
-              {errors.telefone && <Text style={styles.errorText}>{errors.telefone}</Text>}
-            </View>
-            <View style={styles.inputGroup}>
-              <Text style={styles.label}>Endereço:</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="Digite o endereço"
-                placeholderTextColor="#888"
-                value={endereco}
-                onChangeText={setEndereco}
-              />
-              {errors.endereco && <Text style={styles.errorText}>{errors.endereco}</Text>}
-            </View>
-
-            <View style={styles.inputGroup}>
-              <Text style={styles.label}>Sexo:</Text>
-              <View style={styles.pickerWrapper}>
-                <Picker
-                  selectedValue={sexo}
-                  onValueChange={(itemValue) => setSexo(itemValue)}
-                  style={[
-                    styles.picker,
-                    { color: sexo === '' ? '#888' : '#000' } // preto para placeholder, cinza para os demais
-                  ]}
-                >
-                  <Picker.Item label="Selecione o sexo" value="" />
-                  <Picker.Item label="Masculino" value="Masculino" />
-                  <Picker.Item label="Feminino" value="Feminino" />
-                  <Picker.Item label="Neutro" value="Neutro" />
-                  <Picker.Item label="Prefiro não informar" value="Prefiro não informar" />
-                </Picker>
-              </View>
-              {errors.sexo && <Text style={styles.errorText}>{errors.sexo}</Text>}
             </View>
 
             <View style={styles.check}>
