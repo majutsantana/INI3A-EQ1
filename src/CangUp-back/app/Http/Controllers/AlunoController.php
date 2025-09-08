@@ -30,7 +30,6 @@ class AlunoController extends Controller
         $aluno->nome = $dados["nome"];
         $aluno->cpf = $dados["cpf"];
         $aluno->ra = $dados["ra"];
-
         $aluno->id_inst = $dados["id_inst"];
         $aluno->save();
 
