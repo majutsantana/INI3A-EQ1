@@ -21,9 +21,39 @@ class DatabaseSeeder extends Seeder
         // ]);
 
         \App\Models\Usuario::create([
-            'login'=>'yasmin1',
-            'email'=>'teste@srasda.com',
-            'senha'=>'1234'
+            'login'=>'arthur',
+            'email'=>'arthur@cangup.com',
+            'senha'=>'arthurCangUp'
+        ]);
+
+        \App\Models\Usuario::create([
+            'login'=>'chloe',
+            'email'=>'chloe@cangup.com',
+            'senha'=>'chloeCangUp'
+        ]);
+
+        \App\Models\Usuario::create([
+            'login'=>'luiza',
+            'email'=>'luiza@cangup.com',
+            'senha'=>'luizaCangUp'
+        ]);
+
+        \App\Models\Usuario::create([
+            'login'=>'mariajulia',
+            'email'=>'mariajulia@cangup.com',
+            'senha'=>'mariajuliaCangUp'
+        ]);
+
+        \App\Models\Usuario::create([
+            'login'=>'olivia',
+            'email'=>'olivia@cangup.com',
+            'senha'=>'oliviaCangUp'
+        ]);
+
+        \App\Models\Usuario::create([
+            'login'=>'yasmin',
+            'email'=>'yasmin@cangup.com',
+            'senha'=>'yasminCangUp'
         ]);
 
         \App\Models\Perfil::create([
