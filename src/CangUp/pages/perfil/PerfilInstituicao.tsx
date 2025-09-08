@@ -24,6 +24,7 @@ type Instituicao = {
 export default function PerfilInstituicao({ navigation }) {
     const [fontsLoaded, setFontsLoaded] = useState(false);
     const [instituicao, setInstituicao] = useState<Instituicao | null>(null);
+    const [originalInstituicao, setOriginalInstituicao] = useState<Instituicao | null>(null);
     const [rawTelefone, setRawTelefone] = useState('');
     const [editando, setEditando] = useState(false);
     const [errors, setErrors] = useState<{ telefone?: string }>({});
@@ -42,7 +43,7 @@ export default function PerfilInstituicao({ navigation }) {
             const token = await AsyncStorage.getItem("jwt");
             if (!token) {
                 Alert.alert("Erro", "Você precisa estar logado.");
-                return; 
+                return;
             }
             const id = await AsyncStorage.getItem("id_instituicao");
             if (!id) {
@@ -58,6 +59,7 @@ export default function PerfilInstituicao({ navigation }) {
             }
             const data = await res.json();
             setInstituicao(data);
+            setOriginalInstituicao(data); 
             if (data.telefone) {
                 setRawTelefone(data.telefone.replace(/\D/g, ''));
             }
@@ -70,21 +72,18 @@ export default function PerfilInstituicao({ navigation }) {
     const validateForm = () => {
         const newErrors: { telefone?: string } = {};
         let isValid = true;
-
         if (rawTelefone.length < 10 || rawTelefone.length > 11) {
             newErrors.telefone = 'Telefone inválido. Precisa ter 10 ou 11 dígitos.';
             isValid = false;
         }
-
         setErrors(newErrors);
         return isValid;
     };
 
     const salvarEdicao = async () => {
         if (!instituicao) return;
-        if (!validateForm()) {
-            return;
-        }
+        if (!validateForm()) return;
+
         try {
             const token = await AsyncStorage.getItem("jwt");
             const res = await fetch(`${url}/api/instituicoes/${instituicao.id}`, {
@@ -105,6 +104,7 @@ export default function PerfilInstituicao({ navigation }) {
             }
             const atualizado = await res.json();
             setInstituicao(atualizado);
+            setOriginalInstituicao(atualizado);
             setEditando(false);
             setErrors({});
             Alert.alert("Sucesso", "Perfil atualizado!");
@@ -112,6 +112,17 @@ export default function PerfilInstituicao({ navigation }) {
             console.error(err);
             Alert.alert("Erro", "Falha ao salvar dados.");
         }
+    };
+
+    const handleEditCancel = () => {
+        if (editando) {
+            if (originalInstituicao) {
+                setInstituicao(originalInstituicao);
+                setRawTelefone(originalInstituicao.telefone.replace(/\D/g, ''));
+            }
+        }
+        setEditando(!editando);
+        setErrors({});
     };
 
     useEffect(() => {
@@ -135,34 +146,31 @@ export default function PerfilInstituicao({ navigation }) {
             <View style={styles.profileTop}><View style={styles.nameTag}><Text style={styles.nameText}>{instituicao.nome}</Text></View></View>
             <View style={styles.profilePicWrapper}><View style={styles.profilePic}><Text style={styles.picText}>Foto de perfil</Text></View></View>
             <View style={styles.profileBottom}>
-                <TouchableOpacity style={styles.editBtn} onPress={() => { setEditando(!editando); setErrors({}); }}>
+                <TouchableOpacity style={styles.editBtn} onPress={handleEditCancel}>
                     <Text style={styles.editText}>{editando ? 'Cancelar' : 'Editar perfil'}</Text>
                 </TouchableOpacity>
             </View>
             <ScrollView contentContainerStyle={styles.formContainer}>
                 <Text style={styles.label}>Nome:</Text>
-                <TextInput style={styles.input} value={instituicao.nome} editable={false} onChangeText={(text) => handleInputChange('nome', text)} />
+                <TextInput style={[styles.input, editando && styles.inputDisabled]} value={instituicao.nome} editable={false} />
                 <Text style={styles.label}>Email:</Text>
-                <TextInput style={styles.input} value={instituicao.email} editable={false} onChangeText={(text) => handleInputChange('email', text)} />
+                <TextInput style={[styles.input, editando && styles.inputDisabled]} value={instituicao.email} editable={false} />
                 <Text style={styles.label}>Endereço:</Text>
-                <TextInput style={styles.input} value={instituicao.endereco} editable={false} onChangeText={(text) => handleInputChange('endereco', text)} />
+                <TextInput style={styles.input} value={instituicao.endereco} editable={editando} onChangeText={(text) => handleInputChange('endereco', text)} />
                 <Text style={styles.label}>CNPJ:</Text>
-                <TextInput style={styles.input} value={instituicao.cnpj} editable={false} onChangeText={(text) => handleInputChange('cnpj', text)} />
+                <TextInput style={[styles.input, editando && styles.inputDisabled]} value={instituicao.cnpj} editable={false} />
                 <Text style={styles.label}>Telefone para contato:</Text>
                 <TextInputMask
                     style={[styles.input, errors.telefone && styles.inputError]}
                     type={'cel-phone'}
-                    options={{
-                        withDDD: true // Apenas esta opção é necessária
-                    }}
+                    options={{ withDDD: true }}
                     placeholder="(99) 99999-9999"
                     placeholderTextColor="#888"
                     value={instituicao.telefone}
                     onChangeText={(maskedText) => {
                         const newRawText = maskedText.replace(/\D/g, '');
-                        handleInputChange('telefone', maskedText); 
-                        setRawTelefone(newRawText); 
-
+                        handleInputChange('telefone', maskedText);
+                        setRawTelefone(newRawText);
                         if (errors.telefone) setErrors({});
                     }}
                     editable={editando}
@@ -170,8 +178,10 @@ export default function PerfilInstituicao({ navigation }) {
                 />
                 {errors.telefone && <Text style={styles.errorText}>{errors.telefone}</Text>}
                 <Text style={styles.label}>Plano:</Text>
-                <TextInput style={styles.input} value={instituicao.plano} editable={false} onChangeText={(text) => handleInputChange('plano', text)} />
+                <TextInput style={[styles.input, editando && styles.inputDisabled]} value={instituicao.plano} editable={false} />
+                
                 {editando && <TouchableOpacity style={styles.saveBtn} onPress={salvarEdicao}><Text style={styles.saveText}>Salvar Alterações</Text></TouchableOpacity>}
+                
                 <TouchableOpacity style={styles.button} onPress={() => navigation.navigate(`PreCadastroResponsavel`)}><Text style={styles.buttonText}>Cadastro de responsáveis</Text></TouchableOpacity>
                 <TouchableOpacity style={styles.button} onPress={() => navigation.navigate(`PreCadastroAluno`)}><Text style={styles.buttonText}>Cadastro de alunos</Text></TouchableOpacity>
             </ScrollView>
@@ -267,9 +277,6 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderColor: '#ddd',
     },
-    inputError: {
-        borderColor: '#d9534f',
-    },
     errorText: {
         width: '85%',
         color: '#d9534f',
@@ -309,5 +316,12 @@ const styles = StyleSheet.create({
     buttonText: {
         fontSize: 14,
         fontFamily: 'PoppinsRegular',
+    },
+    inputDisabled: {
+        backgroundColor: '#E0E0E0',
+        color: '#888',
+    },
+    inputError: {
+        borderColor: '#d9534f',
     },
 });

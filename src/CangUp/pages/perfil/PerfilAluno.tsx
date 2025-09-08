@@ -16,11 +16,31 @@ import * as Font from 'expo-font';
 import { Picker } from '@react-native-picker/picker';
 import HeaderComLogout from '../../components/HeaderComLogout';
 import FooterComIcones from '../../components/FooterComIcones';
+import useApi from '../../hooks/useApi';
+import { AsyncStorage } from 'react-native';
+import { TextInputMask } from 'react-native-masked-text';
+
+type Aluno = {
+    id: number;
+    nome: string;
+    ra: string;
+    cpf: string;
+    sexo: string;
+    email: string;
+    endereco: string;
+    telefone: string;
+}
 
 export default function PerfilAluno() {
     const navigation = useNavigation();
     const [fontsLoaded, setFontsLoaded] = useState(false);
     const [selectedGenero, setSelectedGenero] = useState('');
+    const [aluno, setAluno] = useState<Aluno | null>(null);
+    const [originalAluno, setOriginalAluno] = useState<Aluno | null>(null);
+    const [rawTelefone, setRawTelefone] = useState('');
+    const [editando, setEditando] = useState(false);
+    const [errors, setErrors] = useState<{ telefone?: string }>({});
+    const { url } = useApi();
 
     const loadFonts = async () => {
         await Font.loadAsync({
@@ -29,17 +49,106 @@ export default function PerfilAluno() {
         });
         setFontsLoaded(true);
     };
+    const fetchAluno = async () => {
+        try {
+            const token = await AsyncStorage.getItem("jwt");
+            if (!token) {
+                Alert.alert("Erro", "Você precisa estar logado.");
+                return;
+            }
+            const id = await AsyncStorage.getItem("id_aluno");
+            if (!id) {
+                Alert.alert("Erro", "ID do aluno não encontrado.");
+                return;
+            }
+            const res = await fetch(`${url}/api/alunos/${id}`, {
+                method: "GET", headers: { "Authorization": `Bearer ${token}` }
+            });
+            if (!res.ok) {
+                Alert.alert("Erro", "Falha ao carregar dados.");
+                return;
+            }
+            const data = await res.json();
+            setAluno(data);
+            setOriginalAluno(data); 
+            if (data.telefone) {
+                setRawTelefone(data.telefone.replace(/\D/g, ''));
+            }
+        } catch (err) {
+            console.error(err);
+            Alert.alert("Erro", "Não foi possível buscar os dados.");
+        }
+    };
+
+    const validateForm = () => {
+        const newErrors: { telefone?: string } = {};
+        let isValid = true;
+        if (rawTelefone.length > 11) {
+            newErrors.telefone = 'Telefone inválido. Precisa ter 11 dígitos.';
+            isValid = false;
+        }
+        setErrors(newErrors);
+        return isValid;
+    };
+
+    const salvarEdicao = async () => {
+        if (!aluno) return;
+        if (!validateForm()) return;
+
+        try {
+            const token = await AsyncStorage.getItem("jwt");
+            const res = await fetch(`${url}/api/alunos/${aluno.id}`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    nome: aluno.nome,
+                    endereco: aluno.endereco,
+                    telefone: rawTelefone
+                })
+            });
+            if (!res.ok) {
+                Alert.alert("Erro", "Não foi possível atualizar.");
+                return;
+            }
+            const atualizado = await res.json();
+            setAluno(atualizado);
+            setOriginalAluno(atualizado);
+            setEditando(false);
+            setErrors({});
+            Alert.alert("Sucesso", "Perfil atualizado!");
+        } catch (err) {
+            console.error(err);
+            Alert.alert("Erro", "Falha ao salvar dados.");
+        }
+    };
+
+    const handleEditCancel = () => {
+        if (editando) {
+            if (originalAluno) {
+                setAluno(originalAluno);
+                setRawTelefone(originalAluno.telefone.replace(/\D/g, ''));
+            }
+        }
+        setEditando(!editando);
+        setErrors({});
+    };
 
     useEffect(() => {
         loadFonts();
+        fetchAluno();
     }, []);
 
-    if (!fontsLoaded) {
-        return (
-            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-                <ActivityIndicator size="large" />
-            </View>
-        );
+    const handleInputChange = (field: keyof Aluno, value: string) => {
+        if (aluno) {
+            setAluno({ ...aluno, [field]: value });
+        }
+    };
+
+    if (!fontsLoaded || !aluno) {
+        return <ActivityIndicator size="large" style={{ flex: 1 }} />;
     }
 
     return (
@@ -48,7 +157,7 @@ export default function PerfilAluno() {
 
             <View style={styles.profileTop}>
                 <View style={styles.nameTag}>
-                    <Text style={styles.nameText}>Nome do Usuário</Text>
+                    <Text style={styles.nameText}>{aluno.nome}</Text>
                 </View>
             </View>
 
@@ -66,30 +175,41 @@ export default function PerfilAluno() {
                     <Text style={styles.editText}>Editar perfil</Text>
                 </TouchableOpacity>
             </View>
-
-            <ScrollView contentContainerStyle={styles.formContainer}>
-                <TextInput placeholder="Nome:" style={styles.input} placeholderTextColor="#000" />
-                <TextInput placeholder="CPF:" style={styles.input} placeholderTextColor="#000" />
-                <TextInput placeholder="Telefone:" style={styles.input} placeholderTextColor="#000" />
-                <View style={styles.input}>
-                    <Picker
-                        selectedValue={selectedGenero}
-                        onValueChange={(itemValue) => setSelectedGenero(itemValue)}
-                        style={styles.picker}
-                        dropdownIconColor="#000"
-                    >
-                        <Picker.Item label="Gênero:" value="" />
-                        <Picker.Item label="Masculino" value="masculino" />
-                        <Picker.Item label="Feminino" value="feminino" />
-                        <Picker.Item label="Neutro" value="neutro" />
-                        <Picker.Item label="Prefiro não informar" value="nao_informar" />
-                    </Picker>
-                </View>
-                <TextInput placeholder="RA:" style={styles.input} placeholderTextColor="#000" />
-                <TextInput placeholder="E-mail:" style={styles.input} placeholderTextColor="#000" />
-                <TextInput placeholder="Instituição:" style={styles.input} placeholderTextColor="#000" />
-                <TextInput placeholder="Endereço:" style={styles.input} placeholderTextColor="#000" />
-                <TextInput placeholder="Bairro:" style={styles.input} placeholderTextColor="#000" />
+             <View style={styles.profileBottom}>
+                            <TouchableOpacity style={styles.editBtn} onPress={handleEditCancel}>
+                                <Text style={styles.editText}>{editando ? 'Cancelar' : 'Editar perfil'}</Text>
+                            </TouchableOpacity>
+                        </View>
+                        <ScrollView contentContainerStyle={styles.formContainer}>
+                            <Text style={styles.label}>Nome:</Text>
+                            <TextInput style={[styles.input, editando && styles.inputDisabled]} value={aluno.nome} editable={false} />
+                            <Text style={styles.label}>Email:</Text>
+                            <TextInput style={[styles.input, editando && styles.inputDisabled]} value={aluno.email} editable={false} />
+                            <Text style={styles.label}>Endereço:</Text>
+                            <TextInput style={styles.input} value={aluno.endereco} editable={editando} onChangeText={(text) => handleInputChange('endereco', text)} />
+                            <Text style={styles.label}>CPF:</Text>
+                            <TextInput style={[styles.input, editando && styles.inputDisabled]} value={aluno.cpf} editable={false} />
+                            <Text style={styles.label}>Telefone para contato:</Text>
+                            <TextInputMask
+                                style={[styles.input, errors.telefone && styles.inputError]}
+                                type={'cel-phone'}
+                                options={{ withDDD: true }}
+                                placeholder="(99) 99999-9999"
+                                placeholderTextColor="#888"
+                                value={aluno.telefone}
+                                onChangeText={(maskedText) => {
+                                    const newRawText = maskedText.replace(/\D/g, '');
+                                    handleInputChange('telefone', maskedText);
+                                    setRawTelefone(newRawText);
+                                    if (errors.telefone) setErrors({});
+                                }}
+                                editable={editando}
+                                keyboardType="phone-pad"
+                            />
+                            {errors.telefone && <Text style={styles.errorText}>{errors.telefone}</Text>}
+                            <Text style={styles.label}>Sexo:</Text>
+                            <TextInput style={[styles.input, editando && styles.inputDisabled]} value={aluno.sexo} editable={false} />
+                            {editando && <TouchableOpacity style={styles.saveBtn} onPress={salvarEdicao}><Text style={styles.saveText}>Salvar Alterações</Text></TouchableOpacity>}
             </ScrollView>
 
             <FooterComIcones/>
@@ -187,7 +307,6 @@ const styles = StyleSheet.create({
         fontFamily: 'PoppinsRegular',
     },
 
-    // Caixa do gênero 
     picker: {
         width: '100%',
         height: Platform.OS === 'ios' ? undefined : 45,
@@ -195,5 +314,50 @@ const styles = StyleSheet.create({
         backgroundColor: '#F5F5F5',
         borderWidth: 0,
         fontFamily: 'PoppinsRegular',
+    },
+
+    label: {
+        width: '85%',
+        fontFamily: 'PoppinsBold',
+        fontSize: 14,
+        color: '#333',
+        marginTop: 10,
+    },
+
+    errorText: {
+        width: '85%',
+        color: '#d9534f',
+        fontSize: 12,
+        fontFamily: 'PoppinsRegular',
+        marginTop: -4,
+        marginBottom: 8,
+    },
+
+    saveBtn: {
+        backgroundColor: '#522a91',
+        borderRadius: 20,
+        paddingHorizontal: 30,
+        paddingVertical: 10,
+        marginTop: 20,
+    },
+
+    saveText: {
+        fontFamily: 'PoppinsBold',
+        fontSize: 16,
+        color: '#fff',
+    },
+
+    buttonText: {
+        fontSize: 14,
+        fontFamily: 'PoppinsRegular',
+    },
+    
+    inputDisabled: {
+        backgroundColor: '#E0E0E0',
+        color: '#888',
+    },
+
+    inputError: {
+        borderColor: '#d9534f',
     },
 });
