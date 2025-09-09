@@ -387,9 +387,9 @@ const styles = StyleSheet.create({
   },
   pickerWrapper: {
     width:'90%',
+    height:'12%',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical:'4%',
     paddingHorizontal:'4%',
     borderRadius: 25,
     overflow: 'hidden',
