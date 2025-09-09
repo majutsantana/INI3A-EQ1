@@ -81,15 +81,15 @@ Route::middleware(['jwt.auth'])->group(function () {
     Route::put('/instituicoes/{id}', [InstituicaoController::class, 'update']);    // Atualizar instituição
     Route::delete('/instituicoes/{id}', [InstituicaoController::class, 'destroy']);  // Deletar instituição
 
-    Route::get('/alunos/{id}', [AlunoController::class, 'show']);      // Listar uma instituição
-    Route::post('/alunos', [AlunoController::class, 'store']);       // Criar instituição (protegido)
-    Route::put('/alunos/{id}', [AlunoController::class, 'update']);    // Atualizar instituição
-    Route::delete('/alunos/{id}', [AlunoController::class, 'destroy']);  // Deletar instituição
+    Route::get('/alunos/{id}', [AlunoController::class, 'show']);      
+    Route::post('/alunos', [AlunoController::class, 'store']);       
+    Route::put('/alunos/{id}', [AlunoController::class, 'update']);    
+    Route::delete('/alunos/{id}', [AlunoController::class, 'destroy']); 
 
-    Route::get('/responsaveis/{id}', [ResponsavelController::class, 'show']);      // Listar uma instituição
-    Route::post('/responsaveis', [ResponsavelController::class, 'store']);       // Criar instituição (protegido)
-    Route::put('/responsaveis/{id}', [ResponsavelController::class, 'update']);    // Atualizar instituição
-    Route::delete('/responsaveis/{id}', [ResponsavelController::class, 'destroy']);  // Deletar instituição*/
+    Route::get('/responsaveis/{id}', [ResponsavelController::class, 'show']);     
+    Route::post('/responsaveis', [ResponsavelController::class, 'store']);       
+    Route::put('/responsaveis/{id}', [ResponsavelController::class, 'update']);    
+    Route::delete('/responsaveis/{id}', [ResponsavelController::class, 'destroy']); 
 
     // --- Cadastros Protegidos ---
     Route::post('/cadastrarAdmin', [AdminController::class, 'store']);

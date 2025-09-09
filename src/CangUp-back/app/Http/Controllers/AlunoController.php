@@ -64,7 +64,7 @@ class AlunoController extends Controller
     }
 
     public function cadastrarAluno(Request $req)
-{
+    {
     $dados = $req->validate([
         'cpf' => 'required|string|exists:alunos,cpf',
         'email' => 'required|string|email|max:255|unique:usuarios,email',
@@ -115,7 +115,33 @@ class AlunoController extends Controller
         'aluno' => $aluno,
         'usuario' => $usuario
     ], 201);
-}
+    }
+
+    public function show($id)
+    {
+        $aluno = Aluno::findOrFail($id);
+        return response()->json($aluno);
+    }
+
+    public function update(Request $request, $id)
+    {
+        $dados = $request->validate([
+            'nome' => 'sometimes|string|max:255',
+            'endereco' => 'sometimes|string',
+            'telefone' => 'sometimes|string',
+    ]);
+
+    $aluno = Aluno::findOrFail($id);
+    $aluno->update($dados);
+    return response()->json($aluno);
+    }
+
+    public function destroy($id)
+    {
+    $aluno = Aluno::findOrFail($id);
+    $aluno->delete();
+    return response()->json(null, 204);
+    }
 
 }
 
