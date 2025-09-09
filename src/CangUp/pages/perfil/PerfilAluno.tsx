@@ -10,15 +10,14 @@ import {
     Alert,
     ActivityIndicator,
     ScrollView,
-    Platform
+    Platform,
 } from 'react-native';
 import * as Font from 'expo-font';
-import { Picker } from '@react-native-picker/picker';
 import HeaderComLogout from '../../components/HeaderComLogout';
 import FooterComIcones from '../../components/FooterComIcones';
 import useApi from '../../hooks/useApi';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { TextInputMask } from 'react-native-masked-text';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 type Aluno = {
     id: number;
@@ -48,36 +47,6 @@ export default function PerfilAluno() {
             'PoppinsBold': require('../../assets/fonts/PoppinsBold.ttf'),
         });
         setFontsLoaded(true);
-    };
-    const fetchAluno = async () => {
-        try {
-            const token = await AsyncStorage.getItem("jwt");
-            if (!token) {
-                Alert.alert("Erro", "Você precisa estar logado.");
-                return;
-            }
-            const id = await AsyncStorage.getItem("id_aluno");
-            if (!id) {
-                Alert.alert("Erro", "ID do aluno não encontrado.");
-                return;
-            }
-            const res = await fetch(`${url}/api/alunos/${id}`, {
-                method: "GET", headers: { "Authorization": `Bearer ${token}` }
-            });
-            if (!res.ok) {
-                Alert.alert("Erro", "Falha ao carregar dados.");
-                return;
-            }
-            const data = await res.json();
-            setAluno(data);
-            setOriginalAluno(data); 
-            if (data.telefone) {
-                setRawTelefone(data.telefone.replace(/\D/g, ''));
-            }
-        } catch (err) {
-            console.error(err);
-            Alert.alert("Erro", "Não foi possível buscar os dados.");
-        }
     };
 
     const validateForm = () => {
@@ -138,7 +107,6 @@ export default function PerfilAluno() {
 
     useEffect(() => {
         loadFonts();
-        fetchAluno();
     }, []);
 
     const handleInputChange = (field: keyof Aluno, value: string) => {
@@ -147,69 +115,52 @@ export default function PerfilAluno() {
         }
     };
 
-    if (!fontsLoaded || !aluno) {
+    if (!fontsLoaded) {
         return <ActivityIndicator size="large" style={{ flex: 1 }} />;
     }
 
     return (
         <SafeAreaView style={styles.safeArea}>
             <HeaderComLogout/>
-
-            <View style={styles.profileTop}>
-                <View style={styles.nameTag}>
-                    <Text style={styles.nameText}>{aluno.nome}</Text>
+            <View>
+                <View style={styles.profileTop}><View style={styles.nameTag}><Text style={styles.nameText}>{/*colocar aluno.nome*/}</Text></View></View>
+                <View style={styles.profilePicWrapper}><Text style={styles.picText}>Foto de perfil</Text></View>
+                <View style={styles.profileBottom}>
+                    <TouchableOpacity style={styles.editBtn} onPress={handleEditCancel}>
+                        <Text style={styles.editText}>{editando ? 'Cancelar' : 'Editar perfil'}</Text>
+                    </TouchableOpacity>
                 </View>
             </View>
-
-            <View style={styles.profilePicWrapper}>
-                <View style={styles.profilePic}>
-                    <Text style={styles.picText}>Foto de perfil</Text>
-                </View>
-            </View>
-
-            <View style={styles.profileBottom}>
-                <TouchableOpacity
-                    style={styles.editBtn}
-                    onPress={() => Alert.alert("Função de edição ainda será implementada.")}
-                >
-                    <Text style={styles.editText}>Editar perfil</Text>
-                </TouchableOpacity>
-            </View>
-             <View style={styles.profileBottom}>
-                            <TouchableOpacity style={styles.editBtn} onPress={handleEditCancel}>
-                                <Text style={styles.editText}>{editando ? 'Cancelar' : 'Editar perfil'}</Text>
-                            </TouchableOpacity>
-                        </View>
-                        <ScrollView contentContainerStyle={styles.formContainer}>
-                            <Text style={styles.label}>Nome:</Text>
-                            <TextInput style={[styles.input, editando && styles.inputDisabled]} value={aluno.nome} editable={false} />
-                            <Text style={styles.label}>Email:</Text>
-                            <TextInput style={[styles.input, editando && styles.inputDisabled]} value={aluno.email} editable={false} />
-                            <Text style={styles.label}>Endereço:</Text>
-                            <TextInput style={styles.input} value={aluno.endereco} editable={editando} onChangeText={(text) => handleInputChange('endereco', text)} />
-                            <Text style={styles.label}>CPF:</Text>
-                            <TextInput style={[styles.input, editando && styles.inputDisabled]} value={aluno.cpf} editable={false} />
-                            <Text style={styles.label}>Telefone para contato:</Text>
-                            <TextInputMask
-                                style={[styles.input, errors.telefone && styles.inputError]}
-                                type={'cel-phone'}
-                                options={{ withDDD: true }}
-                                placeholder="(99) 99999-9999"
-                                placeholderTextColor="#888"
-                                value={aluno.telefone}
-                                onChangeText={(maskedText) => {
-                                    const newRawText = maskedText.replace(/\D/g, '');
-                                    handleInputChange('telefone', maskedText);
-                                    setRawTelefone(newRawText);
-                                    if (errors.telefone) setErrors({});
-                                }}
-                                editable={editando}
-                                keyboardType="phone-pad"
-                            />
-                            {errors.telefone && <Text style={styles.errorText}>{errors.telefone}</Text>}
-                            <Text style={styles.label}>Sexo:</Text>
-                            <TextInput style={[styles.input, editando && styles.inputDisabled]} value={aluno.sexo} editable={false} />
-                            {editando && <TouchableOpacity style={styles.saveBtn} onPress={salvarEdicao}><Text style={styles.saveText}>Salvar Alterações</Text></TouchableOpacity>}
+            <ScrollView contentContainerStyle={styles.formContainer}>
+                <Text style={styles.label}>Nome:</Text>
+                <TextInput style={[styles.input, editando && styles.inputDisabled]} editable={false} />
+                <Text style={styles.label}>Email:</Text>
+                <TextInput style={[styles.input, editando && styles.inputDisabled]} editable={false} />
+                <Text style={styles.label}>Endereço:</Text>
+                <TextInput style={styles.input} editable={editando} onChangeText={(text) => handleInputChange('endereco', text)} />
+                <Text style={styles.label}>CPF:</Text>
+                <TextInput style={[styles.input, editando && styles.inputDisabled]} editable={false} />
+                <Text style={styles.label}>Telefone para contato:</Text>
+                <TextInputMask
+                    style={[styles.input, errors.telefone && styles.inputError]}
+                    type={'cel-phone'}
+                    options={{ withDDD: true }}
+                    placeholder="(99) 99999-9999"
+                    placeholderTextColor="#888"
+                    //value={aluno.telefone}
+                    onChangeText={(maskedText) => {
+                        const newRawText = maskedText.replace(/\D/g, '');
+                        handleInputChange('telefone', maskedText);
+                        setRawTelefone(newRawText);
+                        if (errors.telefone) setErrors({});
+                    }}
+                    editable={editando}
+                    keyboardType="phone-pad"
+                />
+                {errors.telefone && <Text style={styles.errorText}>{errors.telefone}</Text>}
+                <Text style={styles.label}>Sexo:</Text>
+                <TextInput style={[styles.input, editando && styles.inputDisabled]} editable={false} />
+                {editando && <TouchableOpacity style={styles.saveBtn} onPress={salvarEdicao}><Text style={styles.saveText}>Salvar Alterações</Text></TouchableOpacity>}
             </ScrollView>
 
             <FooterComIcones/>
@@ -222,29 +173,36 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: '#FCD28D',
     },
-
     profileTop: {
         backgroundColor: '#FFBE31',
         alignItems: 'center',
         paddingTop: 20,
         paddingBottom: 60,
     },
-
     profileBottom: {
         backgroundColor: '#FCD28D',
         alignItems: 'center',
         paddingTop: 80,
     },
-
     profilePicWrapper: {
+        display: 'flex',
+        justifyContent: 'center',
         position: 'absolute',
-        top: 160, // ajuste fino da posição vertical
-        left: 0,
-        right: 0,
+        backgroundColor: '#D9D9D9',
+        borderRadius: '100%',
         alignItems: 'center',
         zIndex: 2,
+        width: 120,
+        height: 120,
+        borderWidth: 2,
+        borderColor: '#FFF',
+        left: '50%', 
+        top: '50%',
+        transform: [
+        { translateX: -60 },
+        { translateY: -60 }
+        ],
     },
-
     profilePic: {
         width: 120,
         height: 120,
@@ -252,50 +210,49 @@ const styles = StyleSheet.create({
         backgroundColor: '#D9D9D9',
         justifyContent: 'center',
         alignItems: 'center',
-        // borderWidth: 2,
-        // borderColor: '#3D3D3D',
+        borderWidth: 2,
+        borderColor: '#FFF',
     },
-
     picText: {
         fontFamily: 'PoppinsRegular',
         fontSize: 12,
         color: '#555',
     },
-
     nameTag: {
         backgroundColor: '#fff',
         paddingHorizontal: 20,
-        paddingVertical: 5,
+        paddingVertical: 2,
         borderRadius: 20,
-        marginBottom: 10,
+        alignItems: 'center'
     },
-
     nameText: {
         fontFamily: 'PoppinsBold',
         fontSize: 14,
         color: '#000',
     },
-
-    // Botão de editar Perfil
     editBtn: {
-        backgroundColor: '#FFBE31', //amarelo forte para o botão 
-        borderRadius: 20, //borda arredondada
+        backgroundColor: '#FFBE31',
+        borderRadius: 20,
         paddingHorizontal: 20,
         paddingVertical: 6,
     },
-
     editText: {
         fontFamily: 'PoppinsRegular',
         fontSize: 14,
         color: '#000',
     },
-
     formContainer: {
         alignItems: 'center',
         paddingVertical: 20,
         paddingBottom: 100,
     },
-
+    label: {
+        width: '85%',
+        fontFamily: 'PoppinsBold',
+        fontSize: 14,
+        color: '#333',
+        marginTop: 10,
+    },
     input: {
         width: '85%',
         height: 45,
@@ -305,25 +262,10 @@ const styles = StyleSheet.create({
         marginVertical: 8,
         justifyContent: 'center',
         fontFamily: 'PoppinsRegular',
-    },
-
-    picker: {
-        width: '100%',
-        height: Platform.OS === 'ios' ? undefined : 45,
         color: '#000',
-        backgroundColor: '#F5F5F5',
-        borderWidth: 0,
-        fontFamily: 'PoppinsRegular',
+        borderWidth: 1,
+        borderColor: '#ddd',
     },
-
-    label: {
-        width: '85%',
-        fontFamily: 'PoppinsBold',
-        fontSize: 14,
-        color: '#333',
-        marginTop: 10,
-    },
-
     errorText: {
         width: '85%',
         color: '#d9534f',
@@ -332,7 +274,6 @@ const styles = StyleSheet.create({
         marginTop: -4,
         marginBottom: 8,
     },
-
     saveBtn: {
         backgroundColor: '#522a91',
         borderRadius: 20,
@@ -340,23 +281,35 @@ const styles = StyleSheet.create({
         paddingVertical: 10,
         marginTop: 20,
     },
-
     saveText: {
         fontFamily: 'PoppinsBold',
         fontSize: 16,
         color: '#fff',
     },
-
+    button: {
+        backgroundColor: '#FFBE31',
+        paddingVertical: '3%',
+        width: '60%',
+        borderRadius: 20,
+        alignItems: 'center',
+        marginTop: '10%',
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 0,
+            height: 3,
+        },
+        shadowOpacity: 0.27,
+        shadowRadius: 4.65,
+        elevation: 6,
+    },
     buttonText: {
         fontSize: 14,
         fontFamily: 'PoppinsRegular',
     },
-    
     inputDisabled: {
         backgroundColor: '#E0E0E0',
         color: '#888',
     },
-
     inputError: {
         borderColor: '#d9534f',
     },

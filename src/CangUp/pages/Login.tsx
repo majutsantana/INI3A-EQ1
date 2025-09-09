@@ -386,11 +386,11 @@ const styles = StyleSheet.create({
     borderWidth: 0,
   },
   pickerWrapper: {
-
+    width:'90%',
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical:'4%',
-    paddingHorizontal:'2%',
+    paddingHorizontal:'4%',
     borderRadius: 25,
     overflow: 'hidden',
     backgroundColor: '#d9d9d9',
