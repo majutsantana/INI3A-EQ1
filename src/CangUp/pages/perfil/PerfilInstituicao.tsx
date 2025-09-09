@@ -143,12 +143,14 @@ export default function PerfilInstituicao({ navigation }) {
     return (
         <SafeAreaView style={styles.safeArea}>
             <HeaderComLogout />
-            <View style={styles.profileTop}><View style={styles.nameTag}><Text style={styles.nameText}>{instituicao.nome}</Text></View></View>
-            <View style={styles.profilePicWrapper}><View style={styles.profilePic}><Text style={styles.picText}>Foto de perfil</Text></View></View>
-            <View style={styles.profileBottom}>
-                <TouchableOpacity style={styles.editBtn} onPress={handleEditCancel}>
-                    <Text style={styles.editText}>{editando ? 'Cancelar' : 'Editar perfil'}</Text>
-                </TouchableOpacity>
+            <View>
+                <View style={styles.profileTop}><View style={styles.nameTag}><Text style={styles.nameText}>{instituicao.nome}</Text></View></View>
+                <View style={styles.profilePicWrapper}><Text style={styles.picText}>Foto de perfil</Text></View>
+                <View style={styles.profileBottom}>
+                    <TouchableOpacity style={styles.editBtn} onPress={handleEditCancel}>
+                        <Text style={styles.editText}>{editando ? 'Cancelar' : 'Editar perfil'}</Text>
+                    </TouchableOpacity>
+                </View>
             </View>
             <ScrollView contentContainerStyle={styles.formContainer}>
                 <Text style={styles.label}>Nome:</Text>
@@ -207,12 +209,23 @@ const styles = StyleSheet.create({
         paddingTop: 80,
     },
     profilePicWrapper: {
+        display: 'flex',
+        justifyContent: 'center',
         position: 'absolute',
-        top: 160,
-        left: 0,
-        right: 0,
+        backgroundColor: '#D9D9D9',
+        borderRadius: '100%',
         alignItems: 'center',
         zIndex: 2,
+        width: 120,
+        height: 120,
+        borderWidth: 2,
+        borderColor: '#FFF',
+        left: '50%', 
+        top: '50%',
+        transform: [
+        { translateX: -60 },
+        { translateY: -60 }
+        ],
     },
     profilePic: {
         width: 120,
@@ -232,9 +245,9 @@ const styles = StyleSheet.create({
     nameTag: {
         backgroundColor: '#fff',
         paddingHorizontal: 20,
-        paddingVertical: 5,
+        paddingVertical: 2,
         borderRadius: 20,
-        marginBottom: 10,
+        alignItems: 'center'
     },
     nameText: {
         fontFamily: 'PoppinsBold',
