@@ -125,4 +125,30 @@ class ResponsavelController extends Controller
     ], 201);
     }
 
+    public function show($id)
+    {
+        $responsavel = Responsavel::findOrFail($id);
+        return response()->json($responsavel);
+    }
+
+    public function update(Request $request, $id)
+    {
+        $dados = $request->validate([
+            'nome' => 'sometimes|string|max:255',
+            'endereco' => 'sometimes|string',
+            'telefone' => 'sometimes|string',
+        ]);
+
+        $responsavel = Responsavel::findOrFail($id);
+        $responsavel->update($dados);
+        return response()->json($responsavel);
+    }
+
+    public function destroy($id)
+    {
+        $responsavel = Responsavel::findOrFail($id);
+        $responsavel->delete();
+        return response()->json(null, 204);
+    }
+
 }

@@ -81,7 +81,7 @@ Route::middleware(['jwt.auth'])->group(function () {
     Route::put('/instituicoes/{id}', [InstituicaoController::class, 'update']);    // Atualizar instituição
     Route::delete('/instituicoes/{id}', [InstituicaoController::class, 'destroy']);  // Deletar instituição
 
-    /*Route::get('/alunos/{id}', [AlunoController::class, 'show']);      // Listar uma instituição
+    Route::get('/alunos/{id}', [AlunoController::class, 'show']);      // Listar uma instituição
     Route::post('/alunos', [AlunoController::class, 'store']);       // Criar instituição (protegido)
     Route::put('/alunos/{id}', [AlunoController::class, 'update']);    // Atualizar instituição
     Route::delete('/alunos/{id}', [AlunoController::class, 'destroy']);  // Deletar instituição
