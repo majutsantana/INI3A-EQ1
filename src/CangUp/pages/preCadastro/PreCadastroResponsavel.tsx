@@ -76,7 +76,6 @@ export default function PreCadastroResponsavel({ navigation }) {
        fetchInstituicao();
      }, []);
 
-
      const fetchInstituicao = async () => {
       try {
         const token = await AsyncStorage.getItem("jwt");

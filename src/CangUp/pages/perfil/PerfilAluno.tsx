@@ -17,7 +17,7 @@ import { Picker } from '@react-native-picker/picker';
 import HeaderComLogout from '../../components/HeaderComLogout';
 import FooterComIcones from '../../components/FooterComIcones';
 import useApi from '../../hooks/useApi';
-import { AsyncStorage } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { TextInputMask } from 'react-native-masked-text';
 
 type Aluno = {

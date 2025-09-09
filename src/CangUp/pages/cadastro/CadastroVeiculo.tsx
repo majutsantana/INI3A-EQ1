@@ -1,5 +1,6 @@
 import {
     ActivityIndicator,
+    Alert,
     SafeAreaView,
     ScrollView,
     StatusBar,
@@ -17,8 +18,13 @@ import {
   import FooterSemIcones from '../../components/FooterSemIcones';
   import useApi from '../../hooks/useApi';
   import { TextInputMask } from 'react-native-masked-text';
+  import AsyncStorage from '@react-native-async-storage/async-storage';
+
+  type Responsavel = {
+    id: number;
+} 
   
-   const CustomNumericInput = ({ value, onChange, minValue, maxValue }) => {
+   /*const CustomNumericInput = ({ value, onChange, minValue, maxValue }) => {
     const handleIncrement = () => {
       if (value < maxValue) {
         onChange(value + 1);
@@ -39,35 +45,23 @@ import {
         <View style={styles.customNumericInputView}>
           <Text style={styles.customNumericValueText}>{value}</Text>
         </View>
-        <TouchableOpacity onPress={handleIncrement} style={styles.customNumericButton}>
-          <Text style={styles.customNumericButtonText}>+</Text>
         </TouchableOpacity>
-      </View>
+        </View>
     );
-  };
+  };*/
   
   
   export default function CadastroVeiculo({ navigation }) {
     const [fontsLoaded, setFontsLoaded] = useState(false);
+    const [responsavel, setResponsavel] = useState<Responsavel | null>(null);
     const [modelo, setModelo] = useState('');
     const [placa, setPlaca] = useState('');
     const [placaMask, setPlacaMask] = useState('AAA-9999'); 
     const [cor, setCor] = useState('');
-    const [assentos, setAssentos] = useState(1);
+    const [qtde_assentos, setQtdeAssentos] = useState('');
     const [errors, setErrors] = useState({});
+    const { url } = useApi();
   
-    const handleCadastro = async () => {
-      if (validateForm()) {
-        try {
-          await getDados();
-        } catch (error) {
-          console.error("Erro no processo de cadastro (handleCadastro):", error);
-        }
-      } else {
-        console.log('Formulário inválido, corrigindo erros:', errors);
-      }
-    };
-
     const handlePlacaChange = (maskedText, rawText) => {
         const text = rawText || '';
         // Verifica o 5º caractere para decidir entre o padrão antigo e o Mercosul
@@ -109,12 +103,12 @@ import {
         isValid = false;
       }
   
-      const numAssentos = Number(assentos);
+      const numAssentos = Number(qtde_assentos);
       if (isNaN(numAssentos) || numAssentos < 1) {
-        newErrors.assentos = 'O carro deve ter pelo menos 1 assento.';
+        newErrors.qtde_assentos = 'O carro deve ter pelo menos 1 assento.';
         isValid = false;
       } else if (numAssentos > 7) {
-        newErrors.assentos = 'Um carro tem no máximo 7 assentos.';
+        newErrors.qtde_assentos = 'Um carro tem no máximo 7 assentos.';
         isValid = false;
       }
   
@@ -132,24 +126,75 @@ import {
   
     useEffect(() => {
       loadFonts();
+      fetchResponsavel();
     }, []);
   
-    const getDados = async () => {
+    const fetchResponsavel = async () => {
       try {
-        let { url } = useApi();
-        const response = await fetch(url + '/api/cadastrar', { // mudar rota
-          method: 'POST',
+        const token = await AsyncStorage.getItem("jwt");
+        if (!token) {
+          Alert.alert("Erro", "Você precisa estar logado.");
+          navigation.navigate("Login");
+          return;
+        }
+        
+        const id_resp = await AsyncStorage.getItem("id_resposavel");
+        if (!id_resp) {
+            Alert.alert("Erro", "ID do responsavel não encontrado. Por favor, faça o login novamente.");
+            navigation.navigate("Login");
+            return;
+        }
+        const res = await fetch(`${url}/api/responsaveis/${id_resp}`, {
+          method: "GET",
           headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ modelo, placa, cor, assentos }),
+            "Authorization": `Bearer ${token}`
+          }
         });
-        const dados = await response.json();
   
-        navigation.navigate("PerfilResponsavel");
-      } catch (error) {
-        console.error('Erro ao cadastrar veículo:', error);
+        if (!res.ok) {
+          Alert.alert("Erro", "Falha ao carregar dados.");
+          return;
+        }
+  
+        const data = await res.json();
+        setResponsavel(data);
+      }catch (err) {
+        console.error(err);
+        Alert.alert("Erro", "Não foi possível buscar os dados.");
       }
+    }; 
+
+    const handleCadastro  = async () => {
+        if (validateForm()) {
+        try {
+            await getDados();
+            navigation.navigate('PerfilResponsavel');
+        } catch (error) {
+            console.error("Erro no processo de cadastro (handleCadastro):", error);
+        }
+        } else {
+        console.log('Formulário inválido, corrigindo erros:', errors);
+        }
+    };
+
+    const getDados = async () => {
+        try{
+            const token = await AsyncStorage.getItem('jwt');
+            const id_inst = await AsyncStorage.getItem("id_responsavel");
+            let {url} = useApi();
+            const response = await fetch(url+'/api/cadastrarVeiculo', { 
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer '+token
+            },
+            body: JSON.stringify({modelo, placa, cor, qtde_assentos, id_inst}),
+            });
+            const text = await response.text();
+            console.log('Resposta da API (texto):', text);
+        } catch(error){
+            console.error('Erro ao cadastrar veiculo:', error);
+        }
     };
   
     if (!fontsLoaded) {
@@ -221,15 +266,16 @@ import {
               </View>
               
               <View style={styles.inputGroup}>
-                <Text style={styles.label}>Assentos Disponíveis:</Text>
-                <CustomNumericInput
-                  value={assentos}  
-                  onChange={setAssentos}
-                  minValue={1}
-                  maxValue={7}
-                />
-              </View>
-              {errors.assentos && <Text style={styles.errorText}>{errors.assentos}</Text>}
+                <Text style={styles.label}>Assentos Disponíveis:</Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder="Digite a quantidade de assentos:"
+                  placeholderTextColor="#888"
+                  value={qtde_assentos}
+                  onChangeText={setQtdeAssentos}
+                /> 
+              </View>
+              {errors.qtde_assentos && <Text style={styles.errorText}>{errors.qtde_assentos}</Text>}
   
             </ScrollView>
           </View>
