@@ -10,7 +10,7 @@ import {
   Alert,
 } from 'react-native';
 import * as Font from 'expo-font';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { MaterialIcons } from '@expo/vector-icons';
 import Header from '../../components/Header';
 import FooterComIcones from '../../components/FooterComIcones';
@@ -18,6 +18,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { TextInputMask } from 'react-native-masked-text'; //Pacote instalado 
 import useApi from '../../hooks/useApi';
 import HeaderComLogout from '../../components/HeaderComLogout';
+import { AuthContext } from '../../components/AuthContext';
 
 type errorType ={ 
   nome : string | undefined,
@@ -38,6 +39,7 @@ export default function PreCadastroAluno({ navigation }) {
     const [RA, setRA] = useState('');
     const [CPF, setCPF] = useState('');
     const { url } = useApi();
+    const {logout} = useContext(AuthContext);
 
     const validateForm = () => {
      let newErrors : errorType = {nome:undefined, CPF:undefined, RA:undefined};
@@ -83,14 +85,14 @@ export default function PreCadastroAluno({ navigation }) {
         const token = await AsyncStorage.getItem("jwt");
         if (!token) {
           Alert.alert("Erro", "Você precisa estar logado.");
-          navigation.navigate("Login");
+          logout();
           return;
         }
         
         const id_inst = await AsyncStorage.getItem("id_instituicao");
         if (!id_inst) {
             Alert.alert("Erro", "ID da instituição não encontrado. Por favor, faça o login novamente.");
-            navigation.navigate("Login");
+            logout();
             return;
         }
         const res = await fetch(`${url}/api/instituicoes/${id_inst}`, {

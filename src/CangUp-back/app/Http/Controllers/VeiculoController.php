@@ -13,6 +13,7 @@ class VeiculoController extends Controller
 {
     public function cadastrarVeiculo(Request $req)
     {
+        $user = Auth::user();
         $resp = Responsavel::where('email', $user->email)->first();
         $dados = $req->validate([
             'modelo' => 'required|string',

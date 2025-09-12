@@ -11,7 +11,7 @@ import {
     View,
   } from 'react-native';
   import * as Font from 'expo-font';
-  import { useEffect, useState } from 'react';
+  import { useContext, useEffect, useState } from 'react';
   import { useNavigation } from '@react-navigation/native';
   import { MaterialIcons } from '@expo/vector-icons';
   import Header from '../../components/Header';
@@ -19,6 +19,7 @@ import {
   import useApi from '../../hooks/useApi';
   import { TextInputMask } from 'react-native-masked-text';
   import AsyncStorage from '@react-native-async-storage/async-storage';
+import { AuthContext } from '../../components/AuthContext';
 
   type Responsavel = {
     id: number;
@@ -61,6 +62,7 @@ import {
     const [qtde_assentos, setQtdeAssentos] = useState('');
     const [errors, setErrors] = useState({});
     const { url } = useApi();
+    const { logout } = useContext(AuthContext);
   
     const handlePlacaChange = (maskedText, rawText) => {
         const text = rawText || '';
@@ -134,14 +136,14 @@ import {
         const token = await AsyncStorage.getItem("jwt");
         if (!token) {
           Alert.alert("Erro", "Você precisa estar logado.");
-          navigation.navigate("Login");
+          logout();
           return;
         }
         
-        const id_resp = await AsyncStorage.getItem("id_resposavel");
+        const id_resp = await AsyncStorage.getItem("id_responsavel");
         if (!id_resp) {
             Alert.alert("Erro", "ID do responsavel não encontrado. Por favor, faça o login novamente.");
-            navigation.navigate("Login");
+            logout();
             return;
         }
         const res = await fetch(`${url}/api/responsaveis/${id_resp}`, {
@@ -180,7 +182,7 @@ import {
     const getDados = async () => {
         try{
             const token = await AsyncStorage.getItem('jwt');
-            const id_inst = await AsyncStorage.getItem("id_responsavel");
+            const id_resp = await AsyncStorage.getItem("id_responsavel");
             let {url} = useApi();
             const response = await fetch(url+'/api/cadastrarVeiculo', { 
             method: 'POST',
@@ -188,7 +190,7 @@ import {
                 'Content-Type': 'application/json',
                 'Authorization': 'Bearer '+token
             },
-            body: JSON.stringify({modelo, placa, cor, qtde_assentos, id_inst}),
+            body: JSON.stringify({modelo, placa, cor, qtde_assentos, id_resp}),
             });
             const text = await response.text();
             console.log('Resposta da API (texto):', text);

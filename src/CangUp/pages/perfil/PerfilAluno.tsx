@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import {
     SafeAreaView,
     StyleSheet,
@@ -17,6 +17,7 @@ import FooterComIcones from '../../components/FooterComIcones';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import useApi from '../../hooks/useApi';
 import { TextInputMask } from 'react-native-masked-text';
+import { AuthContext } from '../../components/AuthContext';
 
 type Aluno = {
     id: number;
@@ -37,6 +38,7 @@ export default function PerfilAluno({ navigation }) {
     const [errors, setErrors] = useState<{ telefone?: string, cep?: string }>({});
     const { url } = useApi();
     const [fontsLoaded, setFontsLoaded] = useState(false);
+    const {logout} = useContext(AuthContext);
 
     // --- ESTADOS PARA EDIÇÃO DO ENDEREÇO ---
     const [cep, setCep] = useState('');
@@ -60,11 +62,13 @@ export default function PerfilAluno({ navigation }) {
             const token = await AsyncStorage.getItem("jwt");
             if (!token) {
                 Alert.alert("Erro", "Você precisa estar logado.");
+                logout();
                 return;
             }
             const id = await AsyncStorage.getItem("id_aluno");
             if (!id) {
                 Alert.alert("Erro", "ID do aluno não encontrado.");
+                logout();
                 return;
             }
             const res = await fetch(`${url}/api/alunos/${id}`, {

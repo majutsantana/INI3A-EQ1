@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import {
     SafeAreaView,
     StyleSheet,
@@ -16,6 +16,7 @@ import FooterComIcones from '../../components/FooterComIcones';
 import useApi from '../../hooks/useApi';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { TextInputMask } from 'react-native-masked-text';
+import { AuthContext } from '../../components/AuthContext';
 
 type Responsavel = {
     id: number;
@@ -35,6 +36,7 @@ export default function PerfilResponsavel({ navigation }) { //Navigation não es
     const [editando, setEditando] = useState(false);
     const [errors, setErrors] = useState<{ telefone?: string, cep?: string }>({});
     const { url } = useApi();
+    const {logout} = useContext(AuthContext);
 
     // --- ESTADOS PARA EDIÇÃO DO ENDEREÇO ---
     const [cep, setCep] = useState('');
@@ -58,11 +60,13 @@ export default function PerfilResponsavel({ navigation }) { //Navigation não es
             const token = await AsyncStorage.getItem("jwt");
             if (!token) {
                 Alert.alert("Erro", "Você precisa estar logado.");
+                logout();
                 return;
             }
             const id = await AsyncStorage.getItem("id_responsavel");
             if (!id) {
                 Alert.alert("Erro", "ID do responsável não encontrado.");
+                logout();
                 return;
             }
             const res = await fetch(`${url}/api/responsaveis/${id}`, {
@@ -270,7 +274,7 @@ export default function PerfilResponsavel({ navigation }) { //Navigation não es
                 <TextInput style={[styles.input, editando && styles.inputDisabled]} value={responsavel.sexo} editable={false} />
 
                 {editando && <TouchableOpacity style={styles.saveBtn} onPress={salvarEdicao}><Text style={styles.saveText}>Salvar Alterações</Text></TouchableOpacity>}
-                <TouchableOpacity style={styles.button} onPress={() => navigation.navigate(`CadastroVeiculo`)}><Text style={styles.buttonText}>Cadastro de veículo</Text></TouchableOpacity>
+                <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('CadastroVeiculo')}><Text style={styles.buttonText}>Cadastro de veículo</Text></TouchableOpacity>
             </ScrollView>
             <FooterComIcones />
         </SafeAreaView>

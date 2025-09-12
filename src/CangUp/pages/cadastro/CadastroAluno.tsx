@@ -66,6 +66,20 @@ export default function CadastroAluno({ navigation }) {
             const response = await fetch(`https://viacep.com.br/ws/${cepLimpo}/json/`);
             const data = await response.json();
 
+  const handleCadastro = async () => {
+    if (validateForm()) {
+      try {
+        await getDados();
+        // A navegação só deve acontecer após o sucesso do cadastro
+        //navigation.navigate('Login'); 
+      } catch (error) {
+        console.error("Erro no processo de cadastro (handleCadastro):", error);
+      }
+    } else {
+      console.log('Formulário inválido, corrigindo erros:', errors);
+    }
+  };
+
             if (data.erro) {
                 setErrors(prev => ({ ...prev, cep: 'CEP não encontrado.' }));
                 setLogradouro('');
