@@ -27,8 +27,17 @@ export default function PerfilInstituicao({ navigation }) {
     const [originalInstituicao, setOriginalInstituicao] = useState<Instituicao | null>(null);
     const [rawTelefone, setRawTelefone] = useState('');
     const [editando, setEditando] = useState(false);
-    const [errors, setErrors] = useState<{ telefone?: string }>({});
+    const [errors, setErrors] = useState<{ telefone?: string, cep?: string }>({});
     const { url } = useApi();
+
+    // --- ESTADOS PARA EDIÇÃO DO ENDEREÇO ---
+    const [cep, setCep] = useState('');
+    const [logradouro, setLogradouro] = useState('');
+    const [numero, setNumero] = useState('');
+    const [bairro, setBairro] = useState('');
+    const [cidade, setCidade] = useState('');
+    const [uf, setUf] = useState('');
+    const [loadingCep, setLoadingCep] = useState(false);
 
     const loadFonts = async () => {
         await Font.loadAsync({
@@ -59,7 +68,7 @@ export default function PerfilInstituicao({ navigation }) {
             }
             const data = await res.json();
             setInstituicao(data);
-            setOriginalInstituicao(data); 
+            setOriginalInstituicao(data);
             if (data.telefone) {
                 setRawTelefone(data.telefone.replace(/\D/g, ''));
             }
@@ -69,10 +78,36 @@ export default function PerfilInstituicao({ navigation }) {
         }
     };
 
+    // --- FUNÇÃO PARA BUSCAR O ENDEREÇO PELO CEP ---
+    const buscarCep = async () => {
+        const cepLimpo = cep.replace(/\D/g, '');
+        if (cepLimpo.length !== 8) {
+            return;
+        }
+        setLoadingCep(true);
+        setErrors(prev => ({ ...prev, cep: undefined }));
+        try {
+            const response = await fetch(`https://viacep.com.br/ws/${cepLimpo}/json/`);
+            const data = await response.json();
+            if (data.erro) {
+                setErrors(prev => ({ ...prev, cep: 'CEP não encontrado.' }));
+                setLogradouro(''); setBairro(''); setCidade(''); setUf('');
+            } else {
+                setLogradouro(data.logradouro); setBairro(data.bairro); setCidade(data.localidade); setUf(data.uf);
+            }
+        } catch (error) {
+            console.error("Erro ao buscar CEP:", error);
+            setErrors(prev => ({ ...prev, cep: 'Erro ao buscar CEP.' }));
+        } finally {
+            setLoadingCep(false);
+        }
+    };
+
+
     const validateForm = () => {
         const newErrors: { telefone?: string } = {};
         let isValid = true;
-        if (rawTelefone.length < 10 || rawTelefone.length > 11) {
+        if (rawTelefone.length > 0 && (rawTelefone.length < 10 || rawTelefone.length > 11)) {
             newErrors.telefone = 'Telefone inválido. Precisa ter 10 ou 11 dígitos.';
             isValid = false;
         }
@@ -83,6 +118,18 @@ export default function PerfilInstituicao({ navigation }) {
     const salvarEdicao = async () => {
         if (!instituicao) return;
         if (!validateForm()) return;
+        
+        let enderecoFinal = instituicao.endereco;
+        const newAddressParts = [logradouro, numero, bairro, cidade, uf, cep];
+        const isNewAddressStarted = newAddressParts.some(part => part.trim() !== '');
+
+        if (isNewAddressStarted) {
+            if (!cep.trim() || !logradouro.trim() || !numero.trim() || !bairro.trim() || !cidade.trim() || !uf.trim()) {
+                Alert.alert("Erro de Endereço", "Para atualizar o endereço, por favor, preencha todos os campos correspondentes.");
+                return;
+            }
+            enderecoFinal = `${logradouro}, ${numero} - ${bairro}, ${cidade} - ${uf}`;
+        }
 
         try {
             const token = await AsyncStorage.getItem("jwt");
@@ -94,7 +141,7 @@ export default function PerfilInstituicao({ navigation }) {
                 },
                 body: JSON.stringify({
                     nome: instituicao.nome,
-                    endereco: instituicao.endereco,
+                    endereco: enderecoFinal,
                     telefone: rawTelefone
                 })
             });
@@ -120,6 +167,7 @@ export default function PerfilInstituicao({ navigation }) {
                 setInstituicao(originalInstituicao);
                 setRawTelefone(originalInstituicao.telefone.replace(/\D/g, ''));
             }
+            setCep(''); setLogradouro(''); setNumero(''); setBairro(''); setCidade(''); setUf('');
         }
         setEditando(!editando);
         setErrors({});
@@ -155,17 +203,46 @@ export default function PerfilInstituicao({ navigation }) {
             <ScrollView contentContainerStyle={styles.formContainer}>
                 <Text style={styles.label}>Nome:</Text>
                 <TextInput style={[styles.input, editando && styles.inputDisabled]} value={instituicao.nome} editable={false} />
+                
                 <Text style={styles.label}>Email:</Text>
                 <TextInput style={[styles.input, editando && styles.inputDisabled]} value={instituicao.email} editable={false} />
+                
                 <Text style={styles.label}>Endereço:</Text>
-                <TextInput style={styles.input} value={instituicao.endereco} editable={editando} onChangeText={(text) => handleInputChange('endereco', text)} />
+                {editando ? (
+                    <>
+                        <View style={styles.cepContainer}>
+                            <TextInputMask
+                                style={[styles.input, { flex: 1 }, errors.cep && styles.inputError]}
+                                type={'zip-code'}
+                                placeholder="Digite o CEP"
+                                placeholderTextColor="#888"
+                                value={cep}
+                                onChangeText={setCep}
+                                onBlur={buscarCep}
+                                keyboardType="numeric"
+                            />
+                            {loadingCep && <ActivityIndicator style={{ marginLeft: 10 }} color="#522a91" />}
+                        </View>
+                        {errors.cep && <Text style={styles.errorText}>{errors.cep}</Text>}
+
+                        <TextInput style={styles.input} placeholder="Logradouro (Rua, Av...)" value={logradouro} onChangeText={setLogradouro} />
+                        <TextInput style={styles.input} placeholder="Número" value={numero} onChangeText={setNumero} keyboardType="numeric" />
+                        <TextInput style={styles.input} placeholder="Bairro" value={bairro} onChangeText={setBairro} />
+                        <TextInput style={styles.input} placeholder="Cidade" value={cidade} onChangeText={setCidade} />
+                        <TextInput style={styles.input} placeholder="UF" value={uf} onChangeText={setUf} maxLength={2} autoCapitalize="characters" />
+                    </>
+                ) : (
+                    <TextInput style={styles.input} value={instituicao.endereco} editable={false} />
+                )}
+
                 <Text style={styles.label}>CNPJ:</Text>
                 <TextInput style={[styles.input, editando && styles.inputDisabled]} value={instituicao.cnpj} editable={false} />
+                
                 <Text style={styles.label}>Telefone para contato:</Text>
                 <TextInputMask
                     style={[styles.input, errors.telefone && styles.inputError]}
                     type={'cel-phone'}
-                    options={{ withDDD: true }}
+                    options={{ maskType: 'BRL', withDDD: true, dddMask: '(99) ' }}
                     placeholder="(99) 99999-9999"
                     placeholderTextColor="#888"
                     value={instituicao.telefone}
@@ -179,8 +256,9 @@ export default function PerfilInstituicao({ navigation }) {
                     keyboardType="phone-pad"
                 />
                 {errors.telefone && <Text style={styles.errorText}>{errors.telefone}</Text>}
+
                 <Text style={styles.label}>Plano:</Text>
-                <TextInput style={[styles.input, editando && styles.inputDisabled]} value={instituicao.plano} editable={false} />
+                <TextInput style={[styles.input, editando && styles.inputDisabled]} value={instituicao.plano === 'S' ? 'Semestral' : 'Anual'} editable={false} />
                 
                 {editando && <TouchableOpacity style={styles.saveBtn} onPress={salvarEdicao}><Text style={styles.saveText}>Salvar Alterações</Text></TouchableOpacity>}
                 
@@ -213,29 +291,19 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         position: 'absolute',
         backgroundColor: '#D9D9D9',
-        borderRadius: '100%',
+        borderRadius: 100,
         alignItems: 'center',
         zIndex: 2,
         width: 120,
         height: 120,
         borderWidth: 2,
         borderColor: '#FFF',
-        left: '50%', 
+        left: '50%',
         top: '50%',
         transform: [
-        { translateX: -60 },
-        { translateY: -60 }
+            { translateX: -60 },
+            { translateY: -60 }
         ],
-    },
-    profilePic: {
-        width: 120,
-        height: 120,
-        borderRadius: 60,
-        backgroundColor: '#D9D9D9',
-        justifyContent: 'center',
-        alignItems: 'center',
-        borderWidth: 2,
-        borderColor: '#FFF',
     },
     picText: {
         fontFamily: 'PoppinsRegular',
@@ -279,7 +347,7 @@ const styles = StyleSheet.create({
     },
     input: {
         width: '85%',
-        height: 45,
+        minHeight: 45,
         backgroundColor: '#F5F5F5',
         borderRadius: 20,
         paddingHorizontal: 15,
@@ -289,6 +357,7 @@ const styles = StyleSheet.create({
         color: '#000',
         borderWidth: 1,
         borderColor: '#ddd',
+        paddingVertical: 10,
     },
     errorText: {
         width: '85%',
@@ -336,5 +405,10 @@ const styles = StyleSheet.create({
     },
     inputError: {
         borderColor: '#d9534f',
+    },
+    cepContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        width: '85%',
     },
 });

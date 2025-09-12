@@ -12,13 +12,11 @@ import {
     Platform
 } from 'react-native';
 import * as Font from 'expo-font';
-import { Picker } from '@react-native-picker/picker';
 import HeaderComLogout from '../../components/HeaderComLogout';
 import FooterComIcones from '../../components/FooterComIcones';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import useApi from '../../hooks/useApi';
 import { TextInputMask } from 'react-native-masked-text';
-
 
 type Aluno = {
     id: number;
@@ -31,14 +29,23 @@ type Aluno = {
     sexo: string;
 }
 
-export default function PerfilAluno({navigation}) {
-    const [originalAluno, setOriginalAluno] = useState<Responsavel | null>(null);
-    const [aluno, setAluno] = useState <Aluno | null>(null);
+export default function PerfilAluno({ navigation }) {
+    const [originalAluno, setOriginalAluno] = useState<Aluno | null>(null);
+    const [aluno, setAluno] = useState<Aluno | null>(null);
     const [rawTelefone, setRawTelefone] = useState('');
     const [editando, setEditando] = useState(false);
-    const [errors, setErrors] = useState<{ telefone?: string }>({});
+    const [errors, setErrors] = useState<{ telefone?: string, cep?: string }>({});
     const { url } = useApi();
     const [fontsLoaded, setFontsLoaded] = useState(false);
+
+    // --- ESTADOS PARA EDIÇÃO DO ENDEREÇO ---
+    const [cep, setCep] = useState('');
+    const [logradouro, setLogradouro] = useState('');
+    const [numero, setNumero] = useState('');
+    const [bairro, setBairro] = useState('');
+    const [cidade, setCidade] = useState('');
+    const [uf, setUf] = useState('');
+    const [loadingCep, setLoadingCep] = useState(false);
 
     const loadFonts = async () => {
         await Font.loadAsync({
@@ -47,7 +54,7 @@ export default function PerfilAluno({navigation}) {
         });
         setFontsLoaded(true);
     };
-   
+
     const fetchAluno = async () => {
         try {
             const token = await AsyncStorage.getItem("jwt");
@@ -69,7 +76,7 @@ export default function PerfilAluno({navigation}) {
             }
             const data = await res.json();
             setAluno(data);
-            setOriginalAluno(data); 
+            setOriginalAluno(data);
             if (data.telefone) {
                 setRawTelefone(data.telefone.replace(/\D/g, ''));
             }
@@ -79,11 +86,35 @@ export default function PerfilAluno({navigation}) {
         }
     }
 
+    // --- FUNÇÃO PARA BUSCAR O ENDEREÇO PELO CEP ---
+    const buscarCep = async () => {
+        const cepLimpo = cep.replace(/\D/g, '');
+        if (cepLimpo.length !== 8) {
+            return;
+        }
+        setLoadingCep(true);
+        setErrors(prev => ({ ...prev, cep: undefined }));
+        try {
+            const response = await fetch(`https://viacep.com.br/ws/${cepLimpo}/json/`);
+            const data = await response.json();
+            if (data.erro) {
+                setErrors(prev => ({ ...prev, cep: 'CEP não encontrado.' }));
+                setLogradouro(''); setBairro(''); setCidade(''); setUf('');
+            } else {
+                setLogradouro(data.logradouro); setBairro(data.bairro); setCidade(data.localidade); setUf(data.uf);
+            }
+        } catch (error) {
+            console.error("Erro ao buscar CEP:", error);
+            setErrors(prev => ({ ...prev, cep: 'Erro ao buscar CEP.' }));
+        } finally {
+            setLoadingCep(false);
+        }
+    };
 
     const validateForm = () => {
         const newErrors: { telefone?: string } = {};
         let isValid = true;
-        if (rawTelefone.length < 10 || rawTelefone.length > 11) {
+        if (rawTelefone.length > 0 && (rawTelefone.length < 10 || rawTelefone.length > 11)) {
             newErrors.telefone = 'Telefone inválido. Precisa ter 10 ou 11 dígitos.';
             isValid = false;
         }
@@ -94,6 +125,18 @@ export default function PerfilAluno({navigation}) {
     const salvarEdicao = async () => {
         if (!aluno) return;
         if (!validateForm()) return;
+        
+        let enderecoFinal = aluno.endereco;
+        const newAddressParts = [logradouro, numero, bairro, cidade, uf, cep];
+        const isNewAddressStarted = newAddressParts.some(part => part.trim() !== '');
+
+        if (isNewAddressStarted) {
+            if (!cep.trim() || !logradouro.trim() || !numero.trim() || !bairro.trim() || !cidade.trim() || !uf.trim()) {
+                Alert.alert("Erro de Endereço", "Para atualizar o endereço, por favor, preencha todos os campos correspondentes.");
+                return;
+            }
+            enderecoFinal = `${logradouro}, ${numero} - ${bairro}, ${cidade} - ${uf}`;
+        }
 
         try {
             const token = await AsyncStorage.getItem("jwt");
@@ -109,7 +152,7 @@ export default function PerfilAluno({navigation}) {
                     cpf: aluno.cpf,
                     email: aluno.email,
                     telefone: rawTelefone,
-                    endereco: aluno.endereco,
+                    endereco: enderecoFinal,
                     sexo: aluno.sexo
                 })
             });
@@ -128,12 +171,14 @@ export default function PerfilAluno({navigation}) {
             Alert.alert("Erro", "Falha ao salvar dados.");
         }
     };
+
     const handleEditCancel = () => {
         if (editando) {
             if (originalAluno) {
                 setAluno(originalAluno);
                 setRawTelefone(originalAluno.telefone.replace(/\D/g, ''));
             }
+            setCep(''); setLogradouro(''); setNumero(''); setBairro(''); setCidade(''); setUf('');
         }
         setEditando(!editando);
         setErrors({});
@@ -144,13 +189,11 @@ export default function PerfilAluno({navigation}) {
         fetchAluno();
     }, []);
 
-
     const handleInputChange = (field: keyof Aluno, value: string) => {
         if (aluno) {
             setAluno({ ...aluno, [field]: value });
         }
     };
-
 
     if (!fontsLoaded || !aluno) {
         return <ActivityIndicator size="large" style={{ flex: 1 }} />;
@@ -158,7 +201,7 @@ export default function PerfilAluno({navigation}) {
 
     return (
         <SafeAreaView style={styles.safeArea}>
-            <HeaderComLogout/>
+            <HeaderComLogout />
             <View style={styles.profileTop}><View style={styles.nameTag}><Text style={styles.nameText}>{aluno.nome}</Text></View></View>
             <View style={styles.profilePicWrapper}><View style={styles.profilePic}><Text style={styles.picText}>Foto de perfil</Text></View></View>
             <View style={styles.profileBottom}>
@@ -169,19 +212,49 @@ export default function PerfilAluno({navigation}) {
             <ScrollView contentContainerStyle={styles.formContainer}>
                 <Text style={styles.label}>Nome:</Text>
                 <TextInput style={[styles.input, editando && styles.inputDisabled]} value={aluno.nome} editable={false} />
+                
                 <Text style={styles.label}>RA:</Text>
                 <TextInput style={[styles.input, editando && styles.inputDisabled]} value={aluno.ra} editable={false} />
+                
                 <Text style={styles.label}>Email:</Text>
                 <TextInput style={[styles.input, editando && styles.inputDisabled]} value={aluno.email} editable={false} />
+                
                 <Text style={styles.label}>Endereço:</Text>
-                <TextInput style={styles.input} value={aluno.endereco} editable={editando} onChangeText={(text) => handleInputChange('endereco', text)} />
+                 {editando ? (
+                    <>
+                        <View style={styles.cepContainer}>
+                            <TextInputMask
+                                style={[styles.input, { flex: 1 }, errors.cep && styles.inputError]}
+                                type={'zip-code'}
+                                placeholder="Digite o CEP"
+                                placeholderTextColor="#888"
+                                value={cep}
+                                onChangeText={setCep}
+                                onBlur={buscarCep}
+                                keyboardType="numeric"
+                            />
+                            {loadingCep && <ActivityIndicator style={{ marginLeft: 10 }} color="#522a91" />}
+                        </View>
+                        {errors.cep && <Text style={styles.errorText}>{errors.cep}</Text>}
+
+                        <TextInput style={styles.input} placeholder="Logradouro (Rua, Av...)" value={logradouro} onChangeText={setLogradouro} />
+                        <TextInput style={styles.input} placeholder="Número" value={numero} onChangeText={setNumero} keyboardType="numeric" />
+                        <TextInput style={styles.input} placeholder="Bairro" value={bairro} onChangeText={setBairro} />
+                        <TextInput style={styles.input} placeholder="Cidade" value={cidade} onChangeText={setCidade} />
+                        <TextInput style={styles.input} placeholder="UF" value={uf} onChangeText={setUf} maxLength={2} autoCapitalize="characters" />
+                    </>
+                ) : (
+                    <TextInput style={[styles.input, styles.viewingModeInput]} value={aluno.endereco} editable={false} />
+                )}
+
                 <Text style={styles.label}>CPF:</Text>
                 <TextInput style={[styles.input, editando && styles.inputDisabled]} value={aluno.cpf} editable={false} />
+                
                 <Text style={styles.label}>Telefone para contato:</Text>
                 <TextInputMask
-                    style={[styles.input, errors.telefone && styles.inputError]}
+                    style={[styles.input, !editando && styles.viewingModeInput, errors.telefone && styles.inputError]}
                     type={'cel-phone'}
-                    options={{ withDDD: true }}
+                    options={{ maskType: 'BRL', withDDD: true, dddMask: '(99) ' }}
                     placeholder="(99) 99999-9999"
                     placeholderTextColor="#888"
                     value={aluno.telefone}
@@ -195,12 +268,13 @@ export default function PerfilAluno({navigation}) {
                     keyboardType="phone-pad"
                 />
                 {errors.telefone && <Text style={styles.errorText}>{errors.telefone}</Text>}
+
                 <Text style={styles.label}>Sexo:</Text>
                 <TextInput style={[styles.input, editando && styles.inputDisabled]} value={aluno.sexo} editable={false} />
 
                 {editando && <TouchableOpacity style={styles.saveBtn} onPress={salvarEdicao}><Text style={styles.saveText}>Salvar Alterações</Text></TouchableOpacity>}
             </ScrollView>
-            <FooterComIcones/>
+            <FooterComIcones />
         </SafeAreaView>
     );
 }
@@ -211,33 +285,25 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: '#FCD28D',
     },
-
-
     profileTop: {
         backgroundColor: '#FFBE31',
         alignItems: 'center',
         paddingTop: 20,
         paddingBottom: 60,
     },
-
-
     profileBottom: {
         backgroundColor: '#FCD28D',
         alignItems: 'center',
         paddingTop: 80,
     },
-
-
     profilePicWrapper: {
         position: 'absolute',
-        top: 160, // ajuste fino da posição vertical
+        top: 160, 
         left: 0,
         right: 0,
         alignItems: 'center',
         zIndex: 2,
     },
-
-
     profilePic: {
         width: 120,
         height: 120,
@@ -245,8 +311,6 @@ const styles = StyleSheet.create({
         backgroundColor: '#D9D9D9',
         justifyContent: 'center',
         alignItems: 'center',
-        // borderWidth: 2,
-        // borderColor: '#3D3D3D',
     },
     label: {
         width: '85%',
@@ -271,8 +335,6 @@ const styles = StyleSheet.create({
         fontSize: 12,
         color: '#555',
     },
-
-
     nameTag: {
         backgroundColor: '#fff',
         paddingHorizontal: 20,
@@ -280,61 +342,39 @@ const styles = StyleSheet.create({
         borderRadius: 20,
         marginBottom: 10,
     },
-
-
     nameText: {
         fontFamily: 'PoppinsBold',
         fontSize: 14,
         color: '#000',
     },
-
-
-    // Botão de editar Perfil
     editBtn: {
-        backgroundColor: '#FFBE31', //amarelo forte para o botão
-        borderRadius: 20, //borda arredondada
+        backgroundColor: '#FFBE31', 
+        borderRadius: 20, 
         paddingHorizontal: 20,
         paddingVertical: 6,
     },
-
-
     editText: {
         fontFamily: 'PoppinsRegular',
         fontSize: 14,
         color: '#000',
     },
-
-
     formContainer: {
         alignItems: 'center',
         paddingVertical: 20,
         paddingBottom: 100,
     },
-
-
     input: {
         width: '85%',
-        height: 45,
+        minHeight: 45,
         backgroundColor: '#F5F5F5',
         borderRadius: 20,
         paddingHorizontal: 15,
         marginVertical: 8,
         justifyContent: 'center',
         fontFamily: 'PoppinsRegular',
+        paddingVertical: 10,
+        color: '#000'
     },
-
-
-    // Caixa do gênero
-    picker: {
-        width: '100%',
-        height: Platform.OS === 'ios' ? undefined : 45,
-        color: '#000',
-        backgroundColor: '#F5F5F5',
-        borderWidth: 0,
-        fontFamily: 'PoppinsRegular',
-    },
-
-
     saveBtn: {
         backgroundColor: '#522a91',
         borderRadius: 20,
@@ -351,7 +391,14 @@ const styles = StyleSheet.create({
         backgroundColor: '#E0E0E0',
         color: '#888',
     },
+    viewingModeInput: {
+      backgroundColor: '#F5F5F5',
+      color: '#000'
+    },
+    cepContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        width: '85%',
+    },
 });
-
-
 

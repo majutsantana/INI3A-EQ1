@@ -8,8 +8,8 @@ import {
   TextInput,
   TouchableOpacity,
   View,
- } from 'react-native';
- import { Picker } from '@react-native-picker/picker';
+} from 'react-native';
+import { Picker } from '@react-native-picker/picker';
 import * as Font from 'expo-font';
 import { useEffect, useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
@@ -17,121 +17,186 @@ import { MaterialIcons } from '@expo/vector-icons';
 import { CheckBox } from 'react-native-elements';
 import Header from '../../components/Header';
 import FooterSemIcones from '../../components/FooterSemIcones';
-import { Feather} from '@expo/vector-icons';
+import { Feather } from '@expo/vector-icons';
 import { TextInputMask } from 'react-native-masked-text';
 import useApi from '../../hooks/useApi';
- 
- 
- export default function CadastroInstituicao({navigation}) {
-   const [fontsLoaded, setFontsLoaded] = useState(false);
-   const [nome, setNome] = useState('');
-   const [email, setEmail] = useState('');
-   const [endereco, setEndereco] = useState('');
-   //const [horario, setHorario] = useState('');
-   const [cnpj, setcnpj] = useState('');
-   const [telefone, setTelefone] = useState('');
-   const [senha, setSenha] = useState('');
-   const [confSenha, setconfSenha] = useState('');
-   const [plano, setPlano] = useState('');
-   const [check, setCheck] = useState(false);
-   const [errors, setErrors] = useState({});
-   const [senhaVisivel, setSenhaVisivel] = useState(false);
-   const [confSenhaVisivel, setConfSenhaVisivel] = useState(false);
- 
-   const toggleSenhaVisibilidade = () => {
-     setSenhaVisivel(!senhaVisivel);
-   };
- 
-   const toggleConfSenhaVisibilidade = () => {
-     setConfSenhaVisivel(!confSenhaVisivel);
-   };
-   
-   const handleCadastro  = async () => {
-     if (validateForm()) {
-       try {
-         await getDados();
-         navigation.navigate('Login'); //implemetar direcionamento para ir pra tela funcionalidadesInstituicao 
-       } catch (error) {
-         console.error("Erro no processo de cadastro (handleCadastro):", error);
-       }
-     } else {
-       console.log('Formulário inválido, corrigindo erros:', errors);
-     }
-   };
- 
-   const validateForm = () => {
-     let newErrors = {};
-     let isValid = true;
- 
-     if (!nome.trim()) {
-       newErrors.nome = 'Nome é obrigatório.';
-       isValid = false;
-     }
- 
-     if (!email.trim()) {
-       newErrors.email = 'Email é obrigatório.';
-       isValid = false;
-     } else if (!/\S+@\S+\.\S+/.test(email)) { // Regex para validação de formato de email
-       newErrors.email = 'Email inválido.';
-       isValid = false;
-     }
 
-     if (!telefone.trim()) {
+
+export default function CadastroInstituicao({ navigation }) {
+  const [fontsLoaded, setFontsLoaded] = useState(false);
+  const [nome, setNome] = useState('');
+  const [email, setEmail] = useState('');
+  const [cnpj, setcnpj] = useState('');
+  const [telefone, setTelefone] = useState('');
+  const [senha, setSenha] = useState('');
+  const [confSenha, setconfSenha] = useState('');
+  const [plano, setPlano] = useState('');
+  const [check, setCheck] = useState(false);
+  const [errors, setErrors] = useState({});
+  const [senhaVisivel, setSenhaVisivel] = useState(false);
+  const [confSenhaVisivel, setConfSenhaVisivel] = useState(false);
+
+  // --- NOVOS ESTADOS PARA O ENDEREÇO ---
+  const [cep, setCep] = useState('');
+  const [logradouro, setLogradouro] = useState('');
+  const [numero, setNumero] = useState('');
+  const [bairro, setBairro] = useState('');
+  const [cidade, setCidade] = useState('');
+  const [uf, setUf] = useState('');
+  const [loadingCep, setLoadingCep] = useState(false); // Para mostrar indicador de carregamento
+
+  const toggleSenhaVisibilidade = () => {
+    setSenhaVisivel(!senhaVisivel);
+  };
+
+  const toggleConfSenhaVisibilidade = () => {
+    setConfSenhaVisivel(!confSenhaVisivel);
+  };
+
+  // --- FUNÇÃO PARA BUSCAR O ENDEREÇO PELO CEP ---
+  const buscarCep = async () => {
+    const cepLimpo = cep.replace(/\D/g, ''); // Remove caracteres não numéricos
+    if (cepLimpo.length !== 8) {
+      // Se o CEP não tem 8 dígitos, não faz nada ou mostra um erro.
+      return;
+    }
+
+    setLoadingCep(true);
+    setErrors(prev => ({ ...prev, cep: undefined })); // Limpa erro de CEP anterior
+    try {
+      const response = await fetch(`https://viacep.com.br/ws/${cepLimpo}/json/`);
+      const data = await response.json();
+
+      if (data.erro) {
+        setErrors(prev => ({ ...prev, cep: 'CEP não encontrado.' }));
+        setLogradouro('');
+        setBairro('');
+        setCidade('');
+        setUf('');
+      } else {
+        setLogradouro(data.logradouro);
+        setBairro(data.bairro);
+        setCidade(data.localidade);
+        setUf(data.uf);
+        // O foco pode ser movido para o campo de número aqui, se desejado.
+      }
+    } catch (error) {
+      console.error("Erro ao buscar CEP:", error);
+      setErrors(prev => ({ ...prev, cep: 'Erro ao buscar CEP. Verifique sua conexão.' }));
+    } finally {
+      setLoadingCep(false);
+    }
+  };
+
+
+  const handleCadastro = async () => {
+    if (validateForm()) {
+      try {
+        await getDados();
+        navigation.navigate('Login'); //implemetar direcionamento para ir pra tela funcionalidadesInstituicao
+      } catch (error) {
+        console.error("Erro no processo de cadastro (handleCadastro):", error);
+      }
+    } else {
+      console.log('Formulário inválido, corrigindo erros:', errors);
+    }
+  };
+
+  const validateForm = () => {
+    let newErrors = {};
+    let isValid = true;
+
+    if (!nome.trim()) {
+      newErrors.nome = 'Nome é obrigatório.';
+      isValid = false;
+    }
+
+    if (!email.trim()) {
+      newErrors.email = 'Email é obrigatório.';
+      isValid = false;
+    } else if (!/\S+@\S+\.\S+/.test(email)) { // Regex para validação de formato de email
+      newErrors.email = 'Email inválido.';
+      isValid = false;
+    }
+
+    if (!telefone.trim()) {
       newErrors.telefone = 'Telefone é obrigatório.';
       isValid = false;
     } else {
-      const onlyNumbers = telefone.replace(/\D/g, ''); 
-      
-      if (onlyNumbers.length < 10 || onlyNumbers.length > 11) { 
+      const onlyNumbers = telefone.replace(/\D/g, '');
+
+      if (onlyNumbers.length < 10 || onlyNumbers.length > 11) {
         newErrors.telefone = 'Telefone inválido. Deve conter DDD + número.';
         isValid = false;
       }
     }
- 
-     if (!senha.trim()) {
-       newErrors.senha = 'Senha é obrigatória.';
-       isValid = false;
-     } else if (senha.length < 6) {
-       newErrors.senha = 'A senha deve ter pelo menos 6 caracteres.';
-       isValid = false;
-     }
- 
-     if (!confSenha.trim()) {
-       newErrors.confSenha = 'Confirmação de senha é obrigatória.';
-       isValid = false;
-     } else if (senha !== confSenha) {
-       newErrors.confSenha = 'As senhas não coincidem.';
-       isValid = false;
-     }
- 
-     if (!endereco.trim()) {
-       newErrors.endereco = 'Endereço é obrigatório.';
-       isValid = false;
-     }
- 
-     if (!cnpj.trim()) {
-       newErrors.cnpj = 'cnpj é obrigatório.';
-       isValid = false;
-     } else if (cnpj.length<14) {
-       newErrors.cnpj = 'cnpj inválido. Deve conter 14 dígitos numéricos.';
-       isValid = false;
-     }
- 
-     if (!plano) {
-       newErrors.plano = 'Selecione o plano.';
-       isValid = false;
-     }
- 
-     if (!check) {
-       newErrors.check = 'Você deve aceitar os termos de uso.';
-       isValid = false;
-     }
- 
-     setErrors(newErrors);
-     return isValid;
-   };
- 
- 
+
+    if (!senha.trim()) {
+      newErrors.senha = 'Senha é obrigatória.';
+      isValid = false;
+    } else if (senha.length < 6) {
+      newErrors.senha = 'A senha deve ter pelo menos 6 caracteres.';
+      isValid = false;
+    }
+
+    if (!confSenha.trim()) {
+      newErrors.confSenha = 'Confirmação de senha é obrigatória.';
+      isValid = false;
+    } else if (senha !== confSenha) {
+      newErrors.confSenha = 'As senhas não coincidem.';
+      isValid = false;
+    }
+
+    // --- VALIDAÇÃO DOS CAMPOS DE ENDEREÇO ---
+    if (!cep.trim()) {
+      newErrors.cep = 'CEP é obrigatório.';
+      isValid = false;
+    }
+    if (!logradouro.trim()) {
+      newErrors.logradouro = 'Logradouro é obrigatório.';
+      isValid = false;
+    }
+    if (!numero.trim()) {
+      newErrors.numero = 'Número é obrigatório.';
+      isValid = false;
+    }
+    if (!bairro.trim()) {
+      newErrors.bairro = 'Bairro é obrigatório.';
+      isValid = false;
+    }
+    if (!cidade.trim()) {
+      newErrors.cidade = 'Cidade é obrigatória.';
+      isValid = false;
+    }
+    if (!uf.trim()) {
+      newErrors.uf = 'UF é obrigatório.';
+      isValid = false;
+    }
+
+
+    if (!cnpj.trim()) {
+      newErrors.cnpj = 'CNPJ é obrigatório.';
+      isValid = false;
+    } else if (cnpj.length < 14) {
+      newErrors.cnpj = 'CNPJ inválido. Deve conter 14 dígitos numéricos.';
+      isValid = false;
+    }
+
+    if (!plano) {
+      newErrors.plano = 'Selecione o plano.';
+      isValid = false;
+    }
+
+    if (!check) {
+      newErrors.check = 'Você deve aceitar os termos de uso.';
+      isValid = false;
+    }
+
+    setErrors(newErrors);
+    return isValid;
+  };
+
+
   const loadFonts = async () => {
     await Font.loadAsync({
       'PoppinsRegular': require('../../assets/fonts/PoppinsRegular.ttf'),
@@ -139,30 +204,33 @@ import useApi from '../../hooks/useApi';
     });
     setFontsLoaded(true);
   };
- 
- 
+
+
   useEffect(() => {
     loadFonts();
   }, []);
- 
+
   const getDados = async () => {
-   try{
-    let {url} = useApi();
-     const response = await fetch(url+'/api/cadastrarInst', {
-       method: 'POST',
-       headers: {
-         'Content-Type': 'application/json',
-       },
-       body: JSON.stringify({nome, email, endereco, cnpj, telefone, senha, plano}),
-     });
+    // --- MONTA O ENDEREÇO COMPLETO ANTES DE ENVIAR ---
+    const enderecoCompleto = `${logradouro}, ${numero} - ${bairro}, ${cidade} - ${uf}`;
+
+    try {
+      let { url } = useApi();
+      const response = await fetch(url + '/api/cadastrarInst', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ nome, email, endereco: enderecoCompleto, cnpj, telefone, senha, plano }),
+      });
       const text = await response.text();
       console.log('Resposta da API (texto):', text);
-   } catch(error){
-     console.error('Erro ao cadastrar instituição:', error);
-   }
+    } catch (error) {
+      console.error('Erro ao cadastrar instituição:', error);
+    }
   };
- 
- 
+
+
   if (!fontsLoaded) {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
@@ -170,90 +238,162 @@ import useApi from '../../hooks/useApi';
       </View>
     );
   }
- 
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar backgroundColor="#B9A6DA" barStyle="dark-content" />
-      <Header/>
- 
- 
+      <Header />
+
+
       <View style={styles.content}>
         <View style={styles.formContainer}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-        <MaterialIcons name="arrow-back" size={28} color="#000" />
-        </TouchableOpacity>
+          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+            <MaterialIcons name="arrow-back" size={28} color="#000" />
+          </TouchableOpacity>
           <ScrollView
             contentContainerStyle={styles.scrollContent}
             keyboardShouldPersistTaps="handled"
             showsVerticalScrollIndicator={false}
           >
             <View style={styles.inputGroup}>
-               <Text style={styles.label}>Nome:</Text>
-               <TextInput
-                 style={styles.input}
-                 placeholder="Digite o nome"
-                 placeholderTextColor="#888"
-                 value={nome}
-                 onChangeText={setNome}
-               />
-               {errors.nome && <Text style={styles.errorText}>{errors.nome}</Text>}
-             </View>
-             <View style={styles.inputGroup}>
-               <Text style={styles.label}>Email da instituição:</Text>
-               <TextInput
-                 style={styles.input}
-                 placeholder="Digite o email"
-                 placeholderTextColor="#888"
-                 value={email}
-                 onChangeText={setEmail}
-               />
-               {errors.email && <Text style={styles.errorText}>{errors.email}</Text>}
-              </View>
-              <View style={styles.inputGroup}>
-                <Text style={styles.label}>Endereço da instituição:</Text>
-                <TextInput
-                  style={styles.input}
-                  placeholder="Digite o endereço"
+              <Text style={styles.label}>Nome:</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Digite o nome"
+                placeholderTextColor="#888"
+                value={nome}
+                onChangeText={setNome}
+              />
+              {errors.nome && <Text style={styles.errorText}>{errors.nome}</Text>}
+            </View>
+
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>Email da instituição:</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Digite o email"
+                placeholderTextColor="#888"
+                value={email}
+                onChangeText={setEmail}
+                keyboardType="email-address"
+                autoCapitalize="none"
+              />
+              {errors.email && <Text style={styles.errorText}>{errors.email}</Text>}
+            </View>
+
+            {/* --- INÍCIO DO NOVO BLOCO DE ENDEREÇO --- */}
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>Endereço da instituição</Text>
+
+              <View style={styles.cepContainer}>
+                <TextInputMask
+                  style={[styles.input, { flex: 1 }]}
+                  type={'zip-code'}
+                  placeholder="Digite o CEP"
                   placeholderTextColor="#888"
-                  value={endereco}
-                  onChangeText={setEndereco}
+                  value={cep}
+                  onChangeText={setCep}
+                  onBlur={buscarCep} // A mágica acontece aqui!
+                  keyboardType="numeric"
                 />
-                {errors.endereco && <Text style={styles.errorText}>{errors.endereco}</Text>}
+                {loadingCep && <ActivityIndicator style={{ marginLeft: 10 }} color="#522a91" />}
               </View>
-              <View style={styles.inputGroup}>
-               <Text style={styles.label}>CNPJ:</Text>
-               <TextInputMask
-                  type={'cnpj'}
-                  value={cnpj}
-                  onChangeText={text => setcnpj(text)}
-                  placeholder="00.000.000/0000-00"
-                  placeholderTextColor={"#888"}
-                  style={styles.input}
-                />
-               
-               {errors.cnpj && <Text style={styles.errorText}>{errors.cnpj}</Text>}
-              </View>
-              <View style={styles.inputGroup}>
-               <Text style={styles.label}>Telefone:</Text>
-               <TextInputMask
-                  style={styles.input}
-                  type={'cel-phone'}
-                  options={{
-                    maskType: 'BRL',
-                    withDDD: true,
-                    dddMask: '(99) '
-                  }}
-                  placeholder="(99) 99999-9999" 
-                  placeholderTextColor="#888"
-                  value={telefone}
-                  onChangeText={setTelefone}
-                />
-               {errors.telefone && <Text style={styles.errorText}>{errors.telefone}</Text>}
-              </View>
-              <View style={styles.inputGroup}>
-                <Text style={styles.label}>Senha:</Text>
-                <View style={styles.passwordContainer}>
-                
+              {errors.cep && <Text style={styles.errorText}>{errors.cep}</Text>}
+            </View>
+
+            <View style={styles.inputGroup}>
+              <TextInput
+                style={styles.input}
+                placeholder="Logradouro (Rua, Av...)"
+                placeholderTextColor="#888"
+                value={logradouro}
+                onChangeText={setLogradouro}
+              />
+              {errors.logradouro && <Text style={styles.errorText}>{errors.logradouro}</Text>}
+            </View>
+
+            <View style={styles.inputGroup}>
+              <TextInput
+                style={styles.input}
+                placeholder="Número"
+                placeholderTextColor="#888"
+                value={numero}
+                onChangeText={setNumero}
+                keyboardType="numeric"
+              />
+              {errors.numero && <Text style={styles.errorText}>{errors.numero}</Text>}
+            </View>
+
+            <View style={styles.inputGroup}>
+              <TextInput
+                style={styles.input}
+                placeholder="Bairro"
+                placeholderTextColor="#888"
+                value={bairro}
+                onChangeText={setBairro}
+              />
+              {errors.bairro && <Text style={styles.errorText}>{errors.bairro}</Text>}
+            </View>
+
+            <View style={styles.inputGroup}>
+              <TextInput
+                style={styles.input}
+                placeholder="Cidade"
+                placeholderTextColor="#888"
+                value={cidade}
+                onChangeText={setCidade}
+              />
+              {errors.cidade && <Text style={styles.errorText}>{errors.cidade}</Text>}
+            </View>
+
+            <View style={styles.inputGroup}>
+              <TextInput
+                style={styles.input}
+                placeholder="UF"
+                placeholderTextColor="#888"
+                value={uf}
+                onChangeText={setUf}
+                maxLength={2}
+                autoCapitalize="characters"
+              />
+              {errors.uf && <Text style={styles.errorText}>{errors.uf}</Text>}
+            </View>
+            {/* --- FIM DO NOVO BLOCO DE ENDEREÇO --- */}
+
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>CNPJ:</Text>
+              <TextInputMask
+                type={'cnpj'}
+                value={cnpj}
+                onChangeText={text => setcnpj(text)}
+                placeholder="00.000.000/0000-00"
+                placeholderTextColor={"#888"}
+                style={styles.input}
+              />
+              {errors.cnpj && <Text style={styles.errorText}>{errors.cnpj}</Text>}
+            </View>
+
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>Telefone:</Text>
+              <TextInputMask
+                style={styles.input}
+                type={'cel-phone'}
+                options={{
+                  maskType: 'BRL',
+                  withDDD: true,
+                  dddMask: '(99) '
+                }}
+                placeholder="(99) 99999-9999"
+                placeholderTextColor="#888"
+                value={telefone}
+                onChangeText={setTelefone}
+              />
+              {errors.telefone && <Text style={styles.errorText}>{errors.telefone}</Text>}
+            </View>
+
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>Senha:</Text>
+              <View style={styles.passwordContainer}>
                 <TextInput
                   style={styles.passwordInput}
                   placeholder="Digite a senha"
@@ -269,13 +409,13 @@ import useApi from '../../hooks/useApi';
                     color="#888"
                   />
                 </TouchableOpacity>
-                </View>
-                {errors.senha && <Text style={styles.errorText}>{errors.senha}</Text>}
               </View>
-              <View style={styles.inputGroup}>
-                <Text style={styles.label}>Confirme a senha:</Text>
-                <View style={styles.passwordContainer}>
-                
+              {errors.senha && <Text style={styles.errorText}>{errors.senha}</Text>}
+            </View>
+
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>Confirme a senha:</Text>
+              <View style={styles.passwordContainer}>
                 <TextInput
                   style={styles.passwordInput}
                   placeholder="Redigite a senha"
@@ -291,52 +431,54 @@ import useApi from '../../hooks/useApi';
                     color="#888"
                   />
                 </TouchableOpacity>
-                </View> 
-                {errors.confSenha && <Text style={styles.errorText}>{errors.confSenha}</Text>}
               </View>
-              <View style={styles.inputGroup}>
-                  <Text style={styles.label}>Plano da instituição:</Text>
-                  <View style={styles.pickerWrapper}>
-                    <Picker
-                      selectedValue={plano}
-                      onValueChange={(itemValue) => setPlano(itemValue)}
-                      style={[
-                        styles.picker,
-                        { color: plano === '' ? '#888' : '#000' } // preto para placeholder, cinza para os demais
-                      ]}
-                    >
-                      <Picker.Item label="Selecione o plano" value="" />
-                      <Picker.Item label="Semestral" value="S" />
-                      <Picker.Item label="Anual" value="A" />
-                    </Picker>
-                  </View>
-                  {errors.plano && <Text style={styles.errorText}>{errors.plano}</Text>}
-                </View>
+              {errors.confSenha && <Text style={styles.errorText}>{errors.confSenha}</Text>}
+            </View>
+
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>Plano da instituição:</Text>
+              <View style={styles.pickerWrapper}>
+                <Picker
+                  selectedValue={plano}
+                  onValueChange={(itemValue) => setPlano(itemValue)}
+                  style={[
+                    styles.picker,
+                    { color: plano === '' ? '#888' : '#000' }
+                  ]}
+                >
+                  <Picker.Item label="Selecione o plano" value="" />
+                  <Picker.Item label="Semestral" value="S" />
+                  <Picker.Item label="Anual" value="A" />
+                </Picker>
+              </View>
+              {errors.plano && <Text style={styles.errorText}>{errors.plano}</Text>}
+            </View>
+
             <View style={styles.check}>
-               <CheckBox
-               checked={check}
-               onPress={() => setCheck(!check)}/> 
-               <TouchableOpacity> 
-                 <Text style={styles.textCheck}>Termos de uso</Text>
-               </TouchableOpacity>
+              <CheckBox
+                checked={check}
+                onPress={() => setCheck(!check)} />
+              <TouchableOpacity>
+                <Text style={styles.textCheck}>Termos de uso</Text>
+              </TouchableOpacity>
             </View>
             {errors.check && <Text style={styles.errorText}>{errors.check}</Text>}
           </ScrollView>
         </View>
- 
- 
+
+
         <TouchableOpacity style={styles.button}
-          onPress= {handleCadastro}>
+          onPress={handleCadastro}>
           <Text style={styles.buttonText}>Cadastrar</Text>
         </TouchableOpacity>
       </View>
-      <FooterSemIcones/>
+      <FooterSemIcones />
     </SafeAreaView>
   );
- }
- 
- 
- const styles = StyleSheet.create({
+}
+
+
+const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: '#FFD88D',
@@ -367,8 +509,8 @@ import useApi from '../../hooks/useApi';
     margin: '5%',
   },
   inputGroup: {
-    padding:'1%',
-    marginBottom:'2%',
+    padding: '1%',
+    marginBottom: '2%',
   },
   label: {
     fontWeight: 'bold',
@@ -404,8 +546,8 @@ import useApi from '../../hooks/useApi';
     elevation: 6,
   },
   passwordInput: {
-    fontSize:16,
-    flex: 1, 
+    fontSize: 16,
+    flex: 1,
     padding: '5%',
     paddingLeft: '5%',
     fontFamily: 'PoppinsRegular',
@@ -416,7 +558,7 @@ import useApi from '../../hooks/useApi';
   },
   pickerWrapper: {
     alignItems: 'center',
-    justifyContent:'center',
+    justifyContent: 'center',
     paddingHorizontal: '5%',
     paddingVertical: '5%',
     borderRadius: 25,
@@ -432,16 +574,16 @@ import useApi from '../../hooks/useApi';
     elevation: 6,
   },
   picker: {
-    width:'100%',
+    width: '100%',
     fontSize: 16,
     fontFamily: 'PoppinsRegular',
     backgroundColor: '#d9d9d9',
-    borderWidth:0,
+    borderWidth: 0,
   },
   button: {
     backgroundColor: '#FFBE31',
     paddingVertical: '5%',
-    width:'60%',
+    width: '60%',
     borderRadius: 20,
     alignItems: 'center',
     marginTop: '10%',
@@ -458,40 +600,44 @@ import useApi from '../../hooks/useApi';
     fontSize: 18,
     fontFamily: 'PoppinsRegular',
   },
-  seta:{
-    height:'15%',
+  seta: {
+    height: '15%',
   },
   backButton: {
     alignSelf: 'flex-start',
   },
-  check:{
-   display: 'flex',
-   flexDirection:'row',
-   alignItems:'center',
-   justifyContent:'flex-start',
+  check: {
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
   },
-  CheckBox:{
-   padding:-10,
+  CheckBox: {
+    padding: -10,
   },
-  textCheck:{
-   fontSize: 14,
-   fontFamily: 'PoppinsRegular',
-   color: '#522a91', 
+  textCheck: {
+    fontSize: 14,
+    fontFamily: 'PoppinsRegular',
+    color: '#522a91',
   },
   errorText: {
-     color: 'red',
-     fontSize: 12,
-     marginTop: 5,
-     fontFamily: 'PoppinsRegular',
-   },
-   iconButton: {
-     padding:5,
-     fontFamily: 'PoppinsRegular',
-     flexDirection:'row',
-     columnGap: 10,
-     fontSize: 14,
-     alignItems:'center',
-     color:'#888',
-   },
- });
- 
+    color: 'red',
+    fontSize: 12,
+    marginTop: 5,
+    fontFamily: 'PoppinsRegular',
+  },
+  iconButton: {
+    padding: 5,
+    fontFamily: 'PoppinsRegular',
+    flexDirection: 'row',
+    columnGap: 10,
+    fontSize: 14,
+    alignItems: 'center',
+    color: '#888',
+  },
+  // --- NOVO ESTILO PARA O CONTAINER DO CEP ---
+  cepContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  }
+});
