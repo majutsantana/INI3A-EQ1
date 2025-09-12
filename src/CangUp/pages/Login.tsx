@@ -62,10 +62,12 @@ export default function Login({ navigation }) { //bug, não está dando erro
         if (tipoDeLogin === "inst" && IdInst) {
           await AsyncStorage.setItem("id_instituicao", IdInst);
         }
-        else if (tipoDeLogin === "alun")
+        else if (tipoDeLogin === "alun"){
           await AsyncStorage.setItem("id_aluno", IdAlun);
-        else
+        }
+        else{
           await AsyncStorage.setItem("id_responsavel", IdResp);
+        }
       } else {
         Alert.alert("Erro", "Token não recebido.");
       }

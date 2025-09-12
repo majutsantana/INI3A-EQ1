@@ -52,7 +52,7 @@ export default function CadastroAluno({ navigation }) { // Não é erro, é só 
       try {
         await getDados();
         // A navegação só deve acontecer após o sucesso do cadastro
-        // navigation.navigate('Login'); 
+        //navigation.navigate('Login'); 
       } catch (error) {
         console.error("Erro no processo de cadastro (handleCadastro):", error);
       }

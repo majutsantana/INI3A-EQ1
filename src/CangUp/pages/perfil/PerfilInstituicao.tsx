@@ -1,5 +1,5 @@
 import { useNavigation } from '@react-navigation/core';
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import {
     SafeAreaView, StyleSheet, Text, View, TextInput, TouchableOpacity,
     Alert, ActivityIndicator, ScrollView
@@ -10,6 +10,7 @@ import FooterComIcones from '../../components/FooterComIcones';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import useApi from '../../hooks/useApi';
 import { TextInputMask } from 'react-native-masked-text';
+import { AuthContext } from '../../components/AuthContext';
 
 type Instituicao = {
     id: number;
@@ -29,6 +30,7 @@ export default function PerfilInstituicao({ navigation }) {
     const [editando, setEditando] = useState(false);
     const [errors, setErrors] = useState<{ telefone?: string }>({});
     const { url } = useApi();
+    const {logout} = useContext(AuthContext);
 
     const loadFonts = async () => {
         await Font.loadAsync({
@@ -43,11 +45,13 @@ export default function PerfilInstituicao({ navigation }) {
             const token = await AsyncStorage.getItem("jwt");
             if (!token) {
                 Alert.alert("Erro", "Você precisa estar logado.");
+                logout();
                 return;
             }
             const id = await AsyncStorage.getItem("id_instituicao");
             if (!id) {
                 Alert.alert("Erro", "ID da instituição não encontrado.");
+                logout();
                 return;
             }
             const res = await fetch(`${url}/api/instituicoes/${id}`, {
