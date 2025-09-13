@@ -229,11 +229,11 @@ export default function PerfilInstituicao({ navigation }) {
                         </View>
                         {errors.cep && <Text style={styles.errorText}>{errors.cep}</Text>}
 
-                        <TextInput style={styles.input} placeholder="Logradouro (Rua, Av...)" value={logradouro} onChangeText={setLogradouro} />
-                        <TextInput style={styles.input} placeholder="Número" value={numero} onChangeText={setNumero} keyboardType="numeric" />
-                        <TextInput style={styles.input} placeholder="Bairro" value={bairro} onChangeText={setBairro} />
-                        <TextInput style={styles.input} placeholder="Cidade" value={cidade} onChangeText={setCidade} />
-                        <TextInput style={styles.input} placeholder="UF" value={uf} onChangeText={setUf} maxLength={2} autoCapitalize="characters" />
+                        <TextInput style={styles.input} placeholderTextColor="#888" placeholder="Logradouro (Rua, Av...)" value={logradouro} onChangeText={setLogradouro} />
+                        <TextInput style={styles.input} placeholderTextColor="#888" placeholder="Número" value={numero} onChangeText={setNumero} keyboardType="numeric" />
+                        <TextInput style={styles.input} placeholderTextColor="#888" placeholder="Bairro" value={bairro} onChangeText={setBairro} />
+                        <TextInput style={styles.input} placeholderTextColor="#888" placeholder="Cidade" value={cidade} onChangeText={setCidade} />
+                        <TextInput style={styles.input} placeholderTextColor="#888" placeholder="UF" value={uf} onChangeText={setUf} maxLength={2} autoCapitalize="characters" />
                     </>
                 ) : (
                     <TextInput style={styles.input} value={instituicao.endereco} editable={false} />
