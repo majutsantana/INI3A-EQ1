@@ -15,6 +15,7 @@ import EfetivacaoAluno from './pages/efetivacao/EfetivacaoAluno';
 import EfetivacaoResponsavel from './pages/efetivacao/EfetivacaoResponsavel';
 import FuncionalidadesAlunoResponsavel from './pages/funcionalidades/FuncionalidadesAlunoResponsavel';
 import ListaUsuarios from './pages/funcionalidades/ListaUsuarios';
+import ListaInstituicoes from './pages/funcionalidades/ListaInstituicoes';
 import CadastroVeiculo from './pages/cadastro/CadastroVeiculo';
 import { useContext, useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -41,7 +42,8 @@ const AppStack = () => {
   const { userProfile} = useContext(AuthContext);
 
   const getInitialRoute = () => {
-    if (userProfile === "inst") return "ListaUsuarios";
+    if (userProfile === "adm") return "ListaInstituicoes";
+    if (userProfile === "inst") return "PerfilInstituicao";
     if (userProfile === "alun") return "PerfilAluno";
     if (userProfile === "resp") return "PerfilResponsavel";
   };
@@ -56,6 +58,8 @@ const AppStack = () => {
       <Stack.Screen name="FuncionalidadesAlunoResponsavel" component={FuncionalidadesAlunoResponsavel} options={{ headerShown: false }} />
       <Stack.Screen name="CadastroVeiculo" component={CadastroVeiculo} options={{ headerShown: false }} />
       <Stack.Screen name="ListaUsuarios" component={ListaUsuarios} options={{ headerShown: false }} />
+      <Stack.Screen name="ListaInstituicoes" component={ListaInstituicoes} options={{ headerShown: false }} />
+
     </Stack.Navigator>
   );
 };
