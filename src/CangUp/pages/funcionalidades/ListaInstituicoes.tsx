@@ -62,6 +62,17 @@ export default function FuncionalidadesAlunoResponsavel() {
         fetchInstituicoes();
     }, []);
 
+    const verificaPlano = (plano: string) => {
+        if (plano === 'A') {
+            return <Text style={styles.infoInstituicao}>Plano: Anual</Text>;
+        } else if (plano === 'S') {
+            return <Text style={styles.infoInstituicao}>Plano: Semestral</Text>;
+        } else {
+            return null;
+        }
+    };
+    
+
     if (!fontsLoaded || loading) {
         return (
             <View style={styles.loadingContainer}>
@@ -73,7 +84,7 @@ export default function FuncionalidadesAlunoResponsavel() {
     // Filtrando as instituições
     const instituicoesFiltradas = instituicoes.filter(inst =>
         inst.nome.toLowerCase().includes(busca.toLowerCase())
-    );
+    ); 
 
     return (
         <SafeAreaView style={styles.safeArea}>
@@ -97,9 +108,9 @@ export default function FuncionalidadesAlunoResponsavel() {
                     instituicoesFiltradas.map((inst) => (
                         <View key={inst.id} style={styles.cardInstituicao}>
                             <Text style={styles.nomeInstituicao}>{inst.nome}</Text>
-                            <Text style={styles.infoInstituicao}>📧 {inst.email}</Text>
-                            <Text style={styles.infoInstituicao}>📍 {inst.endereco}</Text>
-                            <Text style={styles.infoInstituicao}>📌 Plano: {inst.plano}</Text>
+                            <Text style={styles.infoInstituicao}> Email: {inst.email}</Text>
+                            <Text style={styles.infoInstituicao}> Endereço: {inst.endereco}</Text>
+                            {verificaPlano(inst.plano)}                        
                         </View>
                     ))
                 )}

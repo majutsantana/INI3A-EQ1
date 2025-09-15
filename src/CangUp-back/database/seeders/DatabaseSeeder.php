@@ -43,11 +43,10 @@ class DatabaseSeeder extends Seeder
             'senha'=>'arthurCangUp'
         ]);
 
-        //\App\Models\PerfilUsuario::create([
-        //    'perfil_id'=>'1',
-        //    'usuario_id'=>'1'
-        //]);
-
+        \App\Models\PerfilUsuario::create([
+            'perfil_id'=>'1',
+            'usuario_id'=>'1'
+        ]);
 
         \App\Models\Usuario::create([
             'login'=>'chloe',
@@ -55,11 +54,20 @@ class DatabaseSeeder extends Seeder
             'senha'=>'chloeCangUp'
         ]);
 
+        \App\Models\PerfilUsuario::create([
+            'perfil_id'=>'1',
+            'usuario_id'=>'2'
+        ]);
 
         \App\Models\Usuario::create([
             'login'=>'luiza',
             'email'=>'luiza@cangup.com',
             'senha'=>'luizaCangUp'
+        ]);
+
+        \App\Models\PerfilUsuario::create([
+            'perfil_id'=>'1',
+            'usuario_id'=>'3'
         ]);
 
         \App\Models\Usuario::create([
@@ -68,6 +76,10 @@ class DatabaseSeeder extends Seeder
             'senha'=>'mariajuliaCangUp'
         ]);
 
+        \App\Models\PerfilUsuario::create([
+            'perfil_id'=>'1',
+            'usuario_id'=>'4'
+        ]);
 
         \App\Models\Usuario::create([
             'login'=>'olivia',
@@ -75,11 +87,20 @@ class DatabaseSeeder extends Seeder
             'senha'=>'oliviaCangUp'
         ]);
 
+        \App\Models\PerfilUsuario::create([
+            'perfil_id'=>'1',
+            'usuario_id'=>'5'
+        ]);
 
         \App\Models\Usuario::create([
             'login'=>'yasmin',
             'email'=>'yasmin@cangup.com',
             'senha'=>'yasminCangUp'
+        ]);
+
+        \App\Models\PerfilUsuario::create([
+            'perfil_id'=>'1',
+            'usuario_id'=>'6'
         ]);
     }
 }
