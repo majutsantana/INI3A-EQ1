@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
+import { useNavigation } from '@react-navigation/core';
 import {
     SafeAreaView,
     StyleSheet,
@@ -7,8 +8,10 @@ import {
     ScrollView,
     ActivityIndicator,
     TextInput,
+    TouchableOpacity,
 } from 'react-native';
 import * as Font from 'expo-font';
+import { Feather } from '@expo/vector-icons';
 import HeaderComLogout from '../../components/HeaderComLogout';
 import FooterComIcones from '../../components/FooterComIcones';
 import useApi from '../../hooks/useApi';
@@ -22,7 +25,7 @@ type Instituicao = {
     plano: string;
 }
 
-export default function FuncionalidadesAlunoResponsavel() {
+    export default function FuncionalidadesAlunoResponsavel({navigation}) {
     const [fontsLoaded, setFontsLoaded] = useState(false);
     const [instituicoes, setInstituicoes] = useState<Instituicao[]>([]);
     const [loading, setLoading] = useState(true);
@@ -108,13 +111,16 @@ export default function FuncionalidadesAlunoResponsavel() {
                     instituicoesFiltradas.map((inst) => (
                         <View key={inst.id} style={styles.cardInstituicao}>
                             <Text style={styles.nomeInstituicao}>{inst.nome}</Text>
-                            <Text style={styles.infoInstituicao}> Email: {inst.email}</Text>
-                            <Text style={styles.infoInstituicao}> Endereço: {inst.endereco}</Text>
+                            <Text style={styles.infoInstituicao}> 📧 {inst.email}</Text>
+                            <Text style={styles.infoInstituicao}> 📍 {inst.endereco}</Text>
                             {verificaPlano(inst.plano)}                        
                         </View>
                     ))
                 )}
             </ScrollView>
+            <TouchableOpacity activeOpacity={0.8} style={styles.fab} onPress={() => navigation.navigate(`CadastroInstituicao`)} accessibilityLabel="Adicionar">
+                <Feather name="plus" size={28} color="#fff" />
+            </TouchableOpacity>
 
             <FooterComIcones />
         </SafeAreaView>
@@ -181,4 +187,20 @@ const styles = StyleSheet.create({
         color: '#666',
         textAlign: 'center',
     },
+    fab: {
+        position: 'absolute',
+        right: 20,
+        bottom: 90, // sobe acima do footer
+        width: 60,
+        height: 60,
+        borderRadius: 30,
+        backgroundColor: '#522a91',
+        justifyContent: 'center',
+        alignItems: 'center',
+        elevation: 6,
+        shadowColor: '#000',
+        shadowOpacity: 0.3,
+        shadowOffset: { width: 0, height: 3 },
+        shadowRadius: 4,
+        },
 });

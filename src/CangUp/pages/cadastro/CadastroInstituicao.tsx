@@ -93,7 +93,7 @@ export default function CadastroInstituicao({ navigation }) {
     if (validateForm()) {
       try {
         await getDados();
-        navigation.navigate('Login'); //implemetar direcionamento para ir pra tela funcionalidadesInstituicao
+        navigation.navigate('ListaInstituicoes'); 
       } catch (error) {
         console.error("Erro no processo de cadastro (handleCadastro):", error);
       }

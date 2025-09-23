@@ -43,10 +43,6 @@ export default function TipoCadastro({navigation}) {
         <View style={styles.opcoes}>
           <Text style={styles.title}>Selecione o tipo de usuário:</Text>
 
-          <TouchableOpacity style={styles.button} onPress={()=>navigation.navigate('CadastroInstituicao')}> 
-            <Text style={styles.buttonText}>Instituição</Text>
-          </TouchableOpacity>
-
           <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('EfetivacaoAluno')}>
             <Text style={styles.buttonText}>Aluno</Text>
           </TouchableOpacity>
@@ -87,7 +83,8 @@ const styles = StyleSheet.create({
   },
   body: {
     flex: 1,
-    margin: '10%',
+    marginHorizontal: '10%',
+    marginVertical: '30%',
     backgroundColor: '#f3f3f3',
     borderRadius: 30,
     padding: '5%',

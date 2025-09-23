@@ -16,23 +16,11 @@ const Header = () => {
 
  return (
    <View style={styles.header}>
-     <TouchableOpacity onPress={() => setVisible(true)}>
-       <Icon name="plus-circle-outline" size={26} color={'#212121'} />
-     </TouchableOpacity>
-     <Modal transparent visible={visible}>
-       <SafeAreaView
-         style={{ flex: 1}}
-         onTouchStart={() => setVisible(false)}>
-         <View style={styles.popup}>
-           {options.map((op, i) => (
-             <TouchableOpacity style={styles.option} key={i} onPress={() => op.action}>
-               <Text>{op.title}</Text>
-               <FontAwesome name={op.icon} size={22} color={'#212121'} style={{marginLeft: 10,}} />
-             </TouchableOpacity>
-           ))}
-         </View>
-       </SafeAreaView>
-     </Modal>
+      <View style={styles.popup}>
+        <TouchableOpacity style={styles.option}>
+          <FontAwesome name="moon-o" size={25} color="#000" />
+        </TouchableOpacity>
+      </View>
    </View>
  );
 };
@@ -47,16 +35,6 @@ const styles = StyleSheet.create({
      alignItems: "flex-end",
      justifyContent: "center",
      paddingRight: '5%',
-   },
-   popup: {
-     borderRadius: 8,
-     borderColor: '#333',
-     borderWidth: 1,
-     backgroundColor: '#fff',
-     paddingHorizontal: 10,
-     position: 'absolute',
-     top: 76,
-     right: 20,
    },
    option: {
      flexDirection: 'row',

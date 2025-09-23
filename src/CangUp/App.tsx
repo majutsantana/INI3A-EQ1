@@ -29,7 +29,6 @@ const AuthStack = () => (
     <Stack.Screen name="Login" component={Login} options={{ headerShown: false }} />
     <Stack.Screen name="TipoCadastro" component={TipoCadastro} options={{ headerShown: false }} />
     <Stack.Screen name="CadastroAluno" component={CadastroAluno} options={{ headerShown: false }} />
-    <Stack.Screen name="CadastroInstituicao" component={CadastroInstituicao} options={{ headerShown: false }} />
     <Stack.Screen name="CadastroResponsavel" component={CadastroResponsavel} options={{ headerShown: false }} />
     <Stack.Screen name="RedefinirSenha" component={EsqueciSenha} options={{ title: 'Redefinir Senha' }} />
     <Stack.Screen name="EfetivacaoAluno" component={EfetivacaoAluno} options={{ headerShown: false }} />
@@ -59,7 +58,7 @@ const AppStack = () => {
       <Stack.Screen name="CadastroVeiculo" component={CadastroVeiculo} options={{ headerShown: false }} />
       <Stack.Screen name="ListaUsuarios" component={ListaUsuarios} options={{ headerShown: false }} />
       <Stack.Screen name="ListaInstituicoes" component={ListaInstituicoes} options={{ headerShown: false }} />
-
+      <Stack.Screen name="CadastroInstituicao" component={CadastroInstituicao} options={{ headerShown: false }} />
     </Stack.Navigator>
   );
 };
