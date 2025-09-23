@@ -17,6 +17,8 @@ import {
  import { Picker } from '@react-native-picker/picker';
 import FooterSemIcones from '../../components/FooterSemIcones';
 import useApi from '../../hooks/useApi';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 
 
 type errorType ={ 
@@ -57,7 +59,7 @@ export default function EfetivacaoAluno({ navigation }) { //Navigation não é e
        newErrors.CPF = 'CPF é obrigatório.';
        isValid = false;
      } else if (CPF.length < 14) {
-       newErrors.CPF = 'CPF inválido. Deve conter 11 dígitos numéricos.';
+       newErrors.CPF = 'CPF inválido. Deve conter 14 dígitos numéricos.';
        isValid = false;
      }
  
@@ -77,38 +79,50 @@ export default function EfetivacaoAluno({ navigation }) { //Navigation não é e
        loadFonts();
      }, []);
 
-    const handleCadastro  = async () => {
-        if (validateForm()) {
-        try {
-            await getDados();
-            navigation.navigate('CadastroResponsavel');
-        } catch (error) {
-            console.error("Erro no processo de cadastro (handleCadastro):", error);
-        }
+     
+    const handleEfetivar = async () => {
+    if (validateForm()) {
+      try {
+        const data = await getDados();
+        if (data?.responsavel?.cpf) {
+          await AsyncStorage.setItem("cpf", data.responsavel.cpf);
+          navigation.navigate('CadastroResponsavel');
         } else {
-        console.log('Formulário inválido, corrigindo erros:', errors);
+          console.log("Dados do responsavel não encontrados.");
         }
-    };
-
+      } catch (error) {
+        console.error("Erro no processo de efetivacao (handleEfetivar):", error);
+      }
+    } else {
+      console.log('Formulário inválido, corrigindo erros:', errors);
+    }
+  };
     const getDados = async () => {
         try{
-            const response = await fetch(url+'/api/cadastrarResponsavel', { // luiza e maghu arrumem
+            const response = await fetch(url+'/api/efetivarResponsavel', { // luiza e maghu arrumem
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+                'Accept': 'application/json', 
             },
-            body: JSON.stringify({nome, CPF}),
+            body: JSON.stringify({nome,  cpf: CPF, id_inst: instituicao ? Number(instituicao) : null }),
             });
-            const text = await response.text();
-            console.log('Resposta da API (texto):', text);
-        } catch(error){
-            console.error('Erro ao cadastrar responsavel:', error);
-        }
-    };
+             if (!response.ok) {
+              const errorData = await response.json();
+              throw new Error(errorData.message || 'Erro ao efetivar responsavel');
+            }
+            const data = await response.json();
+            console.log('Responsavel efetivado:', data);
+            return data;
+        } catch (error) {
+            console.error('Erro ao efetivar responsavel:', error);
+            throw error;
+      }
+  };
 
     const renderInst = () => {
       return instituicoes.map(i => 
-              <Picker.Item key={i.id} label={i.nome} value={i.nome} />)
+              <Picker.Item key={i.id} label={i.nome} value={i.id} />)
       } 
       useEffect(() => {
         loadFonts();
@@ -180,7 +194,7 @@ export default function EfetivacaoAluno({ navigation }) { //Navigation não é e
         </View>
  
         <TouchableOpacity style={styles.button}
-          onPress= {handleCadastro}>
+          onPress= {handleEfetivar}>
           <Text style={styles.buttonText}>Prosseguir</Text>
         </TouchableOpacity>
       </View>

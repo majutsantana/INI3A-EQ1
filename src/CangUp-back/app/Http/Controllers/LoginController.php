@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Instituicao;
+use App\Models\Responsavel;
+use App\Models\Aluno;
 use App\Models\Usuario;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -20,13 +22,11 @@ class LoginController extends Controller
     public function login(Request $request)
     {
         $credentials = $request->validate([
-            'login' => 'required|string|email',
+            'login' => 'required|string',
             'senha' => 'required|string',
             'perfil' => 'required|string'
         ]);
-
         $usuario = Usuario::where('login', $credentials['login'])->first();
-
         if (!$usuario || !Hash::check($credentials['senha'], $usuario->senha)) {
             return response()->json(['detail' => 'Credenciais inválidas.'], 401);
         }
@@ -53,6 +53,18 @@ class LoginController extends Controller
             $instituicao = Instituicao::where('email', $usuario->email)->first();
             if ($instituicao) {
                 $responsePayload['id_instituicao'] = $instituicao->id;
+            }
+        }
+        else if ($credentials['perfil'] === 'resp') {
+            $responsavel = Responsavel::where('email', $usuario->email)->first();
+            if ($responsavel) {
+                $responsePayload['id_responsavel'] = $responsavel->id;
+            }
+        }
+        else if ($credentials['perfil'] === 'alun') {
+            $aluno = Aluno::where('email', $usuario->email)->first();
+            if ($aluno) {
+                $responsePayload['id_aluno'] = $aluno->id;
             }
         }
 

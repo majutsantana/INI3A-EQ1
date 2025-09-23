@@ -69,10 +69,12 @@ export default function Login({ navigation }) {
         if (tipoDeLogin === "inst" && IdInst) {
           await AsyncStorage.setItem("id_instituicao", IdInst);
         }
-        else if (tipoDeLogin === "alun")
+        else if (tipoDeLogin === "alun"){
           await AsyncStorage.setItem("id_aluno", IdAlun);
-        else
+        }
+        else{
           await AsyncStorage.setItem("id_responsavel", IdResp);
+        }
       } else {
         Alert.alert("Erro", "Token não recebido.");
       }
@@ -202,7 +204,6 @@ export default function Login({ navigation }) {
         </TouchableOpacity>
       </View>
 
-      {/* MODAL DE ESQUECI MINHA SENHA */}
       <Modal
         animationType="slide"
         transparent={true}

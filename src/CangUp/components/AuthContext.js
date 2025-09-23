@@ -28,19 +28,36 @@ export const AuthProvider = ({ children }) => {
     };
 
     const isLoggedIn = async () => {
+        setIsLoading(true);
         try {
-            setIsLoading(true);
             const token = await AsyncStorage.getItem('jwt');
             const perfil = await AsyncStorage.getItem('perfil');
-            if (token) {
-                setUserToken(token);
-                setUserProfile(perfil);
-            }else {
-            setUserToken(null);
-            setUserProfile(null);
+
+            if (token && token !== "null" && token !== "undefined" && token.trim() !== "") {
+                const response = await fetch("http://localhost:8000/api/usuario", {
+                    headers: {
+                        "Authorization": `Bearer ${token}`,
+                        "Accept": "application/json"
+                    }
+                });
+
+                if (response.ok) {
+                    setUserToken(token);
+                    setUserProfile(perfil);
+                } else {
+                    await AsyncStorage.removeItem("jwt");
+                    await AsyncStorage.removeItem("perfil");
+                    setUserToken(null);
+                    setUserProfile(null);
+                }
+            } else {
+                setUserToken(null);
+                setUserProfile(null);
             }
         } catch (e) {
             console.log(`Erro ao verificar login: ${e}`);
+            setUserToken(null);
+            setUserProfile(null);
         } finally {
             setIsLoading(false);
         }

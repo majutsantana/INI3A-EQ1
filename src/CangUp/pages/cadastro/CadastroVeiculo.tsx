@@ -1,5 +1,6 @@
 import {
     ActivityIndicator,
+    Alert,
     SafeAreaView,
     ScrollView,
     StatusBar,
@@ -10,66 +11,76 @@ import {
     View,
   } from 'react-native';
   import * as Font from 'expo-font';
-  import { useEffect, useState } from 'react';
+  import { useContext, useEffect, useState } from 'react';
   import { useNavigation } from '@react-navigation/native';
   import { MaterialIcons } from '@expo/vector-icons';
   import Header from '../../components/Header';
   import FooterSemIcones from '../../components/FooterSemIcones';
   import useApi from '../../hooks/useApi';
   import { TextInputMask } from 'react-native-masked-text';
+  import AsyncStorage from '@react-native-async-storage/async-storage';
+import { AuthContext } from '../../components/AuthContext';
+
+  type Responsavel = {
+    id: number;
+} 
   
-  // Componente personalizado para substituir o NumericInput
-  const CustomNumericInput = ({ value, onChange, minValue, maxValue }) => {
-    const handleIncrement = () => {
-      if (value < maxValue) {
-        onChange(value + 1);
-      }
-    };
-  
-    const handleDecrement = () => {
-      if (value > minValue) {
-        onChange(value - 1);
-      }
-    };
-  
-    return (
-      <View style={styles.customNumericContainer}>
-        <TouchableOpacity onPress={handleDecrement} style={styles.customNumericButton}>
-          <Text style={styles.customNumericButtonText}>-</Text>
-        </TouchableOpacity>
-        <TextInput
-          style={styles.customNumericInput}
-          value={String(value)}
-          keyboardType="numeric"
-          textAlign="center"
-          editable={false} // Impede a digitação direta para simplificar
-        />
-        <TouchableOpacity onPress={handleIncrement} style={styles.customNumericButton}>
-          <Text style={styles.customNumericButtonText}>+</Text>
-        </TouchableOpacity>
-      </View>
-    );
-  };
+   /*const CustomNumericInput = ({ value, onChange, minValue, maxValue }) => {
+    const handleIncrement = () => {
+      if (value < maxValue) {
+        onChange(value + 1);
+      }
+    };
+  
+    const handleDecrement = () => {
+      if (value > minValue) {
+        onChange(value - 1);
+      }
+    };
+  
+    return (
+      <View style={styles.customNumericContainer}>
+        <TouchableOpacity onPress={handleDecrement} style={styles.customNumericButton}>
+          <Text style={styles.customNumericButtonText}>-</Text>
+        </TouchableOpacity>
+        <View style={styles.customNumericInputView}>
+          <Text style={styles.customNumericValueText}>{value}</Text>
+        </View>
+        </TouchableOpacity>
+        </View>
+    );
+  };*/
   
   
   export default function CadastroVeiculo({ navigation }) {
     const [fontsLoaded, setFontsLoaded] = useState(false);
+    const [responsavel, setResponsavel] = useState<Responsavel | null>(null);
     const [modelo, setModelo] = useState('');
     const [placa, setPlaca] = useState('');
+    const [placaMask, setPlacaMask] = useState('AAA-9999'); 
     const [cor, setCor] = useState('');
-    const [assentos, setAssentos] = useState(1);
+    const [qtde_assentos, setQtdeAssentos] = useState('');
     const [errors, setErrors] = useState({});
+    const { url } = useApi();
+    const { logout } = useContext(AuthContext);
   
-    const handleCadastro = async () => {
-      if (validateForm()) {
-        try {
-          await getDados();
-        } catch (error) {
-          console.error("Erro no processo de cadastro (handleCadastro):", error);
+    const handlePlacaChange = (maskedText, rawText) => {
+        const text = rawText || '';
+        // Verifica o 5º caractere para decidir entre o padrão antigo e o Mercosul
+        if (text.length >= 5) {
+            const fifthChar = text.charAt(4);
+            if (/[a-zA-Z]/.test(fifthChar)) {
+                // Se for letra, usa a máscara Mercosul
+                setPlacaMask('AAA9A99');
+            } else {
+                // Se for número, usa a máscara antiga
+                setPlacaMask('AAA-9999');
+            }
+        } else {
+            // Volta para a máscara padrão se o texto for curto
+            setPlacaMask('AAA-9999');
         }
-      } else {
-        console.log('Formulário inválido, corrigindo erros:', errors);
-      }
+        setPlaca(maskedText.toUpperCase()); // Armazena o valor com máscara e em maiúsculas
     };
   
     const validateForm = () => {
@@ -94,12 +105,12 @@ import {
         isValid = false;
       }
   
-      const numAssentos = Number(assentos);
+      const numAssentos = Number(qtde_assentos);
       if (isNaN(numAssentos) || numAssentos < 1) {
-        newErrors.assentos = 'O carro deve ter pelo menos 1 assento.';
+        newErrors.qtde_assentos = 'O carro deve ter pelo menos 1 assento.';
         isValid = false;
       } else if (numAssentos > 7) {
-        newErrors.assentos = 'Um carro tem no máximo 7 assentos.';
+        newErrors.qtde_assentos = 'Um carro tem no máximo 7 assentos.';
         isValid = false;
       }
   
@@ -117,24 +128,75 @@ import {
   
     useEffect(() => {
       loadFonts();
+      fetchResponsavel();
     }, []);
   
-    const getDados = async () => {
+    const fetchResponsavel = async () => {
       try {
-        let { url } = useApi();
-        const response = await fetch(url + '/api/cadastrar', { // mudar rota
-          method: 'POST',
+        const token = await AsyncStorage.getItem("jwt");
+        if (!token) {
+          Alert.alert("Erro", "Você precisa estar logado.");
+          logout();
+          return;
+        }
+        
+        const id_resp = await AsyncStorage.getItem("id_responsavel");
+        if (!id_resp) {
+            Alert.alert("Erro", "ID do responsavel não encontrado. Por favor, faça o login novamente.");
+            logout();
+            return;
+        }
+        const res = await fetch(`${url}/api/responsaveis/${id_resp}`, {
+          method: "GET",
           headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ modelo, placa, cor, assentos }),
+            "Authorization": `Bearer ${token}`
+          }
         });
-        const dados = await response.json();
   
-        navigation.navigate("PerfilResponsavel");
-      } catch (error) {
-        console.error('Erro ao cadastrar veículo:', error);
+        if (!res.ok) {
+          Alert.alert("Erro", "Falha ao carregar dados.");
+          return;
+        }
+  
+        const data = await res.json();
+        setResponsavel(data);
+      }catch (err) {
+        console.error(err);
+        Alert.alert("Erro", "Não foi possível buscar os dados.");
       }
+    }; 
+
+    const handleCadastro  = async () => {
+        if (validateForm()) {
+        try {
+            await getDados();
+            navigation.navigate('PerfilResponsavel');
+        } catch (error) {
+            console.error("Erro no processo de cadastro (handleCadastro):", error);
+        }
+        } else {
+        console.log('Formulário inválido, corrigindo erros:', errors);
+        }
+    };
+
+    const getDados = async () => {
+        try{
+            const token = await AsyncStorage.getItem('jwt');
+            const id_resp = await AsyncStorage.getItem("id_responsavel");
+            let {url} = useApi();
+            const response = await fetch(url+'/api/cadastrarVeiculo', { 
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer '+token
+            },
+            body: JSON.stringify({modelo, placa, cor, qtde_assentos, id_resp}),
+            });
+            const text = await response.text();
+            console.log('Resposta da API (texto):', text);
+        } catch(error){
+            console.error('Erro ao cadastrar veiculo:', error);
+        }
     };
   
     if (!fontsLoaded) {
@@ -152,15 +214,19 @@ import {
   
         <View style={styles.content}>
           <View style={styles.formContainer}>
-            <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+            <View style={styles.topo}>
+              <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
               <MaterialIcons name="arrow-back" size={28} color="#000" />
-            </TouchableOpacity>
+              </TouchableOpacity>
+              <Text style={styles.tituloAba}>Veículo</Text>
+            </View>
+            
             <ScrollView
               contentContainerStyle={styles.scrollContent}
               keyboardShouldPersistTaps="handled"
               showsVerticalScrollIndicator={false}
             >
-              <Text style={styles.tituloAba}>Veículo</Text>
+              
               <View style={styles.inputGroup}>
                 <Text style={styles.label}>Modelo:</Text>
                 <TextInput
@@ -178,15 +244,17 @@ import {
                     style={styles.input}
                     type={'custom'}
                     options={{
-                        mask: placa.length > 7 ? 'XXX-1234' : 'XXX-1X23' //OLIVIA ARRUMAR
-                    }}
-                    placeholder="XXX-1234 / XXX-1X23"
-                    placeholderTextColor="#888"
-                    value={placa}
-                    onChangeText={setPlaca}
+                    // 'S' aceita letras e números, permitindo ambos os formatos de placa
+                        mask: 'AAA-9S99' 
+                      }}
+                      placeholder="ABC-1234 ou ABC-1D23"
+                      placeholderTextColor="#888"
+                      value={placa}
+                      onChangeText={text => setPlaca(text.toUpperCase())}
+                      autoCapitalize="characters"
                 />
-                {errors.placa && <Text style={styles.errorText}>{errors.placa}</Text>}
               </View>
+              {errors.placa && <Text style={styles.errorText}>{errors.placa}</Text>}
               <View style={styles.inputGroup}>
                 <Text style={styles.label}>Cor:</Text>
                 <TextInput
@@ -200,15 +268,16 @@ import {
               </View>
               
               <View style={styles.inputGroup}>
-                <Text style={styles.label}>Assentos:</Text>
-                <CustomNumericInput
-                  value={assentos}
-                  onChange={setAssentos}
-                  minValue={1}
-                  maxValue={7}
-                />
-                {errors.assentos && <Text style={styles.errorText}>{errors.assentos}</Text>}
+                <Text style={styles.label}>Assentos Disponíveis:</Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder="Digite a quantidade de assentos:"
+                  placeholderTextColor="#888"
+                  value={qtde_assentos}
+                  onChangeText={setQtdeAssentos}
+                /> 
               </View>
+              {errors.qtde_assentos && <Text style={styles.errorText}>{errors.qtde_assentos}</Text>}
   
             </ScrollView>
           </View>
@@ -256,15 +325,19 @@ import {
       margin: '5%',
     },
     inputGroup: {
-      padding: '1%',
       marginBottom: '2%',
+      padding:'1%'
     },
     label: {
       fontWeight: 'bold',
       fontSize: 16,
-      marginBottom: '5%',
+      marginBottom: '3%',
       fontFamily: 'PoppinsRegular',
       textAlign: 'center',
+    },
+    topo: {
+      flexDirection:'row',
+      gap: '24.6%',
     },
     input: {
       backgroundColor: '#d9d9d9',
@@ -284,10 +357,9 @@ import {
     },
     tituloAba: {
       fontFamily: 'PoppinsBold',
-      fontSize: 16,
-      color: '#3D3D3D',
-      textAlign: 'center',
-      marginBottom: 20,
+      fontSize: 20,
+      color: '#333',
+      marginBottom: 10,
     },
     button: {
       backgroundColor: '#FFBE31',
@@ -320,45 +392,44 @@ import {
       fontFamily: 'PoppinsRegular',
       textAlign: 'center',
     },
-    // Estilos para o novo componente customizado
     customNumericContainer: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'center',
-      alignSelf: 'center',
-      backgroundColor: '#d9d9d9',
-      borderRadius: 25,
-      height: 50,
-      width: 200,
-      shadowColor: "#000",
-      shadowOffset: {
-        width: 0,
-        height: 3,
-      },
-      shadowOpacity: 0.27,
-      shadowRadius: 4.65,
-      elevation: 6,
-    },
-    customNumericButton: {
-      width: 60,
-      height: '100%',
-      justifyContent: 'center',
-      alignItems: 'center',
-    },
-    customNumericButtonText: {
-      fontSize: 24,
-      fontWeight: 'bold',
-      color: '#3D3D3D',
-    },
-    customNumericInput: {
-      flex: 1,
-      height: '100%',
-      fontSize: 20,
-      fontFamily: 'PoppinsBold',
-      color: '#3D3D3D',
-      borderLeftWidth: 1,
-      borderRightWidth: 1,
-      borderColor: '#c4c4c4'
-    },
+  		flexDirection: 'row',
+  		alignItems: 'center',
+  		justifyContent: 'center',
+  		alignSelf: 'center',
+  		backgroundColor: '#d9d9d9',
+  		borderRadius: 25,
+  		height: 50,
+  		width: '60%',
+  		shadowColor: "#000",
+  		shadowOffset: {
+  			width: 0,
+  			height: 3,
+  		},
+  		shadowOpacity: 0.27,
+  		shadowRadius: 4.65,
+  		elevation: 6,
+  	},
+  	customNumericButton: {
+  		width: '40%',
+  		height: '100%',
+  		justifyContent: 'center',
+  		alignItems: 'center',
+  	},
+  	customNumericButtonText: {
+  		fontSize: 24,
+  		fontWeight: 'bold',
+  		color: '#3D3D3D',
+  	},
+  	customNumericInputView: {
+  		height: '100%',
+  		justifyContent: 'center',
+      alignItems:'center'
+  	},
+  	customNumericValueText: {
+  		fontSize: 20,
+  		fontFamily: 'PoppinsBold',
+  		color: '#3D3D3D',
+  	},
   });
   

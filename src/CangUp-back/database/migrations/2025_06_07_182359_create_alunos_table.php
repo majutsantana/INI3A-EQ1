@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('email')->nullable();
             $table->string('sexo')->nullable();
             $table->string('endereco')->nullable();
+            $table->string('telefone')->nullable();
             $table->unsignedInteger('id_inst');
             $table->foreign('id_inst')->references('id')->on('instituicoes')->onDelete('cascade');
             $table->timestamps();
