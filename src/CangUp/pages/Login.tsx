@@ -7,6 +7,9 @@ import FooterSemIcones from '../components/FooterSemIcones';
 import { Picker } from '@react-native-picker/picker';
 import useApi from '../hooks/useApi';
 import { AuthContext } from '../components/AuthContext';
+import { Switch } from 'react-native-elements';
+import { useTheme } from '../context/ThemeContext';
+import getStyles from './style'; // Importe a função que retorna os estilos
 
 type _perfil = {
   rotulo: string,
@@ -14,7 +17,7 @@ type _perfil = {
   id: number
 }
 
-export default function Login({ navigation }) { //bug, não está dando erro 
+export default function Login({ navigation }) {
   const [fontsLoaded, setFontsLoaded] = useState<boolean>(false);
   const [username, setusername] = useState<string>('');
   const [senha, setSenha] = useState<string>('');
@@ -24,6 +27,10 @@ export default function Login({ navigation }) { //bug, não está dando erro
   const [modalVisible, setModalVisible] = useState(false);
   const [emailRecuperacao, setEmailRecuperacao] = useState('');
   const { login: contextLogin } = useContext(AuthContext);
+  const { theme, toggleTheme, colors } = useTheme();
+
+  // Chame a função getStyles dentro do componente para obter o objeto de estilos
+  const styles = getStyles();
 
   const toggleSenhaVisibilidade = () => {
     setSenhaVisivel(!senhaVisivel);
@@ -117,14 +124,30 @@ export default function Login({ navigation }) { //bug, não está dando erro
       {/*HEADER COM IMAGEM*/}
       <View style={styles.header}>
         <Image
-          source={require('../assets/logocangUp-horizontal-claro.png')}
+          source={theme == "light" ? require('../assets/logocangUp-horizontal-claro.png') : require('../assets/logocangUp-horizontal-escuro.svg')}
           style={styles.image}
         />
       </View>
 
       {/*BODY*/}
       <View style={styles.body}>
-        <Text style={styles.title}>Bem-vindo de volta!</Text>
+        <View style={styles.inputgroup}>
+          <Text style={styles.title}>Bem-vindo de volta!</Text>
+        </View>
+
+        {/* CONTROLE DE TEMA */}
+        <View style={styles.switchContainer}>
+          <Text style={[styles.text, { color: colors.text }]}>
+            Alternar tema
+          </Text>
+          <Switch
+            value={theme === 'dark'}
+            onValueChange={toggleTheme}
+            trackColor={{ false: '#767577', true: colors.primary }}
+            thumbColor={theme === 'dark' ? '#f4f3f4' : '#f4f3f4'}
+          />
+        </View>
+
         <View style={styles.pickerWrapper}>
           <Picker
             selectedValue={tipoDeLogin}
@@ -195,24 +218,25 @@ export default function Login({ navigation }) { //bug, não está dando erro
         }}>
           <View style={{
             width: '85%',
-            backgroundColor: '#fff',
+            backgroundColor: colors.background, // Cor do modal agora é dinâmica
             borderRadius: 20,
             padding: 20,
             alignItems: 'center',
-            shadowColor: '#000',
+            shadowColor: colors.text,
             shadowOffset: { width: 0, height: 2 },
             shadowOpacity: 0.25,
             shadowRadius: 4,
             elevation: 5,
           }}>
-            <Text style={{ fontSize: 18, fontFamily: 'PoppinsBold', marginBottom: 10 }}>
+            <Text style={{ fontSize: 18, fontFamily: 'PoppinsBold', marginBottom: 10, color: colors.text }}>
               Recuperar Senha
             </Text>
 
             <TextInput
               style={{
                 width: '100%',
-                backgroundColor: '#d9d9d9',
+                backgroundColor: theme === 'light' ? '#d9d9d9' : '#555555',
+                color: colors.text,
                 padding: 12,
                 borderRadius: 10,
                 fontFamily: 'PoppinsRegular',
@@ -226,7 +250,7 @@ export default function Login({ navigation }) { //bug, não está dando erro
 
             <TouchableOpacity
               style={{
-                backgroundColor: '#FFBE31',
+                backgroundColor: theme === 'light' ? '#FFBE31' : '#E8A326',
                 paddingVertical: 10,
                 paddingHorizontal: 20,
                 borderRadius: 10,
@@ -241,11 +265,11 @@ export default function Login({ navigation }) { //bug, não está dando erro
                 setEmailRecuperacao('');
               }}
             >
-              <Text style={{ fontFamily: 'PoppinsBold', color: '#000' }}>Enviar</Text>
+              <Text style={{ fontFamily: 'PoppinsBold', color: colors.text }}>Enviar</Text>
             </TouchableOpacity>
 
             <TouchableOpacity onPress={() => setModalVisible(false)}>
-              <Text style={{ fontFamily: 'PoppinsRegular', color: '#522a91' }}>Cancelar</Text>
+              <Text style={{ fontFamily: 'PoppinsRegular', color: theme === 'light' ? '#522a91' : '#BB86FC' }}>Cancelar</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -255,154 +279,3 @@ export default function Login({ navigation }) { //bug, não está dando erro
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#FFD992',
-  },
-  header: {
-    height: '25%',
-    backgroundColor: '#BEACDE',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  body: {
-    flex: 1,
-    margin: '10%',
-    backgroundColor: '#f3f3f3',
-    borderRadius: 30,
-    padding: '5%',
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 2, height: 6 },
-    shadowOpacity: 0.15,
-    shadowRadius: 4.65,
-    elevation: 1,
-  },
-  title: {
-    fontSize: 20,
-    fontFamily: 'PoppinsBold',
-    paddingBottom:'5%',
-  },
-  input: {
-    backgroundColor: '#d9d9d9',
-    width: '90%',
-    padding: '5%',
-    borderRadius: 30,
-    marginTop: '10%',
-    paddingLeft: '5%',
-    fontFamily: 'PoppinsRegular',
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.27,
-    shadowRadius: 4.65,
-    elevation: 6,
-  },
-  passwordContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#d9d9d9',
-    width: '90%',
-    borderRadius: 30,
-    marginTop: '10%',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.27,
-    shadowRadius: 4.65,
-    elevation: 6,
-  },
-  passwordInput: {
-    flex: 1,
-    padding: '5%',
-    paddingLeft: '5%',
-    fontFamily: 'PoppinsRegular',
-    color: '#000',
-  },
-  eyeIcon: {
-    paddingRight: '5%',
-  },
-  button: {
-    backgroundColor: '#FFBE31',
-    paddingVertical: '5%',
-    paddingHorizontal: '10%',
-    width: '60%',
-    borderRadius: 20,
-    marginTop: '10%',
-    marginBottom: '10%',
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.27,
-    shadowRadius: 4.65,
-    elevation: 6,
-  },
-  buttonText: {
-    color: '#000',
-    fontSize: 18,
-    textAlign: 'center',
-    fontFamily: 'PoppinsRegular',
-  },
-  linkText: {
-    color: '#522a91',
-    fontFamily: 'PoppinsBold',
-    textAlign: 'center',
-  },
-  registerText: {
-    textAlign: 'center',
-    fontFamily: 'PoppinsRegular',
-    display: 'flex',
-    alignItems: 'center',
-  },
-  footer: {
-    height: '8%',
-    backgroundColor: '#BEACDE',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: '5%',
-  },
-  image: {
-    width: '80%',
-    height: '100%',
-  },
-  inputgroup: {
-    width: '100%',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingBottom: '5%',
-  },
-  iconButton: {
-    padding: 5,
-    fontFamily: 'PoppinsRegular',
-    flexDirection: 'row',
-    columnGap: 10,
-    fontSize: 14,
-    alignItems: 'center',
-    color: '#888',
-  },
-  picker: {
-    width: '100%',
-    fontSize: 16,
-    fontFamily: 'PoppinsRegular',
-    backgroundColor: '#d9d9d9',
-    borderWidth: 0,
-  },
-  pickerWrapper: {
-    width:'90%',
-    height:'11%',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal:'4%',
-    borderRadius: 25,
-    overflow: 'hidden',
-    backgroundColor: '#d9d9d9',
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 3,
-    },
-    shadowOpacity: 0.27,
-    shadowRadius: 4.65,
-    elevation: 6,
-  },
-});
