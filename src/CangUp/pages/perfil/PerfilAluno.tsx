@@ -8,8 +8,7 @@ import {
     TouchableOpacity,
     Alert,
     ActivityIndicator,
-    ScrollView,
-    Platform
+    ScrollView
 } from 'react-native';
 import * as Font from 'expo-font';
 import HeaderComLogout from '../../components/HeaderComLogout';
@@ -398,7 +397,7 @@ const styles = StyleSheet.create({
     viewingModeInput: {
       backgroundColor: '#F5F5F5',
       color: '#000'
-    },
+    },  
     cepContainer: {
         flexDirection: 'row',
         alignItems: 'center',
