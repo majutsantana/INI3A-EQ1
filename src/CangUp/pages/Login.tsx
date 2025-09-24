@@ -2,7 +2,7 @@ import { Image, StyleSheet, Text, TextInput, View, TouchableOpacity, ActivityInd
 import * as Font from 'expo-font';
 import { useContext, useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Feather } from '@expo/vector-icons';
+import { Feather, FontAwesome } from '@expo/vector-icons';
 import FooterSemIcones from '../components/FooterSemIcones';
 import { Picker } from '@react-native-picker/picker';
 import useApi from '../hooks/useApi';
@@ -131,22 +131,16 @@ export default function Login({ navigation }) {
 
       {/*BODY*/}
       <View style={styles.body}>
-        <View style={styles.inputgroup}>
-          <Text style={styles.title}>Bem-vindo de volta!</Text>
-        </View>
-
-        {/* CONTROLE DE TEMA */}
-        <View style={styles.switchContainer}>
-          <Text style={[styles.text, { color: colors.text }]}>
-            Alternar tema
-          </Text>
-          <Switch
-            value={theme === 'dark'}
-            onValueChange={toggleTheme}
-            trackColor={{ false: '#767577', true: colors.primary }}
-            thumbColor={theme === 'dark' ? '#f4f3f4' : '#f4f3f4'}
-          />
-        </View>
+          <View style={styles.olivia}>
+            <Text style={styles.title}>Bem-vindo de volta!    </Text>
+            <TouchableOpacity onPress={toggleTheme}>
+              {theme === 'dark' ? (
+                <FontAwesome name="moon-o" size={28} color={colors.text} />
+              ) : (
+                <Feather name="sun" size={28} color={colors.text} />
+              )}
+            </TouchableOpacity>
+          </View>
 
         <View style={styles.pickerWrapper}>
           <Picker
@@ -154,7 +148,7 @@ export default function Login({ navigation }) {
             onValueChange={(itemValue) => setTipoDeLogin(itemValue)}
             style={[
               styles.picker,
-              { color: tipoDeLogin === '' ? '#888' : '#000' }
+              { color: tipoDeLogin === '' ? '#5B5B5B' : '#000' }
             ]}
           >
             <Picker.Item label="Selecione o tipo de Login" value="" />
@@ -165,7 +159,7 @@ export default function Login({ navigation }) {
         <TextInput
           style={styles.input}
           placeholder="Email"
-          placeholderTextColor="#888"
+          placeholderTextColor="#5B5B5B"
           value={username}
           onChangeText={setusername}
         />
@@ -173,7 +167,7 @@ export default function Login({ navigation }) {
           <TextInput
             style={styles.passwordInput}
             placeholder="Senha"
-            placeholderTextColor="#888"
+            placeholderTextColor="#5B5B5B"
             value={senha}
             onChangeText={setSenha}
             secureTextEntry={!senhaVisivel}

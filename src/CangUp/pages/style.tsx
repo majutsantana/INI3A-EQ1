@@ -3,29 +3,28 @@ import { StyleSheet } from 'react-native';
 import { useTheme } from '../context/ThemeContext'; // Importe o hook useTheme
 
 const styles = () => {
-  // Use o hook para acessar o tema e as cores
   const { theme, colors } = useTheme();
 
   return StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: theme === 'light' ? '#FFD992' : '#522a91', // Cor de fundo principal
+      backgroundColor: theme === 'light' ? '#FFD992' : '#4F2E89', // Cor de fundo principal
     },
     header: {
       height: '25%',
-      backgroundColor: theme === 'light' ? '#BEACDE' : '#BEACDE', // Cor do cabeçalho
+      backgroundColor: theme === 'light' ? '#BEACDE' : '#251541', // Cor do cabeçalho
       alignItems: 'center',
       justifyContent: 'center',
     },
     body: {
       flex: 1,
       margin: '10%',
-      backgroundColor: colors.background,
+      backgroundColor: theme === 'light' ? '#F3F3F3' : '#313233',
       borderRadius: 30,
       padding: '5%',
       justifyContent: 'center',
       alignItems: 'center',
-      shadowColor: colors.text,
+      shadowColor: '#000',
       shadowOffset: { width: 2, height: 6 },
       shadowOpacity: 0.15,
       shadowRadius: 4.65,
@@ -34,18 +33,18 @@ const styles = () => {
     title: {
       fontSize: 20,
       fontFamily: 'PoppinsBold',
-      color: colors.text,
+      color: theme === 'light' ? '#000' : '#EEEEEE',
     },
     input: {
-      backgroundColor: theme === 'light' ? '#d9d9d9' : '#555555',
-      color: colors.text,
+      backgroundColor: theme === 'light' ? '#d9d9d9' : '#B9B9B9',
+      color: '#888',
       width: '90%',
       padding: '5%',
       borderRadius: 30,
       marginTop: '10%',
       paddingLeft: '5%',
       fontFamily: 'PoppinsRegular',
-      shadowColor: colors.text,
+      shadowColor: '#000',
       shadowOffset: { width: 0, height: 3 },
       shadowOpacity: 0.27,
       shadowRadius: 4.65,
@@ -54,11 +53,11 @@ const styles = () => {
     passwordContainer: {
       flexDirection: 'row',
       alignItems: 'center',
-      backgroundColor: theme === 'light' ? '#d9d9d9' : '#555555',
+      backgroundColor: theme === 'light' ? '#d9d9d9' : '#B9B9B9',
       width: '90%',
       borderRadius: 30,
       marginTop: '10%',
-      shadowColor: colors.text,
+      shadowColor: '#000',
       shadowOffset: { width: 0, height: 3 },
       shadowOpacity: 0.27,
       shadowRadius: 4.65,
@@ -83,14 +82,14 @@ const styles = () => {
       borderRadius: 20,
       marginTop: '10%',
       marginBottom: '10%',
-      shadowColor: colors.text,
+      shadowColor: '#000',
       shadowOffset: { width: 0, height: 3 },
       shadowOpacity: 0.27,
       shadowRadius: 4.65,
       elevation: 6,
     },
     buttonText: {
-      color: colors.text,
+      color: '#000',
       fontSize: 18,
       textAlign: 'center',
       fontFamily: 'PoppinsRegular',
@@ -109,7 +108,7 @@ const styles = () => {
     },
     footer: {
       height: '8%',
-      backgroundColor: theme === 'light' ? '#BEACDE' : '#522a91',
+      backgroundColor: theme === 'light' ? '#BEACDE' : '#251541',
       alignItems: 'center',
       justifyContent: 'center',
       padding: '5%',
@@ -137,19 +136,17 @@ const styles = () => {
       width: '100%',
       fontSize: 16,
       fontFamily: 'PoppinsRegular',
-      backgroundColor: theme === 'light' ? '#d9d9d9' : '#555555',
+      backgroundColor: theme === 'light' ? '#d9d9d9' : '#B9B9B9',
       borderWidth: 0,
-      color: colors.text,
+      color: colors.text, 
     },
     pickerWrapper: {
-      alignItems: 'center',
-      justifyContent: 'center',
-      paddingHorizontal: '5%',
-      paddingVertical: '5%',
+      paddingHorizontal: '6.6%',
+      paddingVertical: '4.2%',
       borderRadius: 25,
       overflow: 'hidden',
-      backgroundColor: theme === 'light' ? '#d9d9d9' : '#555555',
-      shadowColor: colors.text,
+      backgroundColor: theme === 'light' ? '#d9d9d9' : '#B9B9B9',
+      shadowColor: '#000',
       shadowOffset: {
         width: 0,
         height: 3,
@@ -166,8 +163,12 @@ const styles = () => {
     switchContainer: {
       flexDirection: 'row',
       alignItems: 'center',
-      marginTop: 20,
+      marginTop: '1%',
     },
+    olivia:{
+      flexDirection: 'row',
+      marginBottom: '5%',
+    }
   });
 };
 
