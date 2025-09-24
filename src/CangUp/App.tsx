@@ -43,7 +43,7 @@ const AppStack = () => {
 
   const getInitialRoute = () => {
     if (userProfile === "adm") return "ListaInstituicoes";
-    if (userProfile === "inst") return "PerfilInstituicao";
+    if (userProfile === "inst") return "ListaUsuarios";
     if (userProfile === "alun") return "PerfilAluno";
     if (userProfile === "resp") return "PerfilResponsavel";
   };

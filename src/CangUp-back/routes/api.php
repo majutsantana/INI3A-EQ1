@@ -12,34 +12,6 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\ResponsavelController;
 use App\Http\Controllers\VeiculoController;
 
-
-/*
-|--------------------------------------------------------------------------
-| API Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register API routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "api" middleware group. Make something great!
-|
-*/
-
-
-// A rota padrão do Sanctum foi comentada pois não está em uso no projeto.
-// Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-//     return $request->user();
-// });
-
-
-
-
-//======================================================================
-// ROTAS PÚBLICAS (Não precisam de autenticação)
-//======================================================================
-
-
-
-
 // Rota pública de login
 // --- Autenticação e Recuperação de Senha ---
 Route::post('/login', [LoginController::class, 'login']);

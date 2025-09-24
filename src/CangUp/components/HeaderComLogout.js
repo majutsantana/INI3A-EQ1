@@ -8,7 +8,7 @@ const HeaderComLogout = () => {
   const { logout } = useContext(AuthContext);
 
   const handleLogout = () => {
-    if (window.confirm("Você deseja mesmo sair?")) {
+    if (window.confirm("Você deseja mesmo sair?")) { //nao funciona em mobile
       logout();
     }
   };

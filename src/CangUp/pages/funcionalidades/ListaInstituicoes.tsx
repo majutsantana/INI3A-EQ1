@@ -9,6 +9,7 @@ import {
     ActivityIndicator,
     TextInput,
     TouchableOpacity,
+    Alert,
 } from 'react-native';
 import * as Font from 'expo-font';
 import { Feather } from '@expo/vector-icons';
@@ -16,6 +17,7 @@ import HeaderComLogout from '../../components/HeaderComLogout';
 import FooterComIcones from '../../components/FooterComIcones';
 import useApi from '../../hooks/useApi';
 import { AuthContext } from '../../components/AuthContext';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 type Instituicao = {
     id: number;
@@ -25,13 +27,13 @@ type Instituicao = {
     plano: string;
 }
 
-    export default function FuncionalidadesAlunoResponsavel({navigation}) {
+    export default function ListaInstituicoes({navigation}) {
     const [fontsLoaded, setFontsLoaded] = useState(false);
     const [instituicoes, setInstituicoes] = useState<Instituicao[]>([]);
     const [loading, setLoading] = useState(true);
     const [busca, setBusca] = useState('');
     const { url } = useApi();
-    const { logout } = useContext(AuthContext);
+    const { logout, token } = useContext(AuthContext);
 
     // Carregar fontes
     const loadFonts = async () => {
@@ -75,6 +77,36 @@ type Instituicao = {
         }
     };
     
+    const handleExcluirInstituicao = async (id: number, nome: string) => {
+        if (confirm("Deseja mesmo excluir a instituicao "+nome+"?")){
+            console.log(`Iniciando exclusão direta para a instituição ID: ${id}`);
+            try {
+                const token = await AsyncStorage.getItem('jwt');
+                const response = await fetch(`${url}/api/instituicoes/${id}`, {
+                    method: "DELETE",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${token}`, 
+                    },
+                });
+        
+                if (!response.ok) {
+                    const errorBody = await response.text();
+                    throw new Error(`Falha na API: ${response.status} - ${errorBody}`);
+                }
+        
+                setInstituicoes(prevInstituicoes =>
+                    prevInstituicoes.filter(inst => inst.id !== id)
+                );
+        
+                console.log(`Instituição ID: ${id} excluída com sucesso.`);
+        
+            } catch (error) {
+                console.error("Erro durante o processo de exclusão:", error);
+            }
+        }
+    };
+      
 
     if (!fontsLoaded || loading) {
         return (
@@ -110,6 +142,9 @@ type Instituicao = {
                 ) : (
                     instituicoesFiltradas.map((inst) => (
                         <View key={inst.id} style={styles.cardInstituicao}>
+                        <TouchableOpacity style={styles.fabExcluir} onPress={() => handleExcluirInstituicao(inst.id, inst.nome)}>
+                            <Feather name="trash-2" size={18} color="#fff" />
+                        </TouchableOpacity>
                             <Text style={styles.nomeInstituicao}>{inst.nome}</Text>
                             <Text style={styles.infoInstituicao}> 📧 {inst.email}</Text>
                             <Text style={styles.infoInstituicao}> 📍 {inst.endereco}</Text>
@@ -169,6 +204,7 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.1,
         shadowRadius: 5,
         elevation: 2,
+        position: "relative"
     },
     nomeInstituicao: {
         fontFamily: 'PoppinsBold',
@@ -202,5 +238,19 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.3,
         shadowOffset: { width: 0, height: 3 },
         shadowRadius: 4,
+        },
+        fabExcluir: {
+            position: "absolute",
+            top: 10,
+            right: 10,
+            backgroundColor: "#E53935", // vermelho
+            borderRadius: 20,
+            padding: 10,
+            elevation: 5,
+            zIndex: 10,
+            shadowColor: "#000",
+            shadowOpacity: 0.2,
+            shadowOffset: { width: 0, height: 2 },
+            shadowRadius: 3,
         },
 });
