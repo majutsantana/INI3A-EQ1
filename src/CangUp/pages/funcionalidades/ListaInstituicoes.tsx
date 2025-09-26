@@ -18,6 +18,8 @@ import FooterComIcones from '../../components/FooterComIcones';
 import useApi from '../../hooks/useApi';
 import { AuthContext } from '../../components/AuthContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useTheme } from '../../context/ThemeContext';
+// import getStyles from './../style'; // Importe a função que retorna os estilos
 
 type Instituicao = {
     id: number;
@@ -34,6 +36,10 @@ type Instituicao = {
     const [busca, setBusca] = useState('');
     const { url } = useApi();
     const { logout, token } = useContext(AuthContext);
+    const { theme, toggleTheme, colors } = useTheme();
+    
+    //  const global = getStyles();
+
 
     // Carregar fontes
     const loadFonts = async () => {
@@ -69,9 +75,9 @@ type Instituicao = {
 
     const verificaPlano = (plano: string) => {
         if (plano === 'A') {
-            return <Text style={styles.infoInstituicao}>Plano: Anual</Text>;
+            return <Text style={theme == "light" ? styles.infoInstituicao : styles.infoInstituicaoDark}>Plano: Anual</Text>;
         } else if (plano === 'S') {
-            return <Text style={styles.infoInstituicao}>Plano: Semestral</Text>;
+            return <Text style={theme == "light" ? styles.infoInstituicao : styles.infoInstituicaoDark}>Plano: Semestral</Text>;
         } else {
             return null;
         }
@@ -122,15 +128,15 @@ type Instituicao = {
     ); 
 
     return (
-        <SafeAreaView style={styles.safeArea}>
+        <SafeAreaView style={theme == "light" ? styles.safeArea : styles.safeAreaDark}>
             <HeaderComLogout />
 
             <ScrollView contentContainerStyle={styles.scrollViewContainer}>
-                <Text style={styles.tituloAba}>Instituições</Text>
+                <Text style={theme == "light" ? styles.tituloAba : styles.tituloAbaDark}>Instituições</Text>
 
                 {/* Campo de busca */}
                 <TextInput
-                    style={styles.inputBusca}
+                    style={theme == 'light' ? styles.inputBusca : styles.inputBuscaDark}
                     placeholder="Buscar instituição..."
                     placeholderTextColor="#888"
                     value={busca}
@@ -138,22 +144,22 @@ type Instituicao = {
                 />
 
                 {instituicoesFiltradas.length === 0 ? (
-                    <Text style={styles.textoDia}>Nenhuma instituição encontrada.</Text>
+                    <Text style={theme == 'dark' ? styles.textoDiaDark : styles.textoDia}>Nenhuma instituição encontrada.</Text>
                 ) : (
                     instituicoesFiltradas.map((inst) => (
-                        <View key={inst.id} style={styles.cardInstituicao}>
-                        <TouchableOpacity style={styles.fabExcluir} onPress={() => handleExcluirInstituicao(inst.id, inst.nome)}>
+                        <View key={inst.id} style={theme == 'light' ? styles.cardInstituicao: styles.inputBuscaDark}>
+                        <TouchableOpacity style={theme == 'dark' ? styles.fabExcluirDark : styles.fabExcluir} onPress={() => handleExcluirInstituicao(inst.id, inst.nome)}>
                             <Feather name="trash-2" size={18} color="#fff" />
                         </TouchableOpacity>
-                            <Text style={styles.nomeInstituicao}>{inst.nome}</Text>
-                            <Text style={styles.infoInstituicao}> 📧 {inst.email}</Text>
-                            <Text style={styles.infoInstituicao}> 📍 {inst.endereco}</Text>
+                            <Text style={theme == 'dark' ? styles.nomeInstituicaoDark : styles.nomeInstituicao }>{inst.nome}</Text>
+                            <Text style={theme == "light" ? styles.infoInstituicao : styles.infoInstituicaoDark}> 📧 {inst.email}</Text>
+                            <Text style={theme == "light" ? styles.infoInstituicao : styles.infoInstituicaoDark}> 📍 {inst.endereco}</Text>
                             {verificaPlano(inst.plano)}                        
                         </View>
                     ))
                 )}
             </ScrollView>
-            <TouchableOpacity activeOpacity={0.8} style={styles.fab} onPress={() => navigation.navigate(`CadastroInstituicao`)} accessibilityLabel="Adicionar">
+            <TouchableOpacity activeOpacity={0.8} style={theme == "light" ? styles.fab : styles.fabDark} onPress={() => navigation.navigate(`CadastroInstituicao`)} accessibilityLabel="Adicionar">
                 <Feather name="plus" size={28} color="#fff" />
             </TouchableOpacity>
 
@@ -166,6 +172,9 @@ const styles = StyleSheet.create({
     safeArea: {
         flex: 1,
         backgroundColor: '#FCD28D',
+    },safeAreaDark: {
+        flex: 1,
+        backgroundColor: '#522a91',
     },
     loadingContainer: {
         flex: 1,
@@ -184,6 +193,13 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         marginBottom: 20,
     },
+    tituloAbaDark: {
+        fontFamily: 'PoppinsBold',
+        fontSize: 18,
+        color: 'white',
+        textAlign: 'center',
+        marginBottom: 20,
+    },
     inputBusca: {
         backgroundColor: '#FFF',
         borderRadius: 15,
@@ -195,10 +211,32 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderColor: '#DDD',
     },
+    inputBuscaDark: {
+        backgroundColor: '#555555',
+        borderRadius: 15,
+        padding: 12,
+        fontFamily: 'PoppinsRegular',
+        fontSize: 14,
+        color: '#FFF',
+        marginBottom: 20,
+        borderWidth: 1,
+        borderColor: '#333',
+    },
     cardInstituicao: {
         marginBottom: 15,
         padding: 15,
         backgroundColor: '#FFF',
+        borderRadius: 15,
+        shadowColor: '#000',
+        shadowOpacity: 0.1,
+        shadowRadius: 5,
+        elevation: 2,
+        position: "relative"
+    },
+    cardInstituicaoDark: {
+        marginBottom: 15,
+        padding: 15,
+        backgroundColor: '#333',
         borderRadius: 15,
         shadowColor: '#000',
         shadowOpacity: 0.1,
@@ -212,10 +250,21 @@ const styles = StyleSheet.create({
         color: '#522a91',
         marginBottom: 8,
     },
+    nomeInstituicaoDark: {
+        fontFamily: 'PoppinsBold',
+        fontSize: 16,
+        color: '#E8A326',
+        marginBottom: 8,
+    },
     infoInstituicao: {
         fontFamily: 'PoppinsRegular',
         fontSize: 14,
         color: '#333',
+    },
+    infoInstituicaoDark: {
+        fontFamily: 'PoppinsRegular',
+        fontSize: 14,
+        color: '#FFF',
     },
     textoDia: {
         fontFamily: 'PoppinsRegular',
@@ -243,7 +292,43 @@ const styles = StyleSheet.create({
             position: "absolute",
             top: 10,
             right: 10,
-            backgroundColor: "#E53935", // vermelho
+            backgroundColor: "#E53935", // vermelho do excluir
+            borderRadius: 20,
+            padding: 10,
+            elevation: 5,
+            zIndex: 10,
+            shadowColor: "#000",
+            shadowOpacity: 0.2,
+            shadowOffset: { width: 0, height: 2 },
+            shadowRadius: 3,
+        },
+        textoDiaDark: {
+        fontFamily: 'PoppinsRegular',
+        fontSize: 14,
+        color: 'black',
+        textAlign: 'center',
+    },
+    fabDark: {
+        position: 'absolute',
+        right: 20,
+        bottom: 90, // sobe acima do footer
+        width: 60,
+        height: 60,
+        borderRadius: 30,
+        backgroundColor: '#E8A326',
+        justifyContent: 'center',
+        alignItems: 'center',
+        elevation: 6,
+        shadowColor: '#000',
+        shadowOpacity: 0.3,
+        shadowOffset: { width: 0, height: 3 },
+        shadowRadius: 4,
+        },
+        fabExcluirDark: {
+            position: "absolute",
+            top: 10,
+            right: 10,
+            backgroundColor: "#E53935", // vermelho do excluir
             borderRadius: 20,
             padding: 10,
             elevation: 5,

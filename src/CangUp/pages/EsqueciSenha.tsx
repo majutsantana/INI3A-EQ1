@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import { useTheme } from '../context/ThemeContext';
 
 export default function RedefinirSenha({ navigation }) { //Navigation não está dando erro, é bug
   const [email, setEmail] = useState('');
   const [token, setToken] = useState('');
   const [senha, setSenha] = useState('');
   const [confirmarSenha, setConfirmarSenha] = useState('');
+  
 
   const handleRedefinirSenha = async () => {
     if (!email || !token || !senha || !confirmarSenha) {

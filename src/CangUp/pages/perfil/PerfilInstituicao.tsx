@@ -11,6 +11,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import useApi from '../../hooks/useApi';
 import { TextInputMask } from 'react-native-masked-text';
 import { AuthContext } from '../../components/AuthContext';
+import { useTheme } from '../../context/ThemeContext';
 
 type Instituicao = {
     id: number;
@@ -31,6 +32,7 @@ export default function PerfilInstituicao({ navigation }) {
     const [errors, setErrors] = useState<{ telefone?: string, cep?: string }>({});
     const { url } = useApi();
     const {logout} = useContext(AuthContext);
+    const { theme, toggleTheme, colors } = useTheme();
 
     // --- ESTADOS PARA EDIÇÃO DO ENDEREÇO ---
     const [cep, setCep] = useState('');
@@ -194,6 +196,7 @@ export default function PerfilInstituicao({ navigation }) {
 
     return (
         <SafeAreaView style={styles.safeArea}>
+            {theme}
             <HeaderComLogout />
             <View>
                 <View style={styles.profileTop}><View style={styles.nameTag}><Text style={styles.nameText}>{instituicao.nome}</Text></View></View>
