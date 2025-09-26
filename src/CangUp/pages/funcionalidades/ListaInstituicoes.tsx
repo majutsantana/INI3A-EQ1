@@ -48,10 +48,16 @@ type Instituicao = {
         }
     };
 
-    // Buscar instituições no backend
     const fetchInstituicoes = async () => {
         try {
-            const response = await fetch(`${url}/api/instituicoes`); // ajuste o endpoint se precisar
+            const token = await AsyncStorage.getItem('jwt');
+            const response = await fetch(`${url}/api/instituicoes`,
+                {
+                    headers:{
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`, 
+                }}
+            ); // ajuste o endpoint se precisar
             if (!response.ok) throw new Error("Erro ao buscar instituições");
             const data: Instituicao[] = await response.json();
             setInstituicoes(data);
@@ -146,8 +152,8 @@ type Instituicao = {
                             <Feather name="trash-2" size={18} color="#fff" />
                         </TouchableOpacity>
                             <Text style={styles.nomeInstituicao}>{inst.nome}</Text>
-                            <Text style={styles.infoInstituicao}> 📧 {inst.email}</Text>
-                            <Text style={styles.infoInstituicao}> 📍 {inst.endereco}</Text>
+                            <Text style={styles.infoInstituicao}> 📧 E-mail: {inst.email}</Text>
+                            <Text style={styles.infoInstituicao}> 📍Endereço: {inst.endereco}</Text>
                             {verificaPlano(inst.plano)}                        
                         </View>
                     ))

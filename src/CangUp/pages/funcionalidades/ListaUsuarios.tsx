@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
+import { useNavigation } from '@react-navigation/core';
 import {
     SafeAreaView,
     StyleSheet,
@@ -8,7 +9,7 @@ import {
     ActivityIndicator,
     TextInput,
     TouchableOpacity,
-    Alert, // Importando o Alert para usar na confirmação
+    Alert,
 } from 'react-native';
 import * as Font from 'expo-font';
 import { Feather } from '@expo/vector-icons';
@@ -18,26 +19,29 @@ import useApi from '../../hooks/useApi';
 import { AuthContext } from '../../components/AuthContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-// Definindo o tipo para um Aluno
 type Aluno = {
     id: number;
     nome: string;
     ra: string;
-    cpf: string;
     email: string;
+    cpf: string;
     id_instituicao: number;
 }
 
-export default function ListaUsuarios({ navigation }) {
+type Instituicao = {
+    id: number;
+}
+
+    export default function ListaInstituicoes({navigation}) {
     const [fontsLoaded, setFontsLoaded] = useState(false);
     const [alunos, setAlunos] = useState<Aluno[]>([]);
     const [loading, setLoading] = useState(true);
+    const [instituicao, setInstituicao] = useState<Instituicao | null>(null);
     const [busca, setBusca] = useState('');
     const { url } = useApi();
-    // Obtendo o 'usuario' do contexto, que contém os dados da instituição logada
-    const { usuario } = useContext(AuthContext);
+    const { logout, token } = useContext(AuthContext);
 
-    // Carregar fontes personalizadas
+    // Carregar fontes
     const loadFonts = async () => {
         try {
             await Font.loadAsync({
@@ -50,98 +54,92 @@ export default function ListaUsuarios({ navigation }) {
         }
     };
 
-    // Buscar alunos da instituição logada no backend
-    // Substitua a função fetchAlunos existente por esta no seu arquivo ListaUsuarios.js
-
-const fetchAlunos = async () => {
-    // Garante que só vamos buscar os alunos se tivermos o ID da instituição
-    if (!usuario?.id) {
-        setLoading(false);
-        return;
-    }
-
-    try {
-        setLoading(true);
-        const token = await AsyncStorage.getItem('jwt');
-        
-        // 1. Voltamos a buscar na rota principal de alunos
-        const response = await fetch(`${url}/api/alunos`, {
-            headers: {
-                Authorization: `Bearer ${token}`,
-                "Content-Type": "application/json",
-            },
-        });
-
-        if (!response.ok) {
-            throw new Error("Erro ao buscar a lista completa de alunos");
+    const fetchInstituicao = async () => {
+        try {
+            const token = await AsyncStorage.getItem("jwt");
+            if (!token) {
+                Alert.alert("Erro", "Você precisa estar logado.");
+                logout();
+                return;
+            }
+            const id = await AsyncStorage.getItem("id_instituicao");
+            if (!id) {
+                Alert.alert("Erro", "ID da instituição não encontrado.");
+                logout();
+                return;
+            }
+            const res = await fetch(`${url}/api/instituicoes/${id}`, {
+                method: "GET", headers: { "Authorization": `Bearer ${token}` }
+            });
+            if (!res.ok) {
+                Alert.alert("Erro", "Falha ao carregar dados.");
+                return;
+            }
+            const data = await res.json();
+            setInstituicao(data);
+        } catch (err) {
+            console.error(err);
+            Alert.alert("Erro", "Não foi possível buscar os dados.");
         }
-
-        const todosOsAlunos: Aluno[] = await response.json();
-
-        // 2. Filtramos a lista aqui no frontend para pegar apenas os da instituição logada
-        const alunosDaInstituicao = todosOsAlunos.filter(
-            aluno => aluno.id_instituicao === usuario.id
-        );
-
-        // 3. Atualizamos o estado com a lista já filtrada
-        setAlunos(alunosDaInstituicao);
-
-    } catch (error) {
-        console.error("Erro ao buscar e filtrar alunos:", error);
-    } finally {
-        setLoading(false);
-    }
-};
-
-    // Efeito para carregar fontes e buscar dados iniciais
-    useEffect(() => {
-        loadFonts();
-        fetchAlunos();
-    }, [usuario]); // A busca de alunos agora depende do 'usuario' estar carregado
-
-    // Função para excluir um aluno
-    const handleExcluirAluno = async (id: number, nome: string) => {
-        // Usando o Alert nativo para uma melhor experiência do usuário
-        Alert.alert(
-            "Confirmar Exclusão",
-            `Deseja mesmo excluir o aluno ${nome}?`,
-            [
-                { text: "Cancelar", style: "cancel" },
-                {
-                    text: "Excluir",
-                    onPress: async () => {
-                        try {
-                            const token = await AsyncStorage.getItem('jwt');
-                            const response = await fetch(`${url}/api/alunos/${id}`, {
-                                method: "DELETE",
-                                headers: {
-                                    "Content-Type": "application/json",
-                                    "Authorization": `Bearer ${token}`,
-                                },
-                            });
-
-                            if (!response.ok) {
-                                const errorBody = await response.text();
-                                throw new Error(`Falha na API: ${response.status} - ${errorBody}`);
-                            }
-
-                            // Remove o aluno da lista no estado local para atualizar a UI
-                            setAlunos(prevAlunos =>
-                                prevAlunos.filter(aluno => aluno.id !== id)
-                            );
-                            Alert.alert("Sucesso", `Aluno ${nome} excluído.`);
-                        } catch (error) {
-                            console.error("Erro durante o processo de exclusão:", error);
-                            Alert.alert("Erro", "Não foi possível excluir o aluno.");
-                        }
-                    },
-                    style: "destructive"
-                }
-            ]
-        );
     };
 
-    // Tela de carregamento enquanto as fontes ou os dados não chegam
+    const fetchAlunos = async () => {
+        try {
+            const token = await AsyncStorage.getItem('jwt');
+            const response = await fetch(`${url}/api/alunos`,
+                {
+                    headers:{
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`, 
+                }}
+            ); // ajuste o endpoint se precisar
+            if (!response.ok) throw new Error("Erro ao buscar alunos");
+            const data: Aluno[] = await response.json();
+            setAlunos(data);
+        } catch (error) {
+            console.error("Erro:", error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        loadFonts();
+        fetchInstituicao();
+        fetchAlunos();
+    }, []);
+    
+    const handleExcluirAluno = async (id: number, nome: string) => {
+        if (confirm("Deseja mesmo excluir o aluno "+nome+"?")){
+            console.log(`Iniciando exclusão direta para o aluno ID: ${id}`);
+            try {
+                const token = await AsyncStorage.getItem('jwt');
+                const response = await fetch(`${url}/api/alunos/${id}`, {
+                    method: "DELETE",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${token}`, 
+                    },
+                });
+        
+                if (!response.ok) {
+                    const errorBody = await response.text();
+                    throw new Error(`Falha na API: ${response.status} - ${errorBody}`);
+                }
+        
+                setAlunos(prevAlunos =>
+                    prevAlunos.filter(alun => alun.id !== id)
+                );
+        
+                console.log(`Aluno ID: ${id} excluído com sucesso.`);
+        
+            } catch (error) {
+                console.error("Erro durante o processo de exclusão:", error);
+            }
+        }
+    };
+      
+
     if (!fontsLoaded || loading) {
         return (
             <View style={styles.loadingContainer}>
@@ -150,10 +148,15 @@ const fetchAlunos = async () => {
         );
     }
 
-    // Filtrando os alunos com base no texto da busca
-    const alunosFiltrados = alunos.filter(aluno =>
-        aluno.nome.toLowerCase().includes(busca.toLowerCase())
+    /*const alunosFiltrados = alunos.filter(alun =>
+        alun.nome.toLowerCase().includes(busca.toLowerCase())
+    ); */
+
+    const alunosFiltrados = alunos.filter(alun =>
+        alun.id_instituicao === instituicao?.id &&
+        alun.nome.toLowerCase().includes(busca.toLowerCase())
     );
+
 
     return (
         <SafeAreaView style={styles.safeArea}>
@@ -165,41 +168,33 @@ const fetchAlunos = async () => {
                 {/* Campo de busca */}
                 <TextInput
                     style={styles.inputBusca}
-                    placeholder="Buscar aluno por nome..."
+                    placeholder="Buscar aluno..."
                     placeholderTextColor="#888"
                     value={busca}
                     onChangeText={setBusca}
                 />
 
                 {alunosFiltrados.length === 0 ? (
-                    <Text style={styles.textoInfo}>Nenhum aluno encontrado.</Text>
+                    <Text style={styles.textoDia}>Nenhum aluno encontrado.</Text>
                 ) : (
-                    alunosFiltrados.map((aluno) => (
-                        <View key={aluno.id} style={styles.cardAluno}>
-                            {/* Botão de excluir posicionado no canto do card */}
-                            <TouchableOpacity style={styles.fabExcluir} onPress={() => handleExcluirAluno(aluno.id, aluno.nome)}>
-                                <Feather name="trash-2" size={18} color="#fff" />
-                            </TouchableOpacity>
-                            <Text style={styles.nomeAluno}>{aluno.nome}</Text>
-                            <Text style={styles.infoAluno}>🧑‍🎓 RA: {aluno.ra}</Text>
-                            <Text style={styles.infoAluno}>🪪 CPF: {aluno.cpf}</Text>
-                            <Text style={styles.infoAluno}>📧 E-mail: {aluno.email}</Text>
+                    alunosFiltrados.map((alun) => (
+                        <View key={alun.id} style={styles.cardAluno}>
+                        <TouchableOpacity style={styles.fabExcluir} onPress={() => handleExcluirAluno(alun.id, alun.nome)}>
+                            <Feather name="trash-2" size={18} color="#fff" />
+                        </TouchableOpacity>
+                            <Text style={styles.nomeAluno}>{alun.nome}</Text>
+                            <Text style={styles.infoAluno}> 🧑‍🎓 RA: {alun.ra}</Text>
+                            <Text style={styles.infoAluno}> 🪪 CPF: {alun.cpf}</Text>
+                            <Text style={styles.infoAluno}> 📧 E-mail: {alun.email}</Text>
                         </View>
                     ))
                 )}
             </ScrollView>
-
-            {/* **LÓGICA AJUSTADA**: Botão para navegar para a tela de cadastro de usuário */}
-            <TouchableOpacity activeOpacity={0.8} style={styles.fab} onPress={() => navigation.navigate(`CadastroUsuario`)} accessibilityLabel="Adicionar Aluno">
-                <Feather name="plus" size={28} color="#fff" />
-            </TouchableOpacity>
-
             <FooterComIcones />
         </SafeAreaView>
     );
 }
 
-// Estilos (mantidos conforme o original, apenas com uma pequena alteração de nome)
 const styles = StyleSheet.create({
     safeArea: {
         flex: 1,
@@ -217,7 +212,7 @@ const styles = StyleSheet.create({
     },
     tituloAba: {
         fontFamily: 'PoppinsBold',
-        fontSize: 22, // Um pouco maior para dar mais destaque
+        fontSize: 18,
         color: '#3D3D3D',
         textAlign: 'center',
         marginBottom: 20,
@@ -225,8 +220,7 @@ const styles = StyleSheet.create({
     inputBusca: {
         backgroundColor: '#FFF',
         borderRadius: 15,
-        paddingHorizontal: 15,
-        paddingVertical: 12,
+        padding: 12,
         fontFamily: 'PoppinsRegular',
         fontSize: 14,
         color: '#333',
@@ -242,7 +236,7 @@ const styles = StyleSheet.create({
         shadowColor: '#000',
         shadowOpacity: 0.1,
         shadowRadius: 5,
-        elevation: 3,
+        elevation: 2,
         position: "relative"
     },
     nomeAluno: {
@@ -250,25 +244,22 @@ const styles = StyleSheet.create({
         fontSize: 16,
         color: '#522a91',
         marginBottom: 8,
-        paddingRight: 40, // Espaço para não ficar embaixo do botão excluir
     },
     infoAluno: {
         fontFamily: 'PoppinsRegular',
         fontSize: 14,
-        color: '#555', // Cor um pouco mais suave
-        lineHeight: 22, // Melhor espaçamento entre linhas
+        color: '#333',
     },
-    textoInfo: { // Renomeado de textoDia para um nome mais genérico
+    textoDia: {
         fontFamily: 'PoppinsRegular',
         fontSize: 14,
         color: '#666',
         textAlign: 'center',
-        marginTop: 20,
     },
     fab: {
         position: 'absolute',
         right: 20,
-        bottom: 90,
+        bottom: 90, 
         width: 60,
         height: 60,
         borderRadius: 30,
@@ -280,18 +271,19 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.3,
         shadowOffset: { width: 0, height: 3 },
         shadowRadius: 4,
-    },
-    fabExcluir: {
-        position: "absolute",
-        top: 10,
-        right: 10,
-        backgroundColor: "#E53935",
-        width: 38,
-        height: 38,
-        borderRadius: 19,
-        justifyContent: 'center',
-        alignItems: 'center',
-        elevation: 5,
-        zIndex: 10,
-    },
+        },
+        fabExcluir: {
+            position: "absolute",
+            top: 10,
+            right: 10,
+            backgroundColor: "#E53935", // vermelho
+            borderRadius: 20,
+            padding: 10,
+            elevation: 5,
+            zIndex: 10,
+            shadowColor: "#000",
+            shadowOpacity: 0.2,
+            shadowOffset: { width: 0, height: 2 },
+            shadowRadius: 3,
+        },
 });
