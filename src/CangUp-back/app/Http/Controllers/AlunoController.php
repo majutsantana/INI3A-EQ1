@@ -117,6 +117,12 @@ class AlunoController extends Controller
     ], 201);
     }
 
+    public function index()
+    {
+        return response()->json(Aluno::all());
+    }
+
+
     public function show($id)
     {
         $aluno = Aluno::findOrFail($id);

@@ -27,11 +27,8 @@ Route::post('/efetivarResponsavel', [ResponsavelController::class, 'efetivarResp
 
 
 // --- Consultas Públicas ---
-Route::get('/instituicoes', [InstituicaoController::class, 'index']); // Listar todas as instituições
 Route::get('/perfis', [PerfilController::class, 'getAll']);
-
-
-
+Route::get('/instituicoes', [InstituicaoController::class, 'index']); // Listar todas as instituições
 
 //======================================================================
 // ROTAS PROTEGIDAS (Precisam de autenticação via JWT)
@@ -57,6 +54,8 @@ Route::middleware(['jwt.auth'])->group(function () {
     Route::post('/alunos', [AlunoController::class, 'store']);       
     Route::put('/alunos/{id}', [AlunoController::class, 'update']);    
     Route::delete('/alunos/{id}', [AlunoController::class, 'destroy']); 
+    Route::get('/alunos', [AlunoController::class, 'index']); // Listar todas as instituições
+
 
     Route::get('/responsaveis/{id}', [ResponsavelController::class, 'show']);     
     Route::post('/responsaveis', [ResponsavelController::class, 'store']);       

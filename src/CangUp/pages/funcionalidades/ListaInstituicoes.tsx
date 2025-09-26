@@ -54,10 +54,16 @@ type Instituicao = {
         }
     };
 
-    // Buscar instituições no backend
     const fetchInstituicoes = async () => {
         try {
-            const response = await fetch(`${url}/api/instituicoes`); // ajuste o endpoint se precisar
+            const token = await AsyncStorage.getItem('jwt');
+            const response = await fetch(`${url}/api/instituicoes`,
+                {
+                    headers:{
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`, 
+                }}
+            ); // ajuste o endpoint se precisar
             if (!response.ok) throw new Error("Erro ao buscar instituições");
             const data: Instituicao[] = await response.json();
             setInstituicoes(data);
