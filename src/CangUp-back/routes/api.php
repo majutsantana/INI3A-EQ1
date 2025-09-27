@@ -60,7 +60,8 @@ Route::middleware(['jwt.auth'])->group(function () {
     Route::get('/responsaveis/{id}', [ResponsavelController::class, 'show']);     
     Route::post('/responsaveis', [ResponsavelController::class, 'store']);       
     Route::put('/responsaveis/{id}', [ResponsavelController::class, 'update']);    
-    Route::delete('/responsaveis/{id}', [ResponsavelController::class, 'destroy']); 
+    Route::delete('/responsaveis/{id}', [ResponsavelController::class, 'destroy']);
+    Route::get('/responsaveis', [ResponsavelController::class, 'index']); // Listar todas as instituições 
 
     // --- Cadastros Protegidos ---
     Route::post('/cadastrarAdmin', [AdminController::class, 'store']);

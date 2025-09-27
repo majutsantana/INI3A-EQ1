@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { useNavigation } from '@react-navigation/core';
 import {
     SafeAreaView,
     StyleSheet,
@@ -19,22 +18,34 @@ import useApi from '../../hooks/useApi';
 import { AuthContext } from '../../components/AuthContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+// --- Tipos de Dados ---
 type Aluno = {
     id: number;
     nome: string;
     ra: string;
     email: string;
     cpf: string;
-    id_instituicao: number;
+    id_inst: number;
+}
+
+type Responsavel = {
+    id: number;
+    nome: string;
+    email: string;
+    cpf: string;
+    id_inst: number;
 }
 
 type Instituicao = {
     id: number;
 }
 
-    export default function ListaInstituicoes({navigation}) {
+// --- Componente Principal ---
+export default function ListaInstituicoes({ navigation }) {
     const [fontsLoaded, setFontsLoaded] = useState(false);
+    const [activeTab, setActiveTab] = useState<'alunos' | 'responsaveis'>('alunos'); // Novo estado para a aba ativa
     const [alunos, setAlunos] = useState<Aluno[]>([]);
+    const [responsaveis, setResponsaveis] = useState<Responsavel[]>([]);
     const [loading, setLoading] = useState(true);
     const [instituicao, setInstituicao] = useState<Instituicao | null>(null);
     const [busca, setBusca] = useState('');
@@ -72,14 +83,14 @@ type Instituicao = {
                 method: "GET", headers: { "Authorization": `Bearer ${token}` }
             });
             if (!res.ok) {
-                Alert.alert("Erro", "Falha ao carregar dados.");
+                Alert.alert("Erro", "Falha ao carregar dados da instituição.");
                 return;
             }
             const data = await res.json();
             setInstituicao(data);
         } catch (err) {
             console.error(err);
-            Alert.alert("Erro", "Não foi possível buscar os dados.");
+            Alert.alert("Erro", "Não foi possível buscar os dados da instituição.");
         }
     };
 
@@ -88,108 +99,219 @@ type Instituicao = {
             const token = await AsyncStorage.getItem('jwt');
             const response = await fetch(`${url}/api/alunos`,
                 {
-                    headers:{
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${token}`, 
-                }}
-            ); // ajuste o endpoint se precisar
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${token}`,
+                    }
+                }
+            );
             if (!response.ok) throw new Error("Erro ao buscar alunos");
             const data: Aluno[] = await response.json();
             setAlunos(data);
         } catch (error) {
-            console.error("Erro:", error);
-        } finally {
-            setLoading(false);
+            console.error("Erro ao buscar alunos:", error);
         }
     };
 
-    useEffect(() => {
-        loadFonts();
-        fetchInstituicao();
-        fetchAlunos();
-    }, []);
+    const fetchResponsaveis = async () => {
+        try {
+            const token = await AsyncStorage.getItem('jwt');
+            const response = await fetch(`${url}/api/responsaveis`,
+                {
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${token}`,
+                    }
+                }
+            );
+            if (!response.ok) throw new Error("Erro ao buscar responsáveis");
+            const data: Responsavel[] = await response.json();
+            setResponsaveis(data);
+        } catch (error) {
+            console.error("Erro ao buscar responsáveis:", error);
+        } 
+    };
     
+    const fetchData = async () => {
+        setLoading(true);
+        await Promise.all([
+            fetchInstituicao(),
+            fetchAlunos(),
+            fetchResponsaveis(),
+            loadFonts(),
+        ]);
+        setLoading(false);
+    };
+
+    useEffect(() => {
+        fetchData();
+    }, []);
+
     const handleExcluirAluno = async (id: number, nome: string) => {
-        if (confirm("Deseja mesmo excluir o aluno "+nome+"?")){
-            console.log(`Iniciando exclusão direta para o aluno ID: ${id}`);
+        if (confirm("Deseja mesmo excluir o aluno " + nome + "?")) {
             try {
                 const token = await AsyncStorage.getItem('jwt');
                 const response = await fetch(`${url}/api/alunos/${id}`, {
                     method: "DELETE",
                     headers: {
                         "Content-Type": "application/json",
-                        "Authorization": `Bearer ${token}`, 
+                        "Authorization": `Bearer ${token}`,
                     },
                 });
-        
+
                 if (!response.ok) {
                     const errorBody = await response.text();
                     throw new Error(`Falha na API: ${response.status} - ${errorBody}`);
                 }
-        
+
                 setAlunos(prevAlunos =>
                     prevAlunos.filter(alun => alun.id !== id)
                 );
-        
-                console.log(`Aluno ID: ${id} excluído com sucesso.`);
-        
+                Alert.alert("Sucesso", `Aluno ${nome} excluído.`);
+
             } catch (error) {
                 console.error("Erro durante o processo de exclusão:", error);
+                Alert.alert("Erro", "Não foi possível excluir o aluno.");
             }
         }
     };
-      
+
+    const handleExcluirResponsavel = async (id: number, nome: string) => {
+        if (confirm("Deseja mesmo excluir o responsável " + nome + "?")) {
+            try {
+                const token = await AsyncStorage.getItem('jwt');
+                const response = await fetch(`${url}/api/responsaveis/${id}`, {
+                    method: "DELETE",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${token}`,
+                    },
+                });
+
+                if (!response.ok) {
+                    const errorBody = await response.text();
+                    throw new Error(`Falha na API: ${response.status} - ${errorBody}`);
+                }
+
+                setResponsaveis(prevResponsaveis =>
+                    prevResponsaveis.filter(resp => resp.id !== id)
+                );
+                Alert.alert("Sucesso", `Responsável ${nome} excluído.`);
+
+            } catch (error) {
+                console.error("Erro durante o processo de exclusão:", error);
+                Alert.alert("Erro", "Não foi possível excluir o responsável.");
+            }
+        }
+    };
+
+    const alunosFiltrados = alunos.filter(alun =>
+        alun.id_inst === instituicao?.id &&
+        alun.nome.toLowerCase().includes(busca.toLowerCase())
+    );
+
+    const responsaveisFiltrados = responsaveis.filter(resp =>
+        resp.id_inst === instituicao?.id &&
+        resp.nome.toLowerCase().includes(busca.toLowerCase())
+    );
 
     if (!fontsLoaded || loading) {
         return (
             <View style={styles.loadingContainer}>
-                <ActivityIndicator size="large" color="#BEACDE" />
+                <ActivityIndicator size="large" color="#522a91" />
             </View>
         );
     }
 
-    /*const alunosFiltrados = alunos.filter(alun =>
-        alun.nome.toLowerCase().includes(busca.toLowerCase())
-    ); */
+    const CardItem = ({ item, type }: { item: Aluno | Responsavel, type: 'aluno' | 'responsavel' }) => (
+        <View style={styles.cardItem}>
+            <TouchableOpacity 
+                style={styles.fabExcluir} 
+                onPress={() => 
+                    type === 'aluno' 
+                    ? handleExcluirAluno(item.id, item.nome) 
+                    : handleExcluirResponsavel(item.id, item.nome)
+                }
+            >
+                <Feather name="trash-2" size={18} color="#fff" />
+            </TouchableOpacity>
 
-    const alunosFiltrados = alunos.filter(alun =>
-        alun.id_instituicao === instituicao?.id &&
-        alun.nome.toLowerCase().includes(busca.toLowerCase())
+            <View style={styles.fotoPlaceholder}>
+                <Text style={styles.fotoPlaceholderText}>Foto</Text>
+            </View>
+            
+            <View style={styles.infoContainer}>
+                <Text style={styles.nomeItem}>{item.nome}</Text>
+                
+                {type === 'aluno' && 'ra' in item && (
+                    <Text style={styles.infoItem}> 🧑‍🎓 RA: {item.ra}</Text>
+                )}
+                {'cpf' in item && (
+                    <Text style={styles.infoItem}> 🪪 CPF: {item.cpf}</Text>
+                )}
+                <Text style={styles.infoItem}> 📧 E-mail: {item.email}</Text>
+            </View>
+        </View>
     );
-
 
     return (
         <SafeAreaView style={styles.safeArea}>
             <HeaderComLogout />
 
             <ScrollView contentContainerStyle={styles.scrollViewContainer}>
-                <Text style={styles.tituloAba}>Alunos</Text>
+                <Text style={styles.tituloAba}>
+                    {activeTab === 'alunos' ? 'Lista de Alunos' : 'Lista de Responsáveis'}
+                </Text>
 
                 {/* Campo de busca */}
-                <TextInput
-                    style={styles.inputBusca}
-                    placeholder="Buscar aluno..."
-                    placeholderTextColor="#888"
-                    value={busca}
-                    onChangeText={setBusca}
-                />
+                <View style={styles.inputBuscaContainer}>
+                    <TextInput
+                        style={styles.inputBusca}
+                        placeholder={activeTab === 'alunos' ? "Buscar aluno..." : "Buscar responsável..."}
+                        placeholderTextColor="#888"
+                        value={busca}
+                        onChangeText={setBusca}
+                    />
+                    <Feather name="search" size={20} color="#888" style={styles.iconeBusca} />
+                </View>
 
-                {alunosFiltrados.length === 0 ? (
-                    <Text style={styles.textoDia}>Nenhum aluno encontrado.</Text>
+                {activeTab === 'alunos' ? (
+                    alunosFiltrados.length === 0 ? (
+                        <Text style={styles.textoDia}>Nenhum aluno encontrado.</Text>
+                    ) : (
+                        alunosFiltrados.map((alun) => (
+                            <CardItem key={alun.id} item={alun} type="aluno" />
+                        ))
+                    )
                 ) : (
-                    alunosFiltrados.map((alun) => (
-                        <View key={alun.id} style={styles.cardAluno}>
-                        <TouchableOpacity style={styles.fabExcluir} onPress={() => handleExcluirAluno(alun.id, alun.nome)}>
-                            <Feather name="trash-2" size={18} color="#fff" />
-                        </TouchableOpacity>
-                            <Text style={styles.nomeAluno}>{alun.nome}</Text>
-                            <Text style={styles.infoAluno}> 🧑‍🎓 RA: {alun.ra}</Text>
-                            <Text style={styles.infoAluno}> 🪪 CPF: {alun.cpf}</Text>
-                            <Text style={styles.infoAluno}> 📧 E-mail: {alun.email}</Text>
-                        </View>
-                    ))
+                    responsaveisFiltrados.length === 0 ? (
+                        <Text style={styles.textoDia}>Nenhum responsável encontrado.</Text>
+                    ) : (
+                        responsaveisFiltrados.map((resp) => (
+                            <CardItem key={resp.id} item={resp} type="responsavel" />
+                        ))
+                    )
                 )}
             </ScrollView>
+
+            <View style={styles.tabContainer}>
+                <TouchableOpacity
+                    style={[styles.tabButton, activeTab === 'alunos' && styles.activeTabButton]}
+                    onPress={() => { setActiveTab('alunos'); setBusca(''); }}
+                >
+                    <Text style={[styles.tabText, activeTab === 'alunos' && styles.activeTabText]}>
+                        Lista de Alunos
+                    </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                    style={[styles.tabButton, activeTab === 'responsaveis' && styles.activeTabButton]}
+                    onPress={() => { setActiveTab('responsaveis'); setBusca(''); }}
+                >
+                    <Text style={[styles.tabText, activeTab === 'responsaveis' && styles.activeTabText]}>
+                        Lista de Responsáveis
+                    </Text>
+                </TouchableOpacity>
+            </View>
             <FooterComIcones />
         </SafeAreaView>
     );
@@ -217,18 +339,60 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         marginBottom: 20,
     },
-    inputBusca: {
-        backgroundColor: '#FFF',
+    tabContainer: {
+        flexDirection: 'row',
+        backgroundColor: '#522a91',
+        padding: 0,
+        marginHorizontal: 20,
         borderRadius: 15,
-        padding: 12,
+        overflow: 'hidden',
+        marginBottom: '20%',
+        marginTop: 10,
+    },
+    tabButton: {
+        flex: 1,
+        paddingVertical: 12,
+        alignItems: 'center',
+        backgroundColor: '#522a91', 
+        borderWidth: 0,
+    },
+    activeTabButton: {
+        backgroundColor: '#733FC9',
+    },
+    tabText: {
         fontFamily: 'PoppinsRegular',
         fontSize: 14,
-        color: '#333',
+        color: '#BEACDE',
+    },
+    activeTabText: {
+        fontFamily: 'PoppinsBold',
+        color: '#fff',
+        fontWeight: 'bold',
+    },
+
+    inputBuscaContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: '#FFF',
+        borderRadius: 15,
+        paddingHorizontal: 15,
         marginBottom: 20,
         borderWidth: 1,
         borderColor: '#DDD',
+        height: 50,
     },
-    cardAluno: {
+    inputBusca: {
+        flex: 1,
+        fontFamily: 'PoppinsRegular',
+        fontSize: 14,
+        color: '#333',
+        padding: 0,
+    },
+    iconeBusca: {
+        marginLeft: 10,
+    },
+    
+    cardItem: {
         marginBottom: 15,
         padding: 15,
         backgroundColor: '#FFF',
@@ -237,15 +401,34 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.1,
         shadowRadius: 5,
         elevation: 2,
-        position: "relative"
+        position: "relative",
+        flexDirection: 'row',
+        alignItems: 'center',
     },
-    nomeAluno: {
+    fotoPlaceholder: {
+        width: 60,
+        height: 60,
+        borderRadius: 30,
+        backgroundColor: '#E0E0E0',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginRight: 15,
+    },
+    fotoPlaceholderText: {
+        fontFamily: 'PoppinsRegular',
+        fontSize: 12,
+        color: '#666',
+    },
+    infoContainer: {
+        flex: 1,
+    },
+    nomeItem: {
         fontFamily: 'PoppinsBold',
         fontSize: 16,
         color: '#522a91',
         marginBottom: 8,
     },
-    infoAluno: {
+    infoItem: {
         fontFamily: 'PoppinsRegular',
         fontSize: 14,
         color: '#333',
@@ -256,34 +439,18 @@ const styles = StyleSheet.create({
         color: '#666',
         textAlign: 'center',
     },
-    fab: {
-        position: 'absolute',
-        right: 20,
-        bottom: 90, 
-        width: 60,
-        height: 60,
-        borderRadius: 30,
-        backgroundColor: '#522a91',
-        justifyContent: 'center',
-        alignItems: 'center',
-        elevation: 6,
-        shadowColor: '#000',
-        shadowOpacity: 0.3,
-        shadowOffset: { width: 0, height: 3 },
-        shadowRadius: 4,
-        },
-        fabExcluir: {
-            position: "absolute",
-            top: 10,
-            right: 10,
-            backgroundColor: "#E53935", // vermelho
-            borderRadius: 20,
-            padding: 10,
-            elevation: 5,
-            zIndex: 10,
-            shadowColor: "#000",
-            shadowOpacity: 0.2,
-            shadowOffset: { width: 0, height: 2 },
-            shadowRadius: 3,
-        },
+    fabExcluir: {
+        position: "absolute",
+        top: 10,
+        right: 10,
+        backgroundColor: "#E53935", 
+        borderRadius: 20,
+        padding: 8, 
+        elevation: 5,
+        zIndex: 10,
+        shadowColor: "#000",
+        shadowOpacity: 0.2,
+        shadowOffset: { width: 0, height: 2 },
+        shadowRadius: 3,
+    },
 });

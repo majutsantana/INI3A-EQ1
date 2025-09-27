@@ -125,6 +125,12 @@ class ResponsavelController extends Controller
     ], 201);
     }
 
+    public function index()
+    {
+        return response()->json(Responsavel::all());
+    }
+
+
     public function show($id)
     {
         $responsavel = Responsavel::findOrFail($id);
