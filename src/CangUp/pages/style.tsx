@@ -37,7 +37,7 @@ const styles = () => {
     },
     input: {
       backgroundColor: theme === 'light' ? '#d9d9d9' : '#B9B9B9',
-      color: '#888',
+      color: '#202020ff',
       width: '90%',
       padding: '5%',
       borderRadius: 30,
@@ -68,7 +68,7 @@ const styles = () => {
       padding: '5%',
       paddingLeft: '5%',
       fontFamily: 'PoppinsRegular',
-      color: colors.text,
+      color: '#202020ff',
     },
     eyeIcon: {
       paddingRight: '5%',
@@ -138,7 +138,7 @@ const styles = () => {
       fontFamily: 'PoppinsRegular',
       backgroundColor: theme === 'light' ? '#d9d9d9' : '#B9B9B9',
       borderWidth: 0,
-      color: colors.text, 
+      color: '#202020ff', 
     },
     pickerWrapper: {
       paddingHorizontal: '6.6%',
@@ -158,7 +158,7 @@ const styles = () => {
     text: {
       fontSize: 20,
       marginBottom: 20,
-      color: colors.text,
+      color: '#202020ff',
     },
     switchContainer: {
       flexDirection: 'row',
