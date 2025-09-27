@@ -124,7 +124,7 @@ export default function Login({ navigation }) {
       {/*HEADER COM IMAGEM*/}
       <View style={styles.header}>
         <Image
-          source={theme == "light" ? require('../assets/logocangUp-horizontal-claro.png') : require('../assets/logocangUp-horizontal-escuro.svg')}
+          source={theme == "light" ? require('../assets/logocangUp-horizontal-claro.svg') : require('../assets/logocangUp-horizontal-escuro.svg')}
           style={styles.image}
         />
       </View>

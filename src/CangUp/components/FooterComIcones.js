@@ -8,7 +8,7 @@ const FooterComIcones = () => {
   return (
     <View style={theme == 'light' ? styles.footer : styles.footerDark}>
       <TouchableOpacity>
-        <Ionicons name="person-circle-outline" size={35} color="#fff" />
+        <Ionicons name="person-circle-outline" size={35} color="#fff"/>
       </TouchableOpacity>
       <TouchableOpacity>
         <Ionicons name="home-outline" size={30} color="#fff" />
