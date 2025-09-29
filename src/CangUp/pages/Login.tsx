@@ -124,7 +124,7 @@ export default function Login({ navigation }) {
       {/*HEADER COM IMAGEM*/}
       <View style={styles.header}>
         <Image
-          source={theme == "light" ? require('../assets/logocangUp-horizontal-claro.svg') : require('../assets/logocangUp-horizontal-escuro.svg')}
+          source={theme == "light" ? require('../assets/logocangUp-horizontal-claro.png') : require('../assets/logocangUp-horizontal-escuro.png')} //deixar as fotos centralizadas
           style={styles.image}
         />
       </View>
@@ -132,8 +132,8 @@ export default function Login({ navigation }) {
       {/*BODY*/}
       <View style={styles.body}>
           <View style={styles.olivia}>
-            <Text style={styles.title}>Bem-vindo de volta!    </Text>
-            <TouchableOpacity onPress={toggleTheme}>
+            <Text style={styles.title}>Bem-vindo de volta!</Text>
+            <TouchableOpacity onPress={toggleTheme} style={{marginLeft: 10}}>
               {theme === 'dark' ? (
                 <FontAwesome name="moon-o" size={28} color={colors.text} />
               ) : (
@@ -176,7 +176,7 @@ export default function Login({ navigation }) {
             <Feather
               name={senhaVisivel ? 'eye' : 'eye-off'}
               size={20}
-              color="#888"
+              color="#5B5B5B"
             />
           </TouchableOpacity>
         </View>

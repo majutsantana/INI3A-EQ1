@@ -36,7 +36,7 @@ const HeaderComLogout = () => {
 const styles = StyleSheet.create({
   header: {
     backgroundColor: '#B9A6DA',
-    height: 60,
+    height: '10%',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'flex-end',
@@ -44,7 +44,7 @@ const styles = StyleSheet.create({
   },
   headerDark: {
     backgroundColor: '#251541',
-    height: 60,
+    height: '10%',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'flex-end',
