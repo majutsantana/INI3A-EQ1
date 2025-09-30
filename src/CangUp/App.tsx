@@ -14,6 +14,9 @@ import CadastroResponsavel from './pages/cadastro/CadastroResponsavel';
 import EfetivacaoAluno from './pages/efetivacao/EfetivacaoAluno';
 import EfetivacaoResponsavel from './pages/efetivacao/EfetivacaoResponsavel';
 import FuncionalidadesAlunoResponsavel from './pages/funcionalidades/FuncionalidadesAlunoResponsavel';
+import Mapa from './pages/Mapa';
+//import CaronasAluno from './pages/caronas/CaronasAluno';
+//import CaronasResponsavel from './pages/caronas/CaronasResponsavel';
 import ListaUsuarios from './pages/funcionalidades/ListaUsuarios';
 import ListaInstituicoes from './pages/funcionalidades/ListaInstituicoes';
 import CadastroVeiculo from './pages/cadastro/CadastroVeiculo';
@@ -91,5 +94,3 @@ export default function App() {
     </ThemeProvider>
   );
 }
-
-// Fazer para o PerfilResponsavel depois

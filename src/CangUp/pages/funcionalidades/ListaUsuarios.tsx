@@ -18,7 +18,6 @@ import useApi from '../../hooks/useApi';
 import { AuthContext } from '../../components/AuthContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-// --- Tipos de Dados ---
 type Aluno = {
     id: number;
     nome: string;
@@ -40,7 +39,6 @@ type Instituicao = {
     id: number;
 }
 
-// --- Componente Principal ---
 export default function ListaInstituicoes({ navigation }) {
     const [fontsLoaded, setFontsLoaded] = useState(false);
     const [activeTab, setActiveTab] = useState<'alunos' | 'responsaveis'>('alunos'); // Novo estado para a aba ativa
@@ -52,7 +50,6 @@ export default function ListaInstituicoes({ navigation }) {
     const { url } = useApi();
     const { logout, token } = useContext(AuthContext);
 
-    // Carregar fontes
     const loadFonts = async () => {
         try {
             await Font.loadAsync({
@@ -263,7 +260,6 @@ export default function ListaInstituicoes({ navigation }) {
                     {activeTab === 'alunos' ? 'Lista de Alunos' : 'Lista de Responsáveis'}
                 </Text>
 
-                {/* Campo de busca */}
                 <View style={styles.inputBuscaContainer}>
                     <TextInput
                         style={styles.inputBusca}
