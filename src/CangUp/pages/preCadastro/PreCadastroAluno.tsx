@@ -19,6 +19,7 @@ import { TextInputMask } from 'react-native-masked-text'; //Pacote instalado
 import useApi from '../../hooks/useApi';
 import HeaderComLogout from '../../components/HeaderComLogout';
 import { AuthContext } from '../../components/AuthContext';
+import { useTheme } from '../../context/ThemeContext';
 
 type errorType ={ 
   nome : string | undefined,
@@ -40,7 +41,7 @@ export default function PreCadastroAluno({ navigation }) {
     const [CPF, setCPF] = useState('');
     const { url } = useApi();
     const {logout} = useContext(AuthContext);
-
+    const {theme} = useTheme(); 
     const validateForm = () => {
      let newErrors : errorType = {nome:undefined, CPF:undefined, RA:undefined};
      let isValid = true;
@@ -149,24 +150,24 @@ export default function PreCadastroAluno({ navigation }) {
     };
     
     return(
-      <SafeAreaView style={styles.safeArea}>
+      <SafeAreaView style={theme == "light" ? styles.safeArea : styles.safeAreaDark}>
       <StatusBar backgroundColor="#B9A6DA" barStyle="dark-content" />
       <HeaderComLogout/>
 
-      <View style={styles.content}>
-        <View style={styles.formContainer}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+      <View style={theme == "light" ? styles.content : styles.contentDark}>
+        <View style={theme == "light" ? styles.formContainer : styles.formContainerDark}>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={theme == "light" ? styles.backButton : styles.backButtonDark}>
         <MaterialIcons name="arrow-back" size={28} color="#000" />
         </TouchableOpacity>
           <ScrollView
-            contentContainerStyle={styles.scrollContent}
+            contentContainerStyle={theme == "light" ? styles.scrollContent : styles.scrollContentDark}
             keyboardShouldPersistTaps="handled"
             showsVerticalScrollIndicator={false}
           >
-            <View style={styles.inputGroup}>
-               <Text style={styles.label}>Nome:</Text>
+            <View style={theme == "light" ? styles.inputGroup : styles.inputGroupDark}>
+               <Text style={theme == "light" ? styles.label : styles.labelDark}>Nome:</Text>
                <TextInput
-                 style={styles.input}
+                 style={theme == "light" ? styles.input : styles.inputDark}
                  placeholder="Digite o nome"
                  placeholderTextColor="#888"
                  value={nome}
@@ -174,10 +175,10 @@ export default function PreCadastroAluno({ navigation }) {
                />
                {errors.nome && <Text style={styles.errorText}>{errors.nome}</Text>}
              </View>
-             <View style={styles.inputGroup}>
-               <Text style={styles.label}>Número de matrícula/RA:</Text>
+             <View style={theme == "light" ? styles.inputGroup : styles.inputGroupDark}>
+               <Text style={theme == "light" ? styles.label : styles.labelDark}>Número de matrícula/RA:</Text>
                <TextInput
-                 style={styles.input}
+                 style={theme == "light" ? styles.input : styles.inputDark}
                  placeholder="Digite o número de matrícula"
                  placeholderTextColor="#888"
                  value={RA}
@@ -185,7 +186,7 @@ export default function PreCadastroAluno({ navigation }) {
                />
                {errors.RA && <Text style={styles.errorText}>{errors.RA}</Text>}
               </View>
-              <View style={styles.inputGroup}>
+              <View style={theme == "light" ? styles.inputGroup : styles.inputGroupDark}>
                <Text style={styles.label}>CPF:</Text>
                <TextInputMask
                  type={'cpf'}
@@ -200,9 +201,9 @@ export default function PreCadastroAluno({ navigation }) {
           </ScrollView>
         </View>
  
-        <TouchableOpacity style={styles.button}
+        <TouchableOpacity style={theme == "light" ? styles.button : styles.buttonDark}
           onPress= {handlePreCadastro}>
-          <Text style={styles.buttonText}>Cadastrar Aluno</Text>
+          <Text style={theme == "light" ? styles.buttonText : styles.buttonTextDark}>Cadastrar Aluno</Text>
         </TouchableOpacity>
       </View>
       <FooterComIcones/>
@@ -214,7 +215,19 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: '#FFD88D',
     },
+     safeAreaDark: {
+        flex: 1,
+        backgroundColor: '#522a91',
+    },
     content: {
+        flex: 1,
+        paddingHorizontal: '5%',
+        paddingTop: '10%',
+        paddingBottom: '25%',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+    },
+    contentDark: {
         flex: 1,
         paddingHorizontal: '5%',
         paddingTop: '10%',
@@ -234,7 +247,24 @@ const styles = StyleSheet.create({
         shadowRadius: 4.65,
         elevation: 1,
     },
+    formContainerDark: {
+        flex: 1,
+        backgroundColor: '#333',
+        borderRadius: 30,
+        padding: '5%',
+        width: '90%',
+        shadowColor: '#000',
+        shadowOffset: { width: 2, height: 6 },
+        shadowOpacity: 0.15,
+        shadowRadius: 4.65,
+        elevation: 1,
+    },
     scrollContent: {
+        flexGrow: 1,
+        paddingBottom: '2%',
+        margin: '5%',
+    },
+    scrollContentDark: {
         flexGrow: 1,
         paddingBottom: '2%',
         margin: '5%',
@@ -243,7 +273,17 @@ const styles = StyleSheet.create({
         padding:'1%',
         marginBottom:'2%',
     },
+    inputGroupDark: {
+        padding:'1%',
+        marginBottom:'2%',
+    },
     label: {
+        fontWeight: 'bold',
+        fontSize: 16,
+        marginBottom: '2%',
+        fontFamily: 'PoppinsRegular',
+    },
+    labelDark: {
         fontWeight: 'bold',
         fontSize: 16,
         marginBottom: '2%',
@@ -257,6 +297,22 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontFamily: 'PoppinsRegular',
         shadowColor: "#000",
+        shadowOffset: {
+        width: 0,
+        height: 3,
+        },
+        shadowOpacity: 0.27,
+        shadowRadius: 4.65,
+        elevation: 6,
+    },
+    inputDark: {
+        backgroundColor: '#666',
+        borderRadius: 25,
+        paddingHorizontal: '5%',
+        paddingVertical: '5%',
+        fontSize: 16,
+        fontFamily: 'PoppinsRegular',
+        shadowColor: "white",
         shadowOffset: {
         width: 0,
         height: 3,
@@ -281,7 +337,27 @@ const styles = StyleSheet.create({
         shadowRadius: 4.65,
         elevation: 6,
     },
+    buttonDark: {
+        backgroundColor: '#FFBE31',
+        paddingVertical: '5%',
+        width:'60%',
+        borderRadius: 20,
+        alignItems: 'center',
+        marginTop: '10%',
+        shadowColor: '#000',
+        shadowOffset: {
+        width: 0,
+        height: 3,
+        },
+        shadowOpacity: 0.27,
+        shadowRadius: 4.65,
+        elevation: 6,
+    },
     buttonText: {
+        fontSize: 18,
+        fontFamily: 'PoppinsRegular',
+    },
+    buttonTextDark: {
         fontSize: 18,
         fontFamily: 'PoppinsRegular',
     },
@@ -289,6 +365,9 @@ const styles = StyleSheet.create({
         height:'15%',
     },
     backButton: {
+        alignSelf: 'flex-start',
+    },
+    backButtonDark: {
         alignSelf: 'flex-start',
     },
     errorText: {

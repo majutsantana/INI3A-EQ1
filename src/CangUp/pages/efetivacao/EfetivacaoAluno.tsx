@@ -18,6 +18,7 @@ import { Picker } from '@react-native-picker/picker';
 import FooterSemIcones from '../../components/FooterSemIcones';
 import useApi from '../../hooks/useApi';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useTheme } from '../../context/ThemeContext';
 
 type errorType = {
   nome: string | undefined,
@@ -41,6 +42,7 @@ export default function EfetivacaoAluno({ navigation }) { //Navigation não é e
   const [CPF, setCPF] = useState('');
   const [instituicoes, setInstituicoes] = useState<_inst[]>([]);
   const { url } = useApi();
+  const {theme} = useTheme();
 
   const validateForm = () => {
     let newErrors: errorType = { CPF: undefined, instituicao: undefined, nome: undefined, RA: undefined };
@@ -141,23 +143,23 @@ export default function EfetivacaoAluno({ navigation }) { //Navigation não é e
   }, []);
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <SafeAreaView style={theme == "light" ? styles.safeArea : styles.safeAreaDark}>
       <StatusBar backgroundColor="#B9A6DA" barStyle="dark-content" />
       <Header />
 
-      <View style={styles.content}>
-        <View style={styles.formContainer}>
-          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+      <View style={theme == "light" ? styles.content : styles.contentDark}>
+        <View style={theme == "light" ? styles.formContainer : styles.formContainerDark}>
+          <TouchableOpacity onPress={() => navigation.goBack()} style={theme == "light" ? styles.backButton : styles.backButtonDark}>
             <MaterialIcons name="arrow-back" size={28} color="#000" />
           </TouchableOpacity>
           <ScrollView
-            contentContainerStyle={styles.scrollContent}
+            contentContainerStyle={theme == "light" ? styles.scrollContent : styles.scrollContentDark}
             keyboardShouldPersistTaps="handled"
             showsVerticalScrollIndicator={false}
           >
-            <View style={styles.inputGroup}>
-              <Text style={styles.label}>Instituição:</Text>
-              <View style={styles.pickerWrapper}>
+            <View style={theme == "light" ? styles.inputGroup : styles.inputGroupDark}>
+              <Text style={theme == "light" ? styles.label : styles.labelDark}>Instituição:</Text>
+              <View style={theme == "light" ? styles.pickerWrapper : styles.pickerWrapperDark}>
                 <Picker
                   selectedValue={instituicao}
                   onValueChange={(itemValue) => setInstituicao(itemValue)}
@@ -173,10 +175,10 @@ export default function EfetivacaoAluno({ navigation }) { //Navigation não é e
               {errors.instituicao && <Text style={styles.errorText}>{errors.instituicao}</Text>}
             </View>
 
-            <View style={styles.inputGroup}>
-              <Text style={styles.label}>Nome:</Text>
+            <View style={theme == "light" ? styles.inputGroup : styles.inputGroupDark}>
+              <Text style={theme == "light" ? styles.label : styles.labelDark}>Nome:</Text>
               <TextInput
-                style={styles.input}
+                style={theme == "light" ? styles.input : styles.inputDark}
                 placeholder="Digite o nome"
                 placeholderTextColor="#888"
                 value={nome}
@@ -184,10 +186,10 @@ export default function EfetivacaoAluno({ navigation }) { //Navigation não é e
               />
               {errors.nome && <Text style={styles.errorText}>{errors.nome}</Text>}
             </View>
-            <View style={styles.inputGroup}>
-              <Text style={styles.label}>Número de matrícula/RA:</Text>
+            <View style={theme == "light" ? styles.inputGroup : styles.inputGroupDark}>
+              <Text style={theme == "light" ? styles.label : styles.labelDark}>Número de matrícula/RA:</Text>
               <TextInput
-                style={styles.input}
+                style={theme == "light" ? styles.input : styles.inputDark}
                 placeholder="Digite o número de matrícula"
                 placeholderTextColor="#888"
                 value={RA}
@@ -195,8 +197,8 @@ export default function EfetivacaoAluno({ navigation }) { //Navigation não é e
               />
               {errors.RA && <Text style={styles.errorText}>{errors.RA}</Text>}
             </View>
-            <View style={styles.inputGroup}>
-              <Text style={styles.label}>CPF:</Text>
+            <View style={theme == "light" ? styles.inputGroup : styles.inputGroupDark}>
+              <Text style={theme == "light" ? styles.label : styles.labelDark}>CPF:</Text>
               <TextInputMask
                 type={'cpf'}
                 value={CPF}
@@ -210,9 +212,9 @@ export default function EfetivacaoAluno({ navigation }) { //Navigation não é e
           </ScrollView>
         </View>
 
-        <TouchableOpacity style={styles.button}
+        <TouchableOpacity style={theme == "light" ? styles.button :  styles.buttonDark}
           onPress={handleEfetivar}>
-          <Text style={styles.buttonText}>Prosseguir</Text>
+          <Text style={theme == "light" ? styles.buttonText : styles.buttonTextDark}>Prosseguir</Text>
         </TouchableOpacity>
       </View>
       <FooterSemIcones />
@@ -224,7 +226,19 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#FFD88D',
   },
+  safeAreaDark: {
+    flex: 1,
+    backgroundColor: '#522a91',
+  },
   content: {
+    flex: 1,
+    paddingHorizontal: '5%',
+    paddingTop: '10%',
+    paddingBottom: '25%',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  contentDark: {
     flex: 1,
     paddingHorizontal: '5%',
     paddingTop: '10%',
@@ -244,7 +258,24 @@ const styles = StyleSheet.create({
     shadowRadius: 4.65,
     elevation: 1,
   },
+  formContainerDark: {
+    flex: 1,
+    backgroundColor: '#333',
+    borderRadius: 30,
+    padding: '5%',
+    width: '90%',
+    shadowColor: '#FFF',
+    shadowOffset: { width: 2, height: 6 },
+    shadowOpacity: 0.15,
+    shadowRadius: 4.65,
+    elevation: 1,
+  },
   scrollContent: {
+    flexGrow: 1,
+    paddingBottom: '2%',
+    margin: '5%',
+  },
+  scrollContentDark: {
     flexGrow: 1,
     paddingBottom: '2%',
     margin: '5%',
@@ -253,12 +284,38 @@ const styles = StyleSheet.create({
     padding: '1%',
     marginBottom: '2%',
   },
+  inputGroupDark: {
+    padding: '1%',
+    marginBottom: '2%',
+  },
   label: {
     fontWeight: 'bold',
     fontSize: 16,
     fontFamily: 'PoppinsRegular',
   },
+  labelDark: {
+    fontWeight: 'bold',
+    fontSize: 16,
+    fontFamily: 'PoppinsRegular',
+    color : 'white',
+  },
   input: {
+    backgroundColor: '#d9d9d9',
+    borderRadius: 25,
+    paddingHorizontal: '5%',
+    paddingVertical: '5%',
+    fontSize: 16,
+    fontFamily: 'PoppinsRegular',
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 3,
+    },
+    shadowOpacity: 0.27,
+    shadowRadius: 4.65,
+    elevation: 6,
+  },
+  inputDark: {
     backgroundColor: '#d9d9d9',
     borderRadius: 25,
     paddingHorizontal: '5%',
@@ -291,7 +348,31 @@ const styles = StyleSheet.create({
     shadowRadius: 4.65,
     elevation: 6,
   },
+  pickerWrapperDark: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: '5%',
+    paddingVertical: '5%',
+    borderRadius: 25,
+    overflow: 'hidden',
+    backgroundColor: '#d9d9d9',
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 3,
+    },
+    shadowOpacity: 0.27,
+    shadowRadius: 4.65,
+    elevation: 6,
+  },
   picker: {
+    width: '100%',
+    fontSize: 16,
+    fontFamily: 'PoppinsRegular',
+    backgroundColor: '#d9d9d9',
+    borderWidth: 0,
+  },
+  pickerDark: {
     width: '100%',
     fontSize: 16,
     fontFamily: 'PoppinsRegular',
@@ -314,14 +395,40 @@ const styles = StyleSheet.create({
     shadowRadius: 4.65,
     elevation: 6,
   },
+  buttonDark: {
+    backgroundColor: '#FFBE31',
+    paddingVertical: '5%',
+    width: '60%',
+    borderRadius: 20,
+    alignItems: 'center',
+    marginTop: '10%',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 3,
+    },
+    shadowOpacity: 0.27,
+    shadowRadius: 4.65,
+    elevation: 6,
+  },
   buttonText: {
+    fontSize: 18,
+    fontFamily: 'PoppinsRegular',
+  },
+  buttonTextDark: {
     fontSize: 18,
     fontFamily: 'PoppinsRegular',
   },
   seta: {
     height: '15%',
   },
+  setaDark: {
+    height: '15%',
+  },
   backButton: {
+    alignSelf: 'flex-start',
+  },
+  backButtonDark: {
     alignSelf: 'flex-start',
   },
   errorText: {

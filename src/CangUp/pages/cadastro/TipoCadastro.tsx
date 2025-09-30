@@ -34,17 +34,17 @@ export default function TipoCadastro({navigation}) {
   }
 
   return (
-    <View style={styles.container}>
+    <View style={theme == "light" ? styles.container : styles.containerDark}>
       <Header/>
 
-      <View style={theme == "ligth" ? styles.body : styles.bodyDark}>
+      <View style={theme == "light" ? styles.body : styles.bodyDark}>
         <View style={theme == "light" ? styles.seta : styles.setaDark}>
           <TouchableOpacity onPress={() => navigation.goBack()} style={theme == "light" ? styles.backButton : styles.backButtonDark}>
-            <MaterialIcons name="arrow-back" size={28} color="#000" />
+            <MaterialIcons name="arrow-back" size={28} color={theme == 'light' ? 'black' : 'white'} />
           </TouchableOpacity>
         </View>
         <View style={theme == "light" ? styles.opcoes : styles.opcoesDark}>
-          <Text style={theme == "ligth" ? styles.title : styles.titleDark}>Selecione o tipo de usuário:</Text>
+          <Text style={theme == "light" ? styles.title : styles.titleDark}>Selecione o tipo de usuário:</Text>
 
           <TouchableOpacity style={theme == "light" ? styles.button : styles.buttonDark} onPress={() => navigation.navigate('EfetivacaoAluno')}>
             <Text style={theme == "light" ? styles.buttonText : styles.buttonTextDark}>Aluno</Text>
@@ -82,6 +82,10 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#FFD992',
   },
+  containerDark: {
+    flex: 1,
+    backgroundColor: '#4F2E89',
+  },
   image: {
     width: '80%',
     height: '100%',
@@ -103,7 +107,7 @@ const styles = StyleSheet.create({
     flex: 1,
     marginHorizontal: '10%',
     marginVertical: '30%',
-    backgroundColor: '#f3f3f3',
+    backgroundColor: '#333', //fundo de onde fica os botões do tipo de cadastro
     borderRadius: 30,
     padding: '5%',
     shadowColor: '#000',
@@ -177,6 +181,7 @@ const styles = StyleSheet.create({
     fontSize: 25,
     marginBottom: 30,
     fontFamily: 'PoppinsRegular',
+    color: 'white'
   },
   footer: {
     backgroundColor: '#beacde',
