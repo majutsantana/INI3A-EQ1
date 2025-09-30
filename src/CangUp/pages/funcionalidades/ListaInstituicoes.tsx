@@ -14,7 +14,7 @@ import {
 import * as Font from 'expo-font';
 import { Feather } from '@expo/vector-icons';
 import HeaderComLogout from '../../components/HeaderComLogout';
-import FooterComIcones from '../../components/FooterComIcones';
+import FooterSemIcones from '../../components/FooterSemIcones';
 import useApi from '../../hooks/useApi';
 import { AuthContext } from '../../components/AuthContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -168,8 +168,7 @@ type Instituicao = {
             <TouchableOpacity activeOpacity={0.8} style={theme == "light" ? styles.fab : styles.fabDark} onPress={() => navigation.navigate(`CadastroInstituicao`)} accessibilityLabel="Adicionar">
                 <Feather name="plus" size={28} color="#fff" />
             </TouchableOpacity>
-
-            <FooterComIcones />
+            <FooterSemIcones />
         </SafeAreaView>
     );
 }

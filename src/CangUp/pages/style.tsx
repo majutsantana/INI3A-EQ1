@@ -111,8 +111,8 @@ const styles = () => {
       padding: '5%',
     },
     image: {
-      width: '80%',
-      height: '100%',
+      width: '90%',
+      height: '90%',
     },
     inputgroup: {
       width: '100%',

@@ -33,8 +33,6 @@ export default function PerfilInstituicao({ navigation }) {
     const { url } = useApi();
     const {logout} = useContext(AuthContext);
     const { theme, toggleTheme, colors } = useTheme();
-
-    // --- ESTADOS PARA EDIÇÃO DO ENDEREÇO ---
     const [cep, setCep] = useState('');
     const [logradouro, setLogradouro] = useState('');
     const [numero, setNumero] = useState('');
@@ -83,8 +81,6 @@ export default function PerfilInstituicao({ navigation }) {
             Alert.alert("Erro", "Não foi possível buscar os dados.");
         }
     };
-
-    // --- FUNÇÃO PARA BUSCAR O ENDEREÇO PELO CEP ---
     const buscarCep = async () => {
         const cepLimpo = cep.replace(/\D/g, '');
         if (cepLimpo.length !== 8) {
@@ -196,8 +192,7 @@ export default function PerfilInstituicao({ navigation }) {
 
     return (
         <SafeAreaView style={styles.safeArea}>
-            {theme}
-            <HeaderComLogout />
+            <HeaderComLogout/>
             <View>
                 <View style={styles.profileTop}><View style={styles.nameTag}><Text style={styles.nameText}>{instituicao.nome}</Text></View></View>
                 <View style={styles.profilePicWrapper}><Text style={styles.picText}>Foto de perfil</Text></View>

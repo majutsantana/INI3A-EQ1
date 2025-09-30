@@ -9,7 +9,7 @@ import useApi from '../hooks/useApi';
 import { AuthContext } from '../components/AuthContext';
 import { Switch } from 'react-native-elements';
 import { useTheme } from '../context/ThemeContext';
-import getStyles from './style'; // Importe a função que retorna os estilos
+import getStyles from './style'; 
 
 type _perfil = {
   rotulo: string,
@@ -121,15 +121,13 @@ export default function Login({ navigation }) {
 
   return (
     <View style={styles.container}>
-      {/*HEADER COM IMAGEM*/}
       <View style={styles.header}>
         <Image
-          source={theme == "light" ? require('../assets/logocangUp-horizontal-claro.png') : require('../assets/logocangUp-horizontal-escuro.png')} //deixar as fotos centralizadas
+          source={theme == "light" ? require('../assets/logo-cangUp-horizontal-claro.svg') : require('../assets/logo-cangUp-horizontal-escuro.svg')} //deixar as fotos centralizadas
           style={styles.image}
         />
       </View>
 
-      {/*BODY*/}
       <View style={styles.body}>
           <View style={styles.olivia}>
             <Text style={styles.title}>Bem-vindo de volta!</Text>
@@ -212,7 +210,7 @@ export default function Login({ navigation }) {
         }}>
           <View style={{
             width: '85%',
-            backgroundColor: colors.background, // Cor do modal agora é dinâmica
+            backgroundColor: colors.background, 
             borderRadius: 20,
             padding: 20,
             alignItems: 'center',
