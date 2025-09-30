@@ -339,11 +339,11 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         backgroundColor: '#522a91',
         padding: 0,
-        marginHorizontal: 20,
+        marginHorizontal: '5%',
         borderRadius: 15,
         overflow: 'hidden',
         marginBottom: '20%',
-        marginTop: 10,
+        marginTop: '5%',
     },
     tabButton: {
         flex: 1,

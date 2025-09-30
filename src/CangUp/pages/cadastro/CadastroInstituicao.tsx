@@ -15,11 +15,11 @@ import { useEffect, useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { CheckBox } from 'react-native-elements';
-import Header from '../../components/Header';
 import FooterSemIcones from '../../components/FooterSemIcones';
 import { Feather } from '@expo/vector-icons';
 import { TextInputMask } from 'react-native-masked-text';
 import useApi from '../../hooks/useApi';
+import HeaderComLogout from '../../components/HeaderComLogout';
 
 
 export default function CadastroInstituicao({ navigation }) {
@@ -242,7 +242,7 @@ export default function CadastroInstituicao({ navigation }) {
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar backgroundColor="#B9A6DA" barStyle="dark-content" />
-      <Header />
+      <HeaderComLogout/>
 
 
       <View style={styles.content}>
@@ -472,7 +472,7 @@ export default function CadastroInstituicao({ navigation }) {
           <Text style={styles.buttonText}>Cadastrar</Text>
         </TouchableOpacity>
       </View>
-      <FooterSemIcones />
+      <FooterSemIcones/>
     </SafeAreaView>
   );
 }

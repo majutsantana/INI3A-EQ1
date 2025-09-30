@@ -29,7 +29,7 @@ type Instituicao = {
     plano: string;
 }
 
-    export default function ListaInstituicoes({navigation}) {
+    export default function ListaInstituicoes({navigation}) { //Navigation não está dando erro 
     const [fontsLoaded, setFontsLoaded] = useState(false);
     const [instituicoes, setInstituicoes] = useState<Instituicao[]>([]);
     const [loading, setLoading] = useState(true);

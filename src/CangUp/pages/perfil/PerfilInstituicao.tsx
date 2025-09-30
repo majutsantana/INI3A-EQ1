@@ -192,8 +192,7 @@ export default function PerfilInstituicao({ navigation }) {
 
     return (
         <SafeAreaView style={styles.safeArea}>
-            {theme}
-            <HeaderComLogout />
+            <HeaderComLogout/>
             <View>
                 <View style={styles.profileTop}><View style={styles.nameTag}><Text style={styles.nameText}>{instituicao.nome}</Text></View></View>
                 <View style={styles.profilePicWrapper}><Text style={styles.picText}>Foto de perfil</Text></View>
