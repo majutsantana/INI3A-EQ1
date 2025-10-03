@@ -3,7 +3,7 @@ import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import { Ionicons} from '@expo/vector-icons';
 import { useTheme } from '../context/ThemeContext';
 
-const FooterComIcones = () => {
+const FooterComIcones = (props) => {
   const {theme} = useTheme();
 
   let perfil = localStorage.getItem('perfil');
@@ -13,13 +13,13 @@ const FooterComIcones = () => {
     case 'inst':
       footer = (
         <>
-          <TouchableOpacity onPress={() => navigation.navigate(`PerfilInstituicao`)}>
+          <TouchableOpacity onPress={() => props.nav.navigate(`PerfilInstituicao`)}>
             <Ionicons name="person-circle-outline" size={35} color="#fff"/>
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => navigation.navigate(`ListaUsuarios`)}>
+          <TouchableOpacity onPress={() => props.nav.navigate(`ListaUsuarios`)}>
             <Ionicons name="home-outline" size={30} color="#fff" />
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => navigation.navigate(`FuncionalidadesInsituicao`)}>
+          <TouchableOpacity onPress={() => props.nav.navigate(`FuncionalidadesInsituicao`)}>
             <Ionicons name="time-outline" size={30} color="#fff" />
           </TouchableOpacity>
         </>
@@ -28,16 +28,16 @@ const FooterComIcones = () => {
       case 'alun':
         footer = (
           <>
-            <TouchableOpacity onPress={() => navigation.navigate(`PerfilAluno`)}>
+            <TouchableOpacity onPress={() => props.nav.navigate(`PerfilAluno`)}>
               <Ionicons name="person-circle-outline" size={35} color="#fff"/>
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => navigation.navigate(`PerfilAluno`)}>
+            <TouchableOpacity onPress={() => props.nav.navigate(`PerfilAluno`)}>
               <Ionicons name="home-outline" size={30} color="#fff" />
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => navigation.navigate(`FuncionalidadesAlunoResponsavel`)}> 
+            <TouchableOpacity onPress={() => props.nav.navigate(`FuncionalidadesAlunoResponsavel`)}> 
               <Ionicons name="time-outline" size={30} color="#fff" />
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => navigation.navigate(`PerfilAluno`)}> 
+            <TouchableOpacity onPress={() => props.nav.navigate(`PerfilAluno`)}> 
               <Ionicons name="car-outline" size={35} color="#fff" />
             </TouchableOpacity>
           </>);
@@ -45,16 +45,16 @@ const FooterComIcones = () => {
       case 'resp':
         footer = (
           <>
-             <TouchableOpacity onPress={() => navigation.navigate(`PerfilResponsavel`)}>
+             <TouchableOpacity onPress={() => props.nav.navigate(`PerfilResponsavel`)}>
               <Ionicons name="person-circle-outline" size={35} color="#fff"/>
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => navigation.navigate(`PerfilAluno`)}>
+            <TouchableOpacity onPress={() => props.nav.navigate(`PerfilAluno`)}>
               <Ionicons name="home-outline" size={30} color="#fff" />
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => navigation.navigate(`FuncionalidadesAlunoResponsavel`)}> 
+            <TouchableOpacity onPress={() => props.nav.navigate(`FuncionalidadesAlunoResponsavel`)}> 
               <Ionicons name="time-outline" size={30} color="#fff" />
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => navigation.navigate(`PerfilAluno`)}> 
+            <TouchableOpacity onPress={() => props.nav.navigate(`PerfilAluno`)}> 
               <Ionicons name="car-outline" size={35} color="#fff" />
             </TouchableOpacity>
           </>

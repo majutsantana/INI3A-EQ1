@@ -171,7 +171,7 @@ export default function FuncionalidadesAlunoResponsavel({ navigation }) {
                     </View>
                 </View>
             </ScrollView>
-            <FooterComIcones />
+            <FooterComIcones nav={navigation} />
 
             {showPicker && (
                 <DateTimePicker

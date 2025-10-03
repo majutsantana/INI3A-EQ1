@@ -308,7 +308,7 @@ export default function ListaInstituicoes({ navigation }) {
                     </Text>
                 </TouchableOpacity>
             </View>
-            <FooterComIcones />
+            <FooterComIcones nav={navigation}/>
         </SafeAreaView>
     );
 }

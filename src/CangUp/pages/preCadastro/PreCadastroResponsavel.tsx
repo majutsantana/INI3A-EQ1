@@ -203,7 +203,7 @@ export default function PreCadastroResponsavel({ navigation }) {
             <Text style={styles.buttonText}>Cadastrar Responsável</Text>
           </TouchableOpacity>
         </View>
-        <FooterComIcones/>
+        <FooterComIcones nav={navigation}/>
     </SafeAreaView>
     );
 }
