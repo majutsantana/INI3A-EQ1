@@ -62,7 +62,7 @@ const FooterComIcones = () => {
       break;
 
   }
-  return (<View style={theme == 'light' ? styles.footer : styles.footerDark}> {footer} </View>);
+  return (<View style={theme == 'light' ? styles.footer : styles.footerDark}>{footer}</View>);
 };
 
 const styles = StyleSheet.create({

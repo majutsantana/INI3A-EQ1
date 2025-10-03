@@ -157,7 +157,7 @@ export default function EfetivacaoAluno({ navigation }) { //Navigation não é e
                   selectedValue={instituicao}
                   onValueChange={(itemValue) => setInstituicao(itemValue)}
                   style={[
-                    styles.picker,
+                    theme == "light" ? styles.picker : styles.pickerDark,
                     { color: instituicao === '' ? '#888' : '#000' } 
                   ]}
                 >
@@ -209,7 +209,7 @@ const styles = StyleSheet.create({
     },
     safeAreaDark: {
         flex: 1,
-        backgroundColor: '#FFD88D',
+        backgroundColor: '#522a91',
     },
     content: {
         flex: 1,
@@ -241,7 +241,7 @@ const styles = StyleSheet.create({
     },
     formContainerDark: {
         flex: 1,
-        backgroundColor: '#F5F5F5',
+        backgroundColor: '#333',
         borderRadius: 30,
         padding: '5%',
         width: '90%',
@@ -280,6 +280,7 @@ const styles = StyleSheet.create({
         fontSize: 16,
         marginBottom: '2%',
         fontFamily: 'PoppinsRegular',
+        color: 'white'
     },
     input: {
         backgroundColor: '#d9d9d9',
