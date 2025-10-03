@@ -267,7 +267,7 @@ export default function PerfilInstituicao({ navigation }) {
                 <TouchableOpacity style={styles.button} onPress={() => navigation.navigate(`PreCadastroResponsavel`)}><Text style={styles.buttonText}>Cadastro de responsáveis</Text></TouchableOpacity>
                 <TouchableOpacity style={styles.button} onPress={() => navigation.navigate(`PreCadastroAluno`)}><Text style={styles.buttonText}>Cadastro de alunos</Text></TouchableOpacity>
             </ScrollView>
-            <FooterComIcones />
+            <FooterComIcones nav={navigation}/>
         </SafeAreaView>
     );
 }

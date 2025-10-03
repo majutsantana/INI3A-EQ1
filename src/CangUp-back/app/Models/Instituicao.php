@@ -12,7 +12,7 @@ class Instituicao extends Model
     protected $table = 'instituicoes';
 
     protected $fillable = [
-        'nome', 'email', 'endereco', 'cnpj', 'telefone', 'plano'
+        'nome', 'email', 'endereco', 'cnpj', 'telefone', 'plano' //, 'foto'
     ];
 
     public function alunos()

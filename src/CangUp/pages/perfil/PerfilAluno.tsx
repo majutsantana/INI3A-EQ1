@@ -277,7 +277,7 @@ export default function PerfilAluno({ navigation }) {
 
                 {editando && <TouchableOpacity style={styles.saveBtn} onPress={salvarEdicao}><Text style={styles.saveText}>Salvar Alterações</Text></TouchableOpacity>}
             </ScrollView>
-            <FooterComIcones />
+            <FooterComIcones nav={navigation}/>
         </SafeAreaView>
     );
 }
