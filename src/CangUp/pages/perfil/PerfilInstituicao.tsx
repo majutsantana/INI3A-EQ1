@@ -2,7 +2,7 @@ import { useNavigation } from '@react-navigation/core';
 import React, { useContext, useEffect, useState } from 'react';
 import {
     SafeAreaView, StyleSheet, Text, View, TextInput, TouchableOpacity,
-    Alert, ActivityIndicator, ScrollView
+    Alert, ActivityIndicator, ScrollView, Image
 } from 'react-native';
 import * as Font from 'expo-font';
 import HeaderComLogout from '../../components/HeaderComLogout';
@@ -12,6 +12,8 @@ import useApi from '../../hooks/useApi';
 import { TextInputMask } from 'react-native-masked-text';
 import { AuthContext } from '../../components/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
+import * as ImagePicker from "expo-image-picker";
+import { FontAwesome5} from '@expo/vector-icons';
 
 type Instituicao = {
     id: number;
@@ -21,6 +23,7 @@ type Instituicao = {
     endereco: string;
     plano: string;
     telefone: string;
+    imagem: string;
 }
 
 export default function PerfilInstituicao({ navigation }) {
@@ -31,7 +34,7 @@ export default function PerfilInstituicao({ navigation }) {
     const [editando, setEditando] = useState(false);
     const [errors, setErrors] = useState<{ telefone?: string, cep?: string }>({});
     const { url } = useApi();
-    const {logout} = useContext(AuthContext);
+    const { logout } = useContext(AuthContext);
     const { theme, toggleTheme, colors } = useTheme();
     const [cep, setCep] = useState('');
     const [logradouro, setLogradouro] = useState('');
@@ -40,6 +43,7 @@ export default function PerfilInstituicao({ navigation }) {
     const [cidade, setCidade] = useState('');
     const [uf, setUf] = useState('');
     const [loadingCep, setLoadingCep] = useState(false);
+    const [imagem, setImagem] = useState<string | null>(null);
 
     const loadFonts = async () => {
         await Font.loadAsync({
@@ -47,6 +51,22 @@ export default function PerfilInstituicao({ navigation }) {
             'PoppinsBold': require('../../assets/fonts/PoppinsBold.ttf'),
         });
         setFontsLoaded(true);
+    };
+
+    const pickImage = async () => {
+        let result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            allowsEditing: true,
+            aspect: [1, 1],
+            quality: 0.7,
+            base64: true,
+        });
+
+        if (!result.canceled) {
+            const newBase64 = "data:image/jpeg;base64," + result.assets[0].base64;
+            setImagem(newBase64);
+            handleInputChange('imagem', newBase64); 
+            }
     };
 
     const fetchInstituicao = async () => {
@@ -75,6 +95,9 @@ export default function PerfilInstituicao({ navigation }) {
             setOriginalInstituicao(data);
             if (data.telefone) {
                 setRawTelefone(data.telefone.replace(/\D/g, ''));
+            }
+            if (data.imagem) {
+                setImagem(data.imagem);
             }
         } catch (err) {
             console.error(err);
@@ -120,7 +143,7 @@ export default function PerfilInstituicao({ navigation }) {
     const salvarEdicao = async () => {
         if (!instituicao) return;
         if (!validateForm()) return;
-        
+
         let enderecoFinal = instituicao.endereco;
         const newAddressParts = [logradouro, numero, bairro, cidade, uf, cep];
         const isNewAddressStarted = newAddressParts.some(part => part.trim() !== '');
@@ -144,9 +167,11 @@ export default function PerfilInstituicao({ navigation }) {
                 body: JSON.stringify({
                     nome: instituicao.nome,
                     endereco: enderecoFinal,
-                    telefone: rawTelefone
+                    telefone: rawTelefone,
+                    imagem: instituicao.imagem,
                 })
             });
+            
             if (!res.ok) {
                 Alert.alert("Erro", "Não foi possível atualizar.");
                 return;
@@ -154,6 +179,7 @@ export default function PerfilInstituicao({ navigation }) {
             const atualizado = await res.json();
             setInstituicao(atualizado);
             setOriginalInstituicao(atualizado);
+            setImagem(atualizado.imagem); 
             setEditando(false);
             setErrors({});
             Alert.alert("Sucesso", "Perfil atualizado!");
@@ -168,6 +194,7 @@ export default function PerfilInstituicao({ navigation }) {
             if (originalInstituicao) {
                 setInstituicao(originalInstituicao);
                 setRawTelefone(originalInstituicao.telefone.replace(/\D/g, ''));
+                setImagem(originalInstituicao.imagem); 
             }
             setCep(''); setLogradouro(''); setNumero(''); setBairro(''); setCidade(''); setUf('');
         }
@@ -192,10 +219,17 @@ export default function PerfilInstituicao({ navigation }) {
 
     return (
         <SafeAreaView style={styles.safeArea}>
-            <HeaderComLogout/>
+            <HeaderComLogout />
             <View>
                 <View style={styles.profileTop}><View style={styles.nameTag}><Text style={styles.nameText}>{instituicao.nome}</Text></View></View>
-                <View style={styles.profilePicWrapper}><Text style={styles.picText}>Foto de perfil</Text></View>
+                <TouchableOpacity style={styles.profilePicWrapper} onPress={pickImage}>
+                    <Image
+                        source={
+                            imagem ? { uri: imagem } : require("../../assets/images/FotoPerfil.png")
+                        }
+                        style={styles.perfilSemFoto}
+                    />
+                </TouchableOpacity>                
                 <View style={styles.profileBottom}>
                     <TouchableOpacity style={styles.editBtn} onPress={handleEditCancel}>
                         <Text style={styles.editText}>{editando ? 'Cancelar' : 'Editar perfil'}</Text>
@@ -205,10 +239,10 @@ export default function PerfilInstituicao({ navigation }) {
             <ScrollView contentContainerStyle={styles.formContainer}>
                 <Text style={styles.label}>Nome:</Text>
                 <TextInput style={[styles.input, editando && styles.inputDisabled]} value={instituicao.nome} editable={false} />
-                
+
                 <Text style={styles.label}>Email:</Text>
                 <TextInput style={[styles.input, editando && styles.inputDisabled]} value={instituicao.email} editable={false} />
-                
+
                 <Text style={styles.label}>Endereço:</Text>
                 {editando ? (
                     <>
@@ -239,7 +273,7 @@ export default function PerfilInstituicao({ navigation }) {
 
                 <Text style={styles.label}>CNPJ:</Text>
                 <TextInput style={[styles.input, editando && styles.inputDisabled]} value={instituicao.cnpj} editable={false} />
-                
+
                 <Text style={styles.label}>Telefone para contato:</Text>
                 <TextInputMask
                     style={[styles.input, errors.telefone && styles.inputError]}
@@ -261,13 +295,13 @@ export default function PerfilInstituicao({ navigation }) {
 
                 <Text style={styles.label}>Plano:</Text>
                 <TextInput style={[styles.input, editando && styles.inputDisabled]} value={instituicao.plano === 'S' ? 'Semestral' : 'Anual'} editable={false} />
-                
+
                 {editando && <TouchableOpacity style={styles.saveBtn} onPress={salvarEdicao}><Text style={styles.saveText}>Salvar Alterações</Text></TouchableOpacity>}
-                
+
                 <TouchableOpacity style={styles.button} onPress={() => navigation.navigate(`PreCadastroResponsavel`)}><Text style={styles.buttonText}>Cadastro de responsáveis</Text></TouchableOpacity>
                 <TouchableOpacity style={styles.button} onPress={() => navigation.navigate(`PreCadastroAluno`)}><Text style={styles.buttonText}>Cadastro de alunos</Text></TouchableOpacity>
             </ScrollView>
-            <FooterComIcones nav={navigation}/>
+            <FooterComIcones nav={navigation} />
         </SafeAreaView>
     );
 }
@@ -413,4 +447,11 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         width: '85%',
     },
+    perfilSemFoto: {
+        width: 120,
+        height: 120,
+        borderRadius: '50%',
+        borderWidth: 3,
+        borderColor: "#f1c40f",
+      },
 });

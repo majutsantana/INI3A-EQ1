@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('cnpj');
             $table->string('telefone');
             $table->string('plano');
-            //$table->string('foto')->nullable();
+            $table->text('imagem')->nullable();
             $table->timestamps();
         });
     }

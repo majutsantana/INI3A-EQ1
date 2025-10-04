@@ -9,6 +9,7 @@ use App\Models\Usuario;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage; 
 use Illuminate\Support\Facades\Validator; 
 use Throwable;
 
@@ -83,10 +84,17 @@ class InstituicaoController extends Controller
             'nome' => 'sometimes|string|max:255',
             'endereco' => 'sometimes|string',
             'telefone' => 'sometimes|string',
+            'imagem' => 'sometimes|nullable|string',
         ]);
 
-        $instituicao = Instituicao::findOrFail($id);
+        $instituicao = Instituicao::where('id', $id)->first();
+        if (!$instituicao) {
+            return response()->json(['error' => 'Instituição não encontrada.'], 404);
+        }
+
+        // Atualize os campos diretamente, incluindo a URL da imagem
         $instituicao->update($dados);
+
         return response()->json($instituicao);
     }
 
