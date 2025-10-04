@@ -20,7 +20,7 @@ import { Feather } from '@expo/vector-icons';
 import { TextInputMask } from 'react-native-masked-text';
 import useApi from '../../hooks/useApi';
 import HeaderComLogout from '../../components/HeaderComLogout';
-
+import { useTheme } from '../context/ThemeContext';
 
 export default function CadastroInstituicao({ navigation }) {
   const [fontsLoaded, setFontsLoaded] = useState(false);
@@ -35,6 +35,7 @@ export default function CadastroInstituicao({ navigation }) {
   const [errors, setErrors] = useState({});
   const [senhaVisivel, setSenhaVisivel] = useState(false);
   const [confSenhaVisivel, setConfSenhaVisivel] = useState(false);
+  const { theme, toggleTheme, colors } = useTheme();
 
   // --- NOVOS ESTADOS PARA O ENDEREÇO ---
   const [cep, setCep] = useState('');
@@ -240,12 +241,12 @@ export default function CadastroInstituicao({ navigation }) {
   }
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <SafeAreaView style={theme == "light" ? styles.safeArea : styles.safeAreaDark}>
       <StatusBar backgroundColor="#B9A6DA" barStyle="dark-content" />
       <HeaderComLogout/>
 
 
-      <View style={styles.content}>
+      <View style={theme == "light" ? styles.content : styles.contentDark}>
         <View style={styles.formContainer}>
           <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
             <MaterialIcons name="arrow-back" size={28} color="#000" />
