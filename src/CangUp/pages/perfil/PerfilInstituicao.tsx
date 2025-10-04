@@ -191,33 +191,47 @@ export default function PerfilInstituicao({ navigation }) {
     }
 
     return (
-        <SafeAreaView style={styles.safeArea}>
+        <SafeAreaView style={theme == "light" ? styles.safeArea : styles.safeAreaDark}>
             <HeaderComLogout/>
             <View>
-                <View style={styles.profileTop}><View style={styles.nameTag}><Text style={styles.nameText}>{instituicao.nome}</Text></View></View>
+                <View style={theme == "light" ? styles.profileTop : styles.profileTopDark}><View style={styles.nameTag}><Text style={styles.nameText}>{instituicao.nome}</Text></View></View>
                 <View style={styles.profilePicWrapper}><Text style={styles.picText}>Foto de perfil</Text></View>
-                <View style={styles.profileBottom}>
+                <View style={theme == "light" ? styles.profileBottom : styles.profileBottomDark}>
                     <TouchableOpacity style={styles.editBtn} onPress={handleEditCancel}>
                         <Text style={styles.editText}>{editando ? 'Cancelar' : 'Editar perfil'}</Text>
                     </TouchableOpacity>
                 </View>
             </View>
             <ScrollView contentContainerStyle={styles.formContainer}>
-                <Text style={styles.label}>Nome:</Text>
-                <TextInput style={[styles.input, editando && styles.inputDisabled]} value={instituicao.nome} editable={false} />
-                
-                <Text style={styles.label}>Email:</Text>
-                <TextInput style={[styles.input, editando && styles.inputDisabled]} value={instituicao.email} editable={false} />
-                
-                <Text style={styles.label}>Endereço:</Text>
+                <Text style={theme == "light" ? styles.label : styles.labelDark}>Nome:</Text>
+                <TextInput 
+                    style={[
+                        theme === "light" ? styles.input : styles.inputDark,
+                        editando && styles.inputDisabled
+                    ]} 
+                    value={instituicao.nome} 
+                    editable={false} 
+                />                
+                <Text style={theme == "light" ? styles.label : styles.labelDark}>Email:</Text>
+                <TextInput 
+                    style={[
+                        theme === "light" ? styles.input : styles.inputDark,
+                        editando && styles.inputDisabled
+                    ]} 
+                    value={instituicao.email} 
+                    editable={false} 
+                />                 
+                <Text style={theme == "light" ? styles.label : styles.labelDark}>Endereço:</Text>
                 {editando ? (
                     <>
                         <View style={styles.cepContainer}>
                             <TextInputMask
-                                style={[styles.input, { flex: 1 }, errors.cep && styles.inputError]}
+                                style={[styles.input ,{flex: 1},
+                                    errors.cep && styles.inputError
+                                ]}
                                 type={'zip-code'}
                                 placeholder="Digite o CEP"
-                                placeholderTextColor="#888"
+                                placeholderTextColor="#000"
                                 value={cep}
                                 onChangeText={setCep}
                                 onBlur={buscarCep}
@@ -227,22 +241,33 @@ export default function PerfilInstituicao({ navigation }) {
                         </View>
                         {errors.cep && <Text style={styles.errorText}>{errors.cep}</Text>}
 
-                        <TextInput style={styles.input} placeholderTextColor="#888" placeholder="Logradouro (Rua, Av...)" value={logradouro} onChangeText={setLogradouro} />
-                        <TextInput style={styles.input} placeholderTextColor="#888" placeholder="Número" value={numero} onChangeText={setNumero} keyboardType="numeric" />
-                        <TextInput style={styles.input} placeholderTextColor="#888" placeholder="Bairro" value={bairro} onChangeText={setBairro} />
-                        <TextInput style={styles.input} placeholderTextColor="#888" placeholder="Cidade" value={cidade} onChangeText={setCidade} />
-                        <TextInput style={styles.input} placeholderTextColor="#888" placeholder="UF" value={uf} onChangeText={setUf} maxLength={2} autoCapitalize="characters" />
+                        <TextInput style={styles.input} placeholderTextColor="#000" placeholder="Logradouro (Rua, Av...)" value={logradouro} onChangeText={setLogradouro} />
+                        <TextInput style={styles.input} placeholderTextColor="#000" placeholder="Número" value={numero} onChangeText={setNumero} keyboardType="numeric" />
+                        <TextInput style={styles.input} placeholderTextColor="#000" placeholder="Bairro" value={bairro} onChangeText={setBairro} />
+                        <TextInput style={styles.input} placeholderTextColor="#000" placeholder="Cidade" value={cidade} onChangeText={setCidade} />
+                        <TextInput style={styles.input} placeholderTextColor="#000" placeholder="UF" value={uf} onChangeText={setUf} maxLength={2} autoCapitalize="characters" />
                     </>
                 ) : (
-                    <TextInput style={styles.input} value={instituicao.endereco} editable={false} />
+                    <TextInput style={theme == "light" ? styles.input : styles.inputDark} value={instituicao.endereco} editable={false} />
                 )}
 
-                <Text style={styles.label}>CNPJ:</Text>
-                <TextInput style={[styles.input, editando && styles.inputDisabled]} value={instituicao.cnpj} editable={false} />
-                
-                <Text style={styles.label}>Telefone para contato:</Text>
+                <Text style={theme == "light" ? styles.label : styles.labelDark}>CNPJ:</Text>
+                <TextInput 
+                    style={[
+                        theme === "light" ? styles.input : styles.inputDark,
+                        editando && styles.inputDisabled
+                    ]} 
+                    value={instituicao.cnpj} 
+                    editable={false} 
+                />                 
+                <Text style={theme == "light" ? styles.label : styles.labelDark}>Telefone para contato:</Text>
                 <TextInputMask
-                    style={[styles.input, errors.telefone && styles.inputError]}
+                    style={[
+                        editando? 
+                        styles.input:
+                        theme === "light" ? styles.input : styles.inputDark,
+                        errors.telefone && styles.inputError 
+                    ]}
                     type={'cel-phone'}
                     options={{ maskType: 'BRL', withDDD: true, dddMask: '(99) ' }}
                     placeholder="(99) 99999-9999"
@@ -259,15 +284,21 @@ export default function PerfilInstituicao({ navigation }) {
                 />
                 {errors.telefone && <Text style={styles.errorText}>{errors.telefone}</Text>}
 
-                <Text style={styles.label}>Plano:</Text>
-                <TextInput style={[styles.input, editando && styles.inputDisabled]} value={instituicao.plano === 'S' ? 'Semestral' : 'Anual'} editable={false} />
-                
-                {editando && <TouchableOpacity style={styles.saveBtn} onPress={salvarEdicao}><Text style={styles.saveText}>Salvar Alterações</Text></TouchableOpacity>}
+                <Text style={theme == "light" ? styles.label : styles.labelDark}>Plano:</Text>
+                <TextInput 
+                    style={[
+                        theme === "light" ? styles.input : styles.inputDark,
+                        editando && styles.inputDisabled
+                    ]} 
+                    value={instituicao.plano === 'S' ? 'Semestral' : 'Anual'} 
+                    editable={false} 
+                />                 
+                {editando && <TouchableOpacity style={theme == "light" ? styles.saveBtn : styles.saveBtnDark} onPress={salvarEdicao}><Text style={styles.saveText}>Salvar Alterações</Text></TouchableOpacity>}
                 
                 <TouchableOpacity style={styles.button} onPress={() => navigation.navigate(`PreCadastroResponsavel`)}><Text style={styles.buttonText}>Cadastro de responsáveis</Text></TouchableOpacity>
                 <TouchableOpacity style={styles.button} onPress={() => navigation.navigate(`PreCadastroAluno`)}><Text style={styles.buttonText}>Cadastro de alunos</Text></TouchableOpacity>
             </ScrollView>
-            <FooterComIcones />
+            <FooterComIcones nav={navigation} />
         </SafeAreaView>
     );
 }
@@ -277,14 +308,29 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: '#FCD28D',
     },
+    safeAreaDark: {
+        flex: 1,
+        backgroundColor: '#522a91',
+    },
     profileTop: {
         backgroundColor: '#FFBE31',
         alignItems: 'center',
         paddingTop: 20,
         paddingBottom: 60,
     },
+    profileTopDark:{
+        backgroundColor: '#8a62bbff',
+        alignItems: 'center',
+        paddingTop: 20,
+        paddingBottom: 60,
+    },
     profileBottom: {
         backgroundColor: '#FCD28D',
+        alignItems: 'center',
+        paddingTop: 80,
+    },
+    profileBottomDark:{
+        backgroundColor: '#522a91',
         alignItems: 'center',
         paddingTop: 80,
     },
@@ -347,6 +393,13 @@ const styles = StyleSheet.create({
         color: '#333',
         marginTop: 10,
     },
+    labelDark: {
+        width: '85%',
+        fontFamily: 'PoppinsBold',
+        fontSize: 14,
+        color: 'white',
+        marginTop: 10,
+    },
     input: {
         width: '85%',
         minHeight: 45,
@@ -359,6 +412,20 @@ const styles = StyleSheet.create({
         color: '#000',
         borderWidth: 1,
         borderColor: '#ddd',
+        paddingVertical: 10,
+    },
+    inputDark:{
+        width: '85%',
+        minHeight: 45,
+        backgroundColor: '#B9B9B9',
+        borderRadius: 20,
+        paddingHorizontal: 15,
+        marginVertical: 8,
+        justifyContent: 'center',
+        fontFamily: 'PoppinsRegular',
+        color: '#000',
+        borderWidth: 1,
+        borderColor: '#555',
         paddingVertical: 10,
     },
     errorText: {
@@ -376,10 +443,17 @@ const styles = StyleSheet.create({
         paddingVertical: 10,
         marginTop: 20,
     },
+    saveBtnDark:{
+        backgroundColor: '#BB86FC',
+        borderRadius: 20,
+        paddingHorizontal: 30,
+        paddingVertical: 10,
+        marginTop: 20,
+    },
     saveText: {
         fontFamily: 'PoppinsBold',
         fontSize: 16,
-        color: '#fff',
+        color: 'white',
     },
     button: {
         backgroundColor: '#FFBE31',
@@ -402,8 +476,8 @@ const styles = StyleSheet.create({
         fontFamily: 'PoppinsRegular',
     },
     inputDisabled: {
-        backgroundColor: '#E0E0E0',
-        color: '#888',
+        backgroundColor: '#9a9a9aff',
+        color: '#3c3c3cff',
     },
     inputError: {
         borderColor: '#d9534f',

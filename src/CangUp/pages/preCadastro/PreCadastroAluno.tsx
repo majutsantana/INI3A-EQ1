@@ -206,7 +206,7 @@ export default function PreCadastroAluno({ navigation }) {
           <Text style={theme == "light" ? styles.buttonText : styles.buttonTextDark}>Cadastrar Aluno</Text>
         </TouchableOpacity>
       </View>
-      <FooterComIcones/>
+      <FooterComIcones nav={navigation}/>
     </SafeAreaView>
     );
 }

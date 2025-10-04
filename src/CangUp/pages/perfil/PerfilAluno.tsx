@@ -17,6 +17,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import useApi from '../../hooks/useApi';
 import { TextInputMask } from 'react-native-masked-text';
 import { AuthContext } from '../../components/AuthContext';
+import { useTheme } from '../../context/ThemeContext';
+import getStyles from '../style'; 
 
 type Aluno = {
     id: number;
@@ -47,6 +49,7 @@ export default function PerfilAluno({ navigation }) {
     const [cidade, setCidade] = useState('');
     const [uf, setUf] = useState('');
     const [loadingCep, setLoadingCep] = useState(false);
+    const { theme, toggleTheme, colors } = useTheme();
 
     const loadFonts = async () => {
         await Font.loadAsync({
@@ -203,8 +206,8 @@ export default function PerfilAluno({ navigation }) {
     }
 
     return (
-        <SafeAreaView style={styles.safeArea}>
-            <HeaderComLogout />
+        <SafeAreaView style={theme == "light" ? styles.safeArea : styles.safeAreaDark}>
+            <HeaderComLogout/>
             <View style={styles.profileTop}><View style={styles.nameTag}><Text style={styles.nameText}>{aluno.nome}</Text></View></View>
             <View style={styles.profilePicWrapper}><View style={styles.profilePic}><Text style={styles.picText}>Foto de perfil</Text></View></View>
             <View style={styles.profileBottom}>
@@ -277,7 +280,7 @@ export default function PerfilAluno({ navigation }) {
 
                 {editando && <TouchableOpacity style={styles.saveBtn} onPress={salvarEdicao}><Text style={styles.saveText}>Salvar Alterações</Text></TouchableOpacity>}
             </ScrollView>
-            <FooterComIcones />
+            <FooterComIcones nav={navigation} />
         </SafeAreaView>
     );
 }
@@ -287,6 +290,10 @@ const styles = StyleSheet.create({
     safeArea: {
         flex: 1,
         backgroundColor: '#FCD28D',
+    },
+    safeAreaDark: {
+        flex: 1,
+        backgroundColor: '#522a91',
     },
     profileTop: {
         backgroundColor: '#FFBE31',

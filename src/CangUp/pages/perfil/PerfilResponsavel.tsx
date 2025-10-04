@@ -276,7 +276,7 @@ export default function PerfilResponsavel({ navigation }) { //Navigation não es
                 {editando && <TouchableOpacity style={styles.saveBtn} onPress={salvarEdicao}><Text style={styles.saveText}>Salvar Alterações</Text></TouchableOpacity>}
                 <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('CadastroVeiculo')}><Text style={styles.buttonText}>Cadastro de veículo</Text></TouchableOpacity>
             </ScrollView>
-            <FooterComIcones />
+            <FooterComIcones nav={navigation} />
         </SafeAreaView>
     );
 }

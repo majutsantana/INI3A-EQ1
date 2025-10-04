@@ -182,18 +182,20 @@ export default function Login({ navigation }) {
         <TouchableOpacity style={styles.button} onPress={login}>
           <Text style={styles.buttonText}>Login</Text>
         </TouchableOpacity>
+            
+        <View>
+          <TouchableOpacity onPress={getDados}>
+            <Text style={styles.linkText}>Esqueci minha senha</Text>
+          </TouchableOpacity>
 
-        <TouchableOpacity onPress={getDados}>
-          <Text style={styles.linkText}>Esqueci minha senha</Text>
-        </TouchableOpacity>
+          <Text style={styles.registerText}>
+            Não tem uma conta?
+          </Text>
 
-        <Text style={styles.registerText}>
-          Não tem uma conta?
-        </Text>
-
-        <TouchableOpacity onPress={() => navigation.navigate('TipoCadastro')}>
-          <Text style={styles.linkText}> Criar conta</Text>
-        </TouchableOpacity>
+          <TouchableOpacity onPress={() => navigation.navigate('TipoCadastro')}>
+            <Text style={styles.linkText}> Criar conta</Text>
+          </TouchableOpacity>
+        </View>
       </View>
 
       <Modal
