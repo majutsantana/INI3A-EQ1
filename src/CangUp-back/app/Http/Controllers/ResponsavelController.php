@@ -71,7 +71,7 @@ class ResponsavelController extends Controller
         'cpf' => 'required|string|exists:responsaveis,cpf',
         'email' => 'required|string|email|max:255|unique:usuarios,email',
         'telefone' => 'nullable|string',
-        'sexo' => 'nullable|in:Masculino,Feminino,Neutro,Prefiro não informar',
+        'genero' => 'nullable|in:Masculino,Feminino,Neutro,Prefiro não informar',
         'endereco' => 'nullable|string',
         'senha' => 'required|string|min:6'
     ]);
@@ -112,7 +112,7 @@ class ResponsavelController extends Controller
 
 
     $responsavel->email = $dados['email'];
-    $responsavel->sexo = $dados['sexo'];
+    $responsavel->genero = $dados['genero'];
     $responsavel->endereco = $dados['endereco'];
     $responsavel->telefone = $dados['telefone'];
     $responsavel->update();
@@ -143,6 +143,7 @@ class ResponsavelController extends Controller
             'nome' => 'sometimes|string|max:255',
             'endereco' => 'sometimes|string',
             'telefone' => 'sometimes|string',
+            'imagem' => 'sometimes|nullable|string',
         ]);
 
         $responsavel = Responsavel::findOrFail($id);

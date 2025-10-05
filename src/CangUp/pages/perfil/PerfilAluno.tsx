@@ -8,7 +8,8 @@ import {
     TouchableOpacity,
     Alert,
     ActivityIndicator,
-    ScrollView
+    ScrollView,
+    Image
 } from 'react-native';
 import * as Font from 'expo-font';
 import HeaderComLogout from '../../components/HeaderComLogout';
@@ -17,6 +18,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import useApi from '../../hooks/useApi';
 import { TextInputMask } from 'react-native-masked-text';
 import { AuthContext } from '../../components/AuthContext';
+import * as ImagePicker from "expo-image-picker";
+import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 
 type Aluno = {
     id: number;
@@ -26,7 +29,8 @@ type Aluno = {
     email: string;
     telefone: string;
     endereco: string;
-    sexo: string;
+    genero: string;
+    imagem: string;
 }
 
 export default function PerfilAluno({ navigation }) {
@@ -38,8 +42,6 @@ export default function PerfilAluno({ navigation }) {
     const { url } = useApi();
     const [fontsLoaded, setFontsLoaded] = useState(false);
     const {logout} = useContext(AuthContext);
-
-    // --- ESTADOS PARA EDIÇÃO DO ENDEREÇO ---
     const [cep, setCep] = useState('');
     const [logradouro, setLogradouro] = useState('');
     const [numero, setNumero] = useState('');
@@ -47,6 +49,7 @@ export default function PerfilAluno({ navigation }) {
     const [cidade, setCidade] = useState('');
     const [uf, setUf] = useState('');
     const [loadingCep, setLoadingCep] = useState(false);
+    const [imagem, setImagem] = useState<string | null>(null);
 
     const loadFonts = async () => {
         await Font.loadAsync({
@@ -54,6 +57,22 @@ export default function PerfilAluno({ navigation }) {
             'PoppinsBold': require('../../assets/fonts/PoppinsBold.ttf'),
         });
         setFontsLoaded(true);
+    };
+
+    const pickImage = async () => {
+        let result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            allowsEditing: true,
+            aspect: [1, 1],
+            quality: 0.7,
+            base64: true,
+        });
+
+        if (!result.canceled) {
+            const newBase64 = "data:image/jpeg;base64," + result.assets[0].base64;
+            setImagem(newBase64);
+            handleInputChange('imagem', newBase64); 
+            }
     };
 
     const fetchAluno = async () => {
@@ -83,13 +102,15 @@ export default function PerfilAluno({ navigation }) {
             if (data.telefone) {
                 setRawTelefone(data.telefone.replace(/\D/g, ''));
             }
+            if (data.imagem) {
+                setImagem(data.imagem);
+            }
         } catch (err) {
             console.error(err);
             Alert.alert("Erro", "Não foi possível buscar os dados.");
         }
     }
 
-    // --- FUNÇÃO PARA BUSCAR O ENDEREÇO PELO CEP ---
     const buscarCep = async () => {
         const cepLimpo = cep.replace(/\D/g, '');
         if (cepLimpo.length !== 8) {
@@ -156,7 +177,8 @@ export default function PerfilAluno({ navigation }) {
                     email: aluno.email,
                     telefone: rawTelefone,
                     endereco: enderecoFinal,
-                    sexo: aluno.sexo
+                    genero: aluno.genero,
+                    imagem: aluno.imagem,
                 })
             });
             if (!res.ok) {
@@ -180,6 +202,7 @@ export default function PerfilAluno({ navigation }) {
             if (originalAluno) {
                 setAluno(originalAluno);
                 setRawTelefone(originalAluno.telefone.replace(/\D/g, ''));
+                setImagem(originalAluno.imagem); 
             }
             setCep(''); setLogradouro(''); setNumero(''); setBairro(''); setCidade(''); setUf('');
         }
@@ -205,12 +228,30 @@ export default function PerfilAluno({ navigation }) {
     return (
         <SafeAreaView style={styles.safeArea}>
             <HeaderComLogout />
-            <View style={styles.profileTop}><View style={styles.nameTag}><Text style={styles.nameText}>{aluno.nome}</Text></View></View>
-            <View style={styles.profilePicWrapper}><View style={styles.profilePic}><Text style={styles.picText}>Foto de perfil</Text></View></View>
-            <View style={styles.profileBottom}>
-                <TouchableOpacity style={styles.editBtn} onPress={handleEditCancel}>
-                    <Text style={styles.editText}>{editando ? 'Cancelar' : 'Editar perfil'}</Text>
-                </TouchableOpacity>
+            <View>
+                <View style={styles.profileTop}><View style={styles.nameTag}><Text style={styles.nameText}>{aluno.nome}</Text></View></View>
+                <TouchableOpacity 
+                    style={styles.profilePicWrapper} 
+                    onPress={editando ? pickImage : undefined} 
+                    activeOpacity={editando ? 0.7 : 1} 
+                >
+                    <Image
+                        source={
+                            imagem ? { uri: imagem } : require("../../assets/images/FotoPerfil.png")
+                        }
+                        style={styles.perfilSemFoto}
+                    />
+                    {editando && (  
+                        <View style={styles.editIconContainer}>
+                            <FontAwesome5 name="pencil-alt" size={16} color="#000" />
+                        </View>
+                    )}
+                </TouchableOpacity> 
+                <View style={styles.profileBottom}>
+                    <TouchableOpacity style={styles.editBtn} onPress={handleEditCancel}>
+                        <Text style={styles.editText}>{editando ? 'Cancelar' : 'Editar perfil'}</Text>
+                    </TouchableOpacity>
+                </View>
             </View>
             <ScrollView contentContainerStyle={styles.formContainer}>
                 <Text style={styles.label}>Nome:</Text>
@@ -272,8 +313,8 @@ export default function PerfilAluno({ navigation }) {
                 />
                 {errors.telefone && <Text style={styles.errorText}>{errors.telefone}</Text>}
 
-                <Text style={styles.label}>Sexo:</Text>
-                <TextInput style={[styles.input, editando && styles.inputDisabled]} value={aluno.sexo} editable={false} />
+                <Text style={styles.label}>Gênero:</Text>
+                <TextInput style={[styles.input, editando && styles.inputDisabled]} value={aluno.genero} editable={false} />
 
                 {editando && <TouchableOpacity style={styles.saveBtn} onPress={salvarEdicao}><Text style={styles.saveText}>Salvar Alterações</Text></TouchableOpacity>}
             </ScrollView>
@@ -299,21 +340,24 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingTop: 80,
     },
-    profilePicWrapper: {
+     profilePicWrapper: {
+        display: 'flex',
+        justifyContent: 'center',
         position: 'absolute',
-        top: 160, 
-        left: 0,
-        right: 0,
+        backgroundColor: '#D9D9D9',
+        borderRadius: 100,
         alignItems: 'center',
         zIndex: 2,
-    },
-    profilePic: {
         width: 120,
         height: 120,
-        borderRadius: 60,
-        backgroundColor: '#D9D9D9',
-        justifyContent: 'center',
-        alignItems: 'center',
+        borderWidth: 2,
+        borderColor: '#FFF',
+        left: '50%',
+        top: '50%',
+        transform: [
+            { translateX: -60 },
+            { translateY: -60 }
+        ],
     },
     label: {
         width: '85%',
@@ -332,11 +376,6 @@ const styles = StyleSheet.create({
         fontFamily: 'PoppinsRegular',
         marginTop: -4,
         marginBottom: 8,
-    },
-    picText: {
-        fontFamily: 'PoppinsRegular',
-        fontSize: 12,
-        color: '#555',
     },
     nameTag: {
         backgroundColor: '#fff',
@@ -375,8 +414,10 @@ const styles = StyleSheet.create({
         marginVertical: 8,
         justifyContent: 'center',
         fontFamily: 'PoppinsRegular',
+        color: '#000',
+        borderWidth: 1,
+        borderColor: '#ddd',
         paddingVertical: 10,
-        color: '#000'
     },
     saveBtn: {
         backgroundColor: '#522a91',
@@ -402,6 +443,28 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         width: '85%',
+    },
+    perfilSemFoto: {
+        width: 120,
+        height: 120,
+        borderRadius: '50%',
+        borderWidth: 3,
+        borderColor: "#BEACDE",
+    },
+    editIconContainer: {
+        position: 'absolute',
+        bottom: 0,
+        right: 0,
+        backgroundColor: '#FFBE31', 
+        borderRadius: 20,
+        padding: 8,
+        borderWidth: 2,
+        borderColor: '#FFF',    
+        elevation: 4,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
     },
 });
 

@@ -15,7 +15,7 @@ import {
   import { useNavigation } from '@react-navigation/native';
   import { MaterialIcons } from '@expo/vector-icons';
   import Header from '../../components/Header';
-  import FooterSemIcones from '../../components/FooterSemIcones';
+  import FooterComIcones from '../../components/FooterSemIcones';
   import useApi from '../../hooks/useApi';
   import { TextInputMask } from 'react-native-masked-text';
   import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -288,7 +288,7 @@ import { AuthContext } from '../../components/AuthContext';
           </TouchableOpacity>
         </View>
   
-        <FooterSemIcones />
+        <FooterComIcones />
       </SafeAreaView>
     );
   }

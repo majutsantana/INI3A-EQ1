@@ -9,6 +9,7 @@ import {
     Alert,
     ActivityIndicator,
     ScrollView,
+    Image
 } from 'react-native';
 import * as Font from 'expo-font';
 import HeaderComLogout from '../../components/HeaderComLogout';
@@ -17,6 +18,8 @@ import useApi from '../../hooks/useApi';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { TextInputMask } from 'react-native-masked-text';
 import { AuthContext } from '../../components/AuthContext';
+import * as ImagePicker from "expo-image-picker";
+import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 
 type Responsavel = {
     id: number;
@@ -24,8 +27,9 @@ type Responsavel = {
     cpf: string;
     email: string;
     telefone: string;
-    sexo: string;
+    genero: string;
     endereco: string;
+    imagem: string;
 }
 
 export default function PerfilResponsavel({ navigation }) { //Navigation não está dando erro, é apenas o vs code
@@ -37,8 +41,6 @@ export default function PerfilResponsavel({ navigation }) { //Navigation não es
     const [errors, setErrors] = useState<{ telefone?: string, cep?: string }>({});
     const { url } = useApi();
     const {logout} = useContext(AuthContext);
-
-    // --- ESTADOS PARA EDIÇÃO DO ENDEREÇO ---
     const [cep, setCep] = useState('');
     const [logradouro, setLogradouro] = useState('');
     const [numero, setNumero] = useState('');
@@ -46,6 +48,7 @@ export default function PerfilResponsavel({ navigation }) { //Navigation não es
     const [cidade, setCidade] = useState('');
     const [uf, setUf] = useState('');
     const [loadingCep, setLoadingCep] = useState(false);
+    const [imagem, setImagem] = useState<string | null>(null);
 
     const loadFonts = async () => {
         await Font.loadAsync({
@@ -53,6 +56,22 @@ export default function PerfilResponsavel({ navigation }) { //Navigation não es
             'PoppinsBold': require('../../assets/fonts/PoppinsBold.ttf'),
         });
         setFontsLoaded(true);
+    };
+
+    const pickImage = async () => {
+        let result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            allowsEditing: true,
+            aspect: [1, 1],
+            quality: 0.7,
+            base64: true,
+        });
+
+        if (!result.canceled) {
+            const newBase64 = "data:image/jpeg;base64," + result.assets[0].base64;
+            setImagem(newBase64);
+            handleInputChange('imagem', newBase64); 
+            }
     };
 
     const fetchResponsavel = async () => {
@@ -82,13 +101,15 @@ export default function PerfilResponsavel({ navigation }) { //Navigation não es
             if (data.telefone) {
                 setRawTelefone(data.telefone.replace(/\D/g, ''));
             }
+            if (data.imagem) {
+                setImagem(data.imagem);
+            }
         } catch (err) {
             console.error(err);
             Alert.alert("Erro", "Não foi possível buscar os dados.");
         }
     };
 
-    // --- FUNÇÃO PARA BUSCAR O ENDEREÇO PELO CEP ---
     const buscarCep = async () => {
         const cepLimpo = cep.replace(/\D/g, '');
         if (cepLimpo.length !== 8) {
@@ -153,8 +174,9 @@ export default function PerfilResponsavel({ navigation }) { //Navigation não es
                     cpf: responsavel.cpf,
                     email: responsavel.email,
                     telefone: rawTelefone,
-                    sexo: responsavel.sexo,
+                    genero: responsavel.genero,
                     endereco: enderecoFinal,
+                    imagem: responsavel.imagem,
                 })
             });
             if (!res.ok) {
@@ -179,7 +201,6 @@ export default function PerfilResponsavel({ navigation }) { //Navigation não es
                 setResponsavel(originalResponsavel);
                 setRawTelefone(originalResponsavel.telefone.replace(/\D/g, ''));
             }
-            // Limpa os campos de endereço temporários
             setCep(''); setLogradouro(''); setNumero(''); setBairro(''); setCidade(''); setUf('');
         }
         setEditando(!editando);
@@ -206,7 +227,23 @@ export default function PerfilResponsavel({ navigation }) { //Navigation não es
             <HeaderComLogout />
             <View>
                 <View style={styles.profileTop}><View style={styles.nameTag}><Text style={styles.nameText}>{responsavel.nome}</Text></View></View>
-                <View style={styles.profilePicWrapper}><Text style={styles.picText}>Foto de perfil</Text></View>
+                <TouchableOpacity 
+                    style={styles.profilePicWrapper} 
+                    onPress={editando ? pickImage : undefined} 
+                    activeOpacity={editando ? 0.7 : 1} 
+                >
+                    <Image
+                        source={
+                            imagem ? { uri: imagem } : require("../../assets/images/FotoPerfil.png")
+                        }
+                        style={styles.perfilSemFoto}
+                    />
+                    {editando && (  
+                        <View style={styles.editIconContainer}>
+                            <FontAwesome5 name="pencil-alt" size={16} color="#000" />
+                        </View>
+                    )}
+                </TouchableOpacity> 
                 <View style={styles.profileBottom}>
                     <TouchableOpacity style={styles.editBtn} onPress={handleEditCancel}>
                         <Text style={styles.editText}>{editando ? 'Cancelar' : 'Editar perfil'}</Text>
@@ -270,8 +307,8 @@ export default function PerfilResponsavel({ navigation }) { //Navigation não es
                 />
                 {errors.telefone && <Text style={styles.errorText}>{errors.telefone}</Text>}
 
-                <Text style={styles.label}>Sexo:</Text>
-                <TextInput style={[styles.input, editando && styles.inputDisabled]} value={responsavel.sexo} editable={false} />
+                <Text style={styles.label}>Gênero:</Text>
+                <TextInput style={[styles.input, editando && styles.inputDisabled]} value={responsavel.genero} editable={false} />
 
                 {editando && <TouchableOpacity style={styles.saveBtn} onPress={salvarEdicao}><Text style={styles.saveText}>Salvar Alterações</Text></TouchableOpacity>}
                 <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('CadastroVeiculo')}><Text style={styles.buttonText}>Cadastro de veículo</Text></TouchableOpacity>
@@ -315,11 +352,6 @@ const styles = StyleSheet.create({
             { translateX: -60 },
             { translateY: -60 }
         ],
-    },
-    picText: {
-        fontFamily: 'PoppinsRegular',
-        fontSize: 12,
-        color: '#555',
     },
     nameTag: {
         backgroundColor: '#fff',
@@ -421,6 +453,28 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         width: '85%',
+    },
+    perfilSemFoto: {
+        width: 120,
+        height: 120,
+        borderRadius: '50%',
+        borderWidth: 3,
+        borderColor: "#BEACDE",
+    },
+    editIconContainer: {
+        position: 'absolute',
+        bottom: 0,
+        right: 0,
+        backgroundColor: '#FFBE31',
+        borderRadius: 20,
+        padding: 8,
+        borderWidth: 2,
+        borderColor: '#FFF',    
+        elevation: 4,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
     },
 });
 

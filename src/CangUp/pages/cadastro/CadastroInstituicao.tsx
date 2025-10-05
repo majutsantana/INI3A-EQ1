@@ -20,7 +20,7 @@ import { Feather } from '@expo/vector-icons';
 import { TextInputMask } from 'react-native-masked-text';
 import useApi from '../../hooks/useApi';
 import HeaderComLogout from '../../components/HeaderComLogout';
-import { useTheme } from '../context/ThemeContext';
+import { useTheme } from '../../context/ThemeContext';
 
 export default function CadastroInstituicao({ navigation }) {
   const [fontsLoaded, setFontsLoaded] = useState(false);

@@ -9,6 +9,7 @@ import {
     TextInput,
     TouchableOpacity,
     Alert,
+    Image
 } from 'react-native';
 import * as Font from 'expo-font';
 import { Feather } from '@expo/vector-icons';
@@ -25,6 +26,7 @@ type Aluno = {
     email: string;
     cpf: string;
     id_inst: number;
+    imagem?: string;
 }
 
 type Responsavel = {
@@ -33,6 +35,7 @@ type Responsavel = {
     email: string;
     cpf: string;
     id_inst: number;
+    imagem?: string;
 }
 
 type Instituicao = {
@@ -205,12 +208,12 @@ export default function ListaInstituicoes({ navigation }) {
     const alunosFiltrados = alunos.filter(alun =>
         alun.id_inst === instituicao?.id &&
         alun.nome.toLowerCase().includes(busca.toLowerCase())
-    );
+    ).sort((a, b) => a.nome.localeCompare(b.nome, 'pt', { sensitivity: 'base' }));
 
     const responsaveisFiltrados = responsaveis.filter(resp =>
         resp.id_inst === instituicao?.id &&
         resp.nome.toLowerCase().includes(busca.toLowerCase())
-    );
+    ).sort((a, b) => a.nome.localeCompare(b.nome, 'pt', { sensitivity: 'base' }));
 
     if (!fontsLoaded || loading) {
         return (
@@ -232,10 +235,15 @@ export default function ListaInstituicoes({ navigation }) {
             >
                 <Feather name="trash-2" size={18} color="#fff" />
             </TouchableOpacity>
-
-            <View style={styles.fotoPlaceholder}>
-                <Text style={styles.fotoPlaceholderText}>Foto</Text>
-            </View>
+            
+             <Image
+                source={
+                    item.imagem
+                    ? { uri: item.imagem }
+                    : require("../../assets/images/FotoPerfil.png") 
+                }
+                style={styles.fotoItem}
+            />
             
             <View style={styles.infoContainer}>
                 <Text style={styles.nomeItem}>{item.nome}</Text>
@@ -246,7 +254,13 @@ export default function ListaInstituicoes({ navigation }) {
                 {'cpf' in item && (
                     <Text style={styles.infoItem}> 🪪 CPF: {item.cpf}</Text>
                 )}
-                <Text style={styles.infoItem}> 📧 E-mail: {item.email}</Text>
+                {item.email ? (
+                    <Text style={styles.infoItem}> 📧 E-mail: {item.email}</Text>
+                ) : (
+                    <Text style={styles.cadastroPendenteText}>
+                        {type === 'aluno' ? 'Aluno' : 'Responsável'} não finalizou o cadastro!
+                    </Text>
+                )}
             </View>
         </View>
     );
@@ -401,6 +415,15 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
     },
+    fotoItem: {
+        width: 60,
+        height: 60,
+        borderRadius: 30, 
+        marginRight: 15,
+        borderWidth: 2,
+        borderColor: '#BEACDE',
+        backgroundColor: '#E0E0E0', 
+    },
     fotoPlaceholder: {
         width: 60,
         height: 60,
@@ -428,6 +451,13 @@ const styles = StyleSheet.create({
         fontFamily: 'PoppinsRegular',
         fontSize: 14,
         color: '#333',
+    },
+    cadastroPendenteText: {
+        fontFamily: 'PoppinsRegular',
+        fontSize: 14,
+        color: '#522a91',
+        marginTop: 5,
+        fontStyle: 'italic',
     },
     textoDia: {
         fontFamily: 'PoppinsRegular',

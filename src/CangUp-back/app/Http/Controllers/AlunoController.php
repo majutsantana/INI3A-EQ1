@@ -18,7 +18,7 @@ class AlunoController extends Controller
 
         $user = Auth::user();
         $inst = Instituicao::where('email', $user->email)->first();
-        // dd($inst);
+        
         $dados = $req->validate([
             'nome' => 'required|string',
             'cpf' => 'required|string',
@@ -68,7 +68,7 @@ class AlunoController extends Controller
     $dados = $req->validate([
         'cpf' => 'required|string|exists:alunos,cpf',
         'email' => 'required|string|email|max:255|unique:usuarios,email',
-        'sexo' => 'nullable|in:Masculino,Feminino,Neutro,Prefiro não informar',
+        'genero' => 'nullable|in:Masculino,Feminino,Neutro,Prefiro não informar',
         'endereco' => 'nullable|string',
         'telefone' => 'nullable|string',
         'senha' => 'required|string|min:6'
@@ -105,7 +105,7 @@ class AlunoController extends Controller
     ]);
 
     $aluno->email = $dados['email'];
-    $aluno->sexo = $dados['sexo'];
+    $aluno->genero = $dados['genero'];
     $aluno->endereco = $dados['endereco'];
     $aluno->telefone = $dados['telefone'];
     $aluno->update();
@@ -135,6 +135,7 @@ class AlunoController extends Controller
             'nome' => 'sometimes|string|max:255',
             'endereco' => 'sometimes|string',
             'telefone' => 'sometimes|string',
+            'imagem' => 'sometimes|nullable|string',
     ]);
 
     $aluno = Aluno::findOrFail($id);

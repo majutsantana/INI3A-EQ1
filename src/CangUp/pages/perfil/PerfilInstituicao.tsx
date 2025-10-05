@@ -1,4 +1,3 @@
-import { useNavigation } from '@react-navigation/core';
 import React, { useContext, useEffect, useState } from 'react';
 import {
     SafeAreaView, StyleSheet, Text, View, TextInput, TouchableOpacity,
@@ -13,7 +12,7 @@ import { TextInputMask } from 'react-native-masked-text';
 import { AuthContext } from '../../components/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
 import * as ImagePicker from "expo-image-picker";
-import { FontAwesome5} from '@expo/vector-icons';
+import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 
 type Instituicao = {
     id: number;
@@ -218,18 +217,27 @@ export default function PerfilInstituicao({ navigation }) {
     }
 
     return (
-        <SafeAreaView style={styles.safeArea}>
+         <SafeAreaView style={styles.safeArea}>
             <HeaderComLogout />
             <View>
                 <View style={styles.profileTop}><View style={styles.nameTag}><Text style={styles.nameText}>{instituicao.nome}</Text></View></View>
-                <TouchableOpacity style={styles.profilePicWrapper} onPress={pickImage}>
+                <TouchableOpacity 
+                    style={styles.profilePicWrapper} 
+                    onPress={editando ? pickImage : undefined} 
+                    activeOpacity={editando ? 0.7 : 1} 
+                >
                     <Image
                         source={
                             imagem ? { uri: imagem } : require("../../assets/images/FotoPerfil.png")
                         }
                         style={styles.perfilSemFoto}
                     />
-                </TouchableOpacity>                
+                    {editando && (  
+                        <View style={styles.editIconContainer}>
+                            <FontAwesome5 name="pencil-alt" size={16} color="#000" />
+                        </View>
+                    )}
+                </TouchableOpacity> 
                 <View style={styles.profileBottom}>
                     <TouchableOpacity style={styles.editBtn} onPress={handleEditCancel}>
                         <Text style={styles.editText}>{editando ? 'Cancelar' : 'Editar perfil'}</Text>
@@ -341,11 +349,6 @@ const styles = StyleSheet.create({
             { translateY: -60 }
         ],
     },
-    picText: {
-        fontFamily: 'PoppinsRegular',
-        fontSize: 12,
-        color: '#555',
-    },
     nameTag: {
         backgroundColor: '#fff',
         paddingHorizontal: 20,
@@ -452,6 +455,21 @@ const styles = StyleSheet.create({
         height: 120,
         borderRadius: '50%',
         borderWidth: 3,
-        borderColor: "#f1c40f",
-      },
+        borderColor: "#BEACDE",
+    },
+    editIconContainer: {
+        position: 'absolute',
+        bottom: 0,
+        right: 0,
+        backgroundColor: '#FFBE31',
+        borderRadius: 20,
+        padding: 8,
+        borderWidth: 2,
+        borderColor: '#FFF',    
+        elevation: 4,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+    },
 });
