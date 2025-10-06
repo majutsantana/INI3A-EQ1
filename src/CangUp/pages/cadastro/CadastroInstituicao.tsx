@@ -246,7 +246,7 @@ export default function CadastroInstituicao({ navigation }) {
       <HeaderComLogout/>
 
 
-      <View style={theme == "light" ? styles.content : styles.contentDark}>
+      <View style= {styles.content} >
         <View style={styles.formContainer}>
           <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
             <MaterialIcons name="arrow-back" size={28} color="#000" />
@@ -483,6 +483,10 @@ const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: '#FFD88D',
+  },
+  safeAreaDark: {
+        flex: 1,
+        backgroundColor: '#522a91',
   },
   content: {
     flex: 1,

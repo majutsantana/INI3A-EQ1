@@ -13,7 +13,7 @@ class Responsavel extends Model
     protected $table = 'responsaveis';
 
     protected $fillable = [
-        'nome', 'cpf', 'email', 'telefone', 'endereco', 'sexo', 'id_inst'
+        'nome', 'cpf', 'email', 'telefone', 'endereco', 'genero', 'imagem', 'id_inst'
     ];
 
 

@@ -19,7 +19,6 @@ import useApi from '../../hooks/useApi';
 import { AuthContext } from '../../components/AuthContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useTheme } from '../../context/ThemeContext';
-// import getStyles from './../style'; // Importe a função que retorna os estilos
 
 type Instituicao = {
     id: number;
@@ -37,11 +36,7 @@ type Instituicao = {
     const { url } = useApi();
     const { logout, token } = useContext(AuthContext);
     const { theme, toggleTheme, colors } = useTheme();
-    
-    //  const global = getStyles();
 
-
-    // Carregar fontes
     const loadFonts = async () => {
         try {
             await Font.loadAsync({
@@ -128,10 +123,9 @@ type Instituicao = {
         );
     }
 
-    // Filtrando as instituições
     const instituicoesFiltradas = instituicoes.filter(inst =>
         inst.nome.toLowerCase().includes(busca.toLowerCase())
-    ); 
+    ).sort((a, b) => a.nome.localeCompare(b.nome, 'pt', { sensitivity: 'base' })); 
 
     return (
         <SafeAreaView style={theme == "light" ? styles.safeArea : styles.safeAreaDark}>
@@ -140,7 +134,6 @@ type Instituicao = {
             <ScrollView contentContainerStyle={styles.scrollViewContainer}>
                 <Text style={theme == "light" ? styles.tituloAba : styles.tituloAbaDark}>Instituições</Text>
 
-                {/* Campo de busca */}
                 <TextInput
                     style={theme == 'light' ? styles.inputBusca : styles.inputBuscaDark}
                     placeholder="Buscar instituição..."

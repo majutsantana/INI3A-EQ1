@@ -9,6 +9,7 @@ import {
     Alert,
     ActivityIndicator,
     ScrollView,
+    Image
 } from 'react-native';
 import * as Font from 'expo-font';
 import HeaderComLogout from '../../components/HeaderComLogout';
@@ -16,7 +17,10 @@ import FooterComIcones from '../../components/FooterComIcones';
 import useApi from '../../hooks/useApi';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { TextInputMask } from 'react-native-masked-text';
+import { useTheme } from '../../context/ThemeContext';
 import { AuthContext } from '../../components/AuthContext';
+import * as ImagePicker from "expo-image-picker";
+import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 
 type Responsavel = {
     id: number;
@@ -24,8 +28,9 @@ type Responsavel = {
     cpf: string;
     email: string;
     telefone: string;
-    sexo: string;
+    genero: string;
     endereco: string;
+    imagem: string;
 }
 
 export default function PerfilResponsavel({ navigation }) { //Navigation não está dando erro, é apenas o vs code
@@ -37,8 +42,6 @@ export default function PerfilResponsavel({ navigation }) { //Navigation não es
     const [errors, setErrors] = useState<{ telefone?: string, cep?: string }>({});
     const { url } = useApi();
     const {logout} = useContext(AuthContext);
-
-    // --- ESTADOS PARA EDIÇÃO DO ENDEREÇO ---
     const [cep, setCep] = useState('');
     const [logradouro, setLogradouro] = useState('');
     const [numero, setNumero] = useState('');
@@ -46,6 +49,8 @@ export default function PerfilResponsavel({ navigation }) { //Navigation não es
     const [cidade, setCidade] = useState('');
     const [uf, setUf] = useState('');
     const [loadingCep, setLoadingCep] = useState(false);
+    const [imagem, setImagem] = useState<string | null>(null);
+    const { theme} = useTheme();
 
     const loadFonts = async () => {
         await Font.loadAsync({
@@ -53,6 +58,22 @@ export default function PerfilResponsavel({ navigation }) { //Navigation não es
             'PoppinsBold': require('../../assets/fonts/PoppinsBold.ttf'),
         });
         setFontsLoaded(true);
+    };
+
+    const pickImage = async () => {
+        let result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            allowsEditing: true,
+            aspect: [1, 1],
+            quality: 0.7,
+            base64: true,
+        });
+
+        if (!result.canceled) {
+            const newBase64 = "data:image/jpeg;base64," + result.assets[0].base64;
+            setImagem(newBase64);
+            handleInputChange('imagem', newBase64); 
+            }
     };
 
     const fetchResponsavel = async () => {
@@ -82,13 +103,15 @@ export default function PerfilResponsavel({ navigation }) { //Navigation não es
             if (data.telefone) {
                 setRawTelefone(data.telefone.replace(/\D/g, ''));
             }
+            if (data.imagem) {
+                setImagem(data.imagem);
+            }
         } catch (err) {
             console.error(err);
             Alert.alert("Erro", "Não foi possível buscar os dados.");
         }
     };
 
-    // --- FUNÇÃO PARA BUSCAR O ENDEREÇO PELO CEP ---
     const buscarCep = async () => {
         const cepLimpo = cep.replace(/\D/g, '');
         if (cepLimpo.length !== 8) {
@@ -153,8 +176,9 @@ export default function PerfilResponsavel({ navigation }) { //Navigation não es
                     cpf: responsavel.cpf,
                     email: responsavel.email,
                     telefone: rawTelefone,
-                    sexo: responsavel.sexo,
+                    genero: responsavel.genero,
                     endereco: enderecoFinal,
+                    imagem: responsavel.imagem,
                 })
             });
             if (!res.ok) {
@@ -179,7 +203,6 @@ export default function PerfilResponsavel({ navigation }) { //Navigation não es
                 setResponsavel(originalResponsavel);
                 setRawTelefone(originalResponsavel.telefone.replace(/\D/g, ''));
             }
-            // Limpa os campos de endereço temporários
             setCep(''); setLogradouro(''); setNumero(''); setBairro(''); setCidade(''); setUf('');
         }
         setEditando(!editando);
@@ -202,33 +225,63 @@ export default function PerfilResponsavel({ navigation }) { //Navigation não es
     }
 
     return (
-        <SafeAreaView style={styles.safeArea}>
+        <SafeAreaView style={theme == "light" ? styles.safeArea : styles.safeAreaDark}>
             <HeaderComLogout />
             <View>
-                <View style={styles.profileTop}><View style={styles.nameTag}><Text style={styles.nameText}>{responsavel.nome}</Text></View></View>
-                <View style={styles.profilePicWrapper}><Text style={styles.picText}>Foto de perfil</Text></View>
-                <View style={styles.profileBottom}>
+                <View style={theme == "light" ? styles.profileTop : styles.profileTopDark}><View style={styles.nameTag}><Text style={styles.nameText}>{responsavel.nome}</Text></View></View>
+                <TouchableOpacity 
+                    style={styles.profilePicWrapper} 
+                    onPress={editando ? pickImage : undefined} 
+                    activeOpacity={editando ? 0.7 : 1} 
+                >
+                    <Image
+                        source={
+                            imagem ? { uri: imagem } : require("../../assets/images/FotoPerfil.png")
+                        }
+                        style={styles.perfilSemFoto}
+                    />
+                    {editando && (  
+                        <View style={styles.editIconContainer}>
+                            <FontAwesome5 name="pencil-alt" size={16} color="#000" />
+                        </View>
+                    )}
+                </TouchableOpacity> 
+                <View style={theme == "light" ? styles.profileBottom : styles.profileBottomDark}>
                     <TouchableOpacity style={styles.editBtn} onPress={handleEditCancel}>
                         <Text style={styles.editText}>{editando ? 'Cancelar' : 'Editar perfil'}</Text>
                     </TouchableOpacity>
                 </View>
             </View>
             <ScrollView contentContainerStyle={styles.formContainer}>
-                <Text style={styles.label}>Nome:</Text>
-                <TextInput style={[styles.input, editando && styles.inputDisabled]} value={responsavel.nome} editable={false} />
-
-                <Text style={styles.label}>Email:</Text>
-                <TextInput style={[styles.input, editando && styles.inputDisabled]} value={responsavel.email} editable={false} />
-
-                <Text style={styles.label}>Endereço:</Text>
+                <Text style={theme == "light" ? styles.label : styles.labelDark}>Nome:</Text>
+                    <TextInput 
+                        style={[
+                            theme === "light" ? styles.input : styles.inputDark,
+                            editando && styles.inputDisabled
+                        ]} 
+                        value={responsavel.nome} 
+                        editable={false} 
+                    />                
+                    <Text style={theme == "light" ? styles.label : styles.labelDark}>Email:</Text>
+                    <TextInput 
+                        style={[
+                            theme === "light" ? styles.input : styles.inputDark,
+                            editando && styles.inputDisabled
+                        ]} 
+                        value={responsavel.email} 
+                        editable={false} 
+                    /> 
+                <Text style={theme == "light" ? styles.label : styles.labelDark}>Endereço:</Text>
                 {editando ? (
                     <>
                         <View style={styles.cepContainer}>
                             <TextInputMask
-                                style={[styles.input, { flex: 1 }, errors.cep && styles.inputError]}
+                                style={[styles.input ,{flex: 1},
+                                    errors.cep && styles.inputError
+                                ]}
                                 type={'zip-code'}
                                 placeholder="Digite o CEP"
-                                placeholderTextColor="#888"
+                                placeholderTextColor="#000"
                                 value={cep}
                                 onChangeText={setCep}
                                 onBlur={buscarCep}
@@ -238,22 +291,27 @@ export default function PerfilResponsavel({ navigation }) { //Navigation não es
                         </View>
                         {errors.cep && <Text style={styles.errorText}>{errors.cep}</Text>}
 
-                        <TextInput style={styles.input} placeholderTextColor="#888" placeholder="Logradouro (Rua, Av...)" value={logradouro} onChangeText={setLogradouro} />
-                        <TextInput style={styles.input} placeholderTextColor="#888" placeholder="Número" value={numero} onChangeText={setNumero} keyboardType="numeric" />
-                        <TextInput style={styles.input} placeholderTextColor="#888" placeholder="Bairro" value={bairro} onChangeText={setBairro} />
-                        <TextInput style={styles.input} placeholderTextColor="#888" placeholder="Cidade" value={cidade} onChangeText={setCidade} />
-                        <TextInput style={styles.input} placeholderTextColor="#888" placeholder="UF" value={uf} onChangeText={setUf} maxLength={2} autoCapitalize="characters" />
+                        <TextInput style={styles.input} placeholderTextColor="#000" placeholder="Logradouro (Rua, Av...)" value={logradouro} onChangeText={setLogradouro} />
+                        <TextInput style={styles.input} placeholderTextColor="#000" placeholder="Número" value={numero} onChangeText={setNumero} keyboardType="numeric" />
+                        <TextInput style={styles.input} placeholderTextColor="#000" placeholder="Bairro" value={bairro} onChangeText={setBairro} />
+                        <TextInput style={styles.input} placeholderTextColor="#000" placeholder="Cidade" value={cidade} onChangeText={setCidade} />
+                        <TextInput style={styles.input} placeholderTextColor="#000" placeholder="UF" value={uf} onChangeText={setUf} maxLength={2} autoCapitalize="characters" />
                     </>
                 ) : (
-                    <TextInput style={styles.input} value={responsavel.endereco} editable={false} />
+                    <TextInput style={theme == "light" ? styles.input : styles.inputDark} value={responsavel.endereco} editable={false} />
                 )}
 
-                <Text style={styles.label}>CPF:</Text>
+                <Text style={theme == "light" ? styles.label : styles.labelDark}>CPF:</Text>
                 <TextInput style={[styles.input, editando && styles.inputDisabled]} value={responsavel.cpf} editable={false} />
 
-                <Text style={styles.label}>Telefone para contato:</Text>
+                <Text style={theme == "light" ? styles.label : styles.labelDark}>Telefone para contato:</Text>
                 <TextInputMask
-                    style={[styles.input, errors.telefone && styles.inputError]}
+                    style={[
+                        editando? 
+                        styles.input:
+                        theme === "light" ? styles.input : styles.inputDark,
+                        errors.telefone && styles.inputError 
+                    ]}
                     type={'cel-phone'}
                     options={{ maskType: 'BRL', withDDD: true, dddMask: '(99) ' }}
                     placeholder="(99) 99999-9999"
@@ -270,10 +328,10 @@ export default function PerfilResponsavel({ navigation }) { //Navigation não es
                 />
                 {errors.telefone && <Text style={styles.errorText}>{errors.telefone}</Text>}
 
-                <Text style={styles.label}>Sexo:</Text>
-                <TextInput style={[styles.input, editando && styles.inputDisabled]} value={responsavel.sexo} editable={false} />
+                <Text style={theme == "light" ? styles.label : styles.labelDark}>Gênero:</Text>
+                <TextInput style={[theme === "light" ? styles.input : styles.inputDark, editando && styles.inputDisabled]} value={responsavel.genero} editable={false} />
 
-                {editando && <TouchableOpacity style={styles.saveBtn} onPress={salvarEdicao}><Text style={styles.saveText}>Salvar Alterações</Text></TouchableOpacity>}
+                {editando && <TouchableOpacity style={theme == "light" ? styles.saveBtn : styles.saveBtnDark} onPress={salvarEdicao}><Text style={styles.saveText}>Salvar Alterações</Text></TouchableOpacity>}
                 <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('CadastroVeiculo')}><Text style={styles.buttonText}>Cadastro de veículo</Text></TouchableOpacity>
             </ScrollView>
             <FooterComIcones nav={navigation}/>
@@ -286,14 +344,29 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: '#FCD28D',
     },
+    safeAreaDark: {
+        flex: 1,
+        backgroundColor: '#522a91',
+    },
     profileTop: {
         backgroundColor: '#FFBE31',
         alignItems: 'center',
         paddingTop: 20,
         paddingBottom: 60,
     },
+    profileTopDark:{
+        backgroundColor: '#8a62bbff',
+        alignItems: 'center',
+        paddingTop: 20,
+        paddingBottom: 60,
+    },
     profileBottom: {
         backgroundColor: '#FCD28D',
+        alignItems: 'center',
+        paddingTop: 80,
+    },
+    profileBottomDark:{
+        backgroundColor: '#522a91',
         alignItems: 'center',
         paddingTop: 80,
     },
@@ -315,11 +388,6 @@ const styles = StyleSheet.create({
             { translateX: -60 },
             { translateY: -60 }
         ],
-    },
-    picText: {
-        fontFamily: 'PoppinsRegular',
-        fontSize: 12,
-        color: '#555',
     },
     nameTag: {
         backgroundColor: '#fff',
@@ -356,6 +424,13 @@ const styles = StyleSheet.create({
         color: '#333',
         marginTop: 10,
     },
+    labelDark: {
+        width: '85%',
+        fontFamily: 'PoppinsBold',
+        fontSize: 14,
+        color: 'white',
+        marginTop: 10,
+    },
     input: {
         width: '85%',
         minHeight: 45,
@@ -370,6 +445,20 @@ const styles = StyleSheet.create({
         borderColor: '#ddd',
         paddingVertical: 10,
     },
+    inputDark:{
+        width: '85%',
+        minHeight: 45,
+        backgroundColor: '#B9B9B9',
+        borderRadius: 20,
+        paddingHorizontal: 15,
+        marginVertical: 8,
+        justifyContent: 'center',
+        fontFamily: 'PoppinsRegular',
+        color: '#000',
+        borderWidth: 1,
+        borderColor: '#555',
+        paddingVertical: 10,
+    },
     errorText: {
         width: '85%',
         color: '#d9534f',
@@ -380,6 +469,13 @@ const styles = StyleSheet.create({
     },
     saveBtn: {
         backgroundColor: '#522a91',
+        borderRadius: 20,
+        paddingHorizontal: 30,
+        paddingVertical: 10,
+        marginTop: 20,
+    },
+    saveBtnDark:{
+        backgroundColor: '#BB86FC',
         borderRadius: 20,
         paddingHorizontal: 30,
         paddingVertical: 10,
@@ -421,6 +517,28 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         width: '85%',
+    },
+    perfilSemFoto: {
+        width: 120,
+        height: 120,
+        borderRadius: '50%',
+        borderWidth: 3,
+        borderColor: "#BEACDE",
+    },
+    editIconContainer: {
+        position: 'absolute',
+        bottom: 0,
+        right: 0,
+        backgroundColor: '#FFBE31',
+        borderRadius: 20,
+        padding: 8,
+        borderWidth: 2,
+        borderColor: '#FFF',    
+        elevation: 4,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
     },
 });
 

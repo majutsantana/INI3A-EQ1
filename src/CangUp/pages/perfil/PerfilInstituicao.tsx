@@ -1,4 +1,3 @@
-import { useNavigation } from '@react-navigation/core';
 import React, { useContext, useEffect, useState } from 'react';
 import {
     SafeAreaView, StyleSheet, Text, View, TextInput, TouchableOpacity,
@@ -13,7 +12,7 @@ import { TextInputMask } from 'react-native-masked-text';
 import { AuthContext } from '../../components/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
 import * as ImagePicker from "expo-image-picker";
-import { FontAwesome5} from '@expo/vector-icons';
+import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 
 type Instituicao = {
     id: number;
@@ -218,18 +217,27 @@ export default function PerfilInstituicao({ navigation }) {
     }
 
     return (
-        <SafeAreaView style={theme == "light" ? styles.safeArea : styles.safeAreaDark}>
+         <SafeAreaView style={theme == "light" ? styles.safeArea : styles.safeAreaDark}>
             <HeaderComLogout />
             <View>
                 <View style={theme == "light" ? styles.profileTop : styles.profileTopDark}><View style={styles.nameTag}><Text style={styles.nameText}>{instituicao.nome}</Text></View></View>
-                <TouchableOpacity style={styles.profilePicWrapper} onPress={pickImage}>
+                <TouchableOpacity 
+                    style={styles.profilePicWrapper} 
+                    onPress={editando ? pickImage : undefined} 
+                    activeOpacity={editando ? 0.7 : 1} 
+                >
                     <Image
                         source={
                             imagem ? { uri: imagem } : require("../../assets/images/FotoPerfil.png")
                         }
                         style={styles.perfilSemFoto}
                     />
-                </TouchableOpacity>                
+                    {editando && (  
+                        <View style={styles.editIconContainer}>
+                            <FontAwesome5 name="pencil-alt" size={16} color="#000" />
+                        </View>
+                    )}
+                </TouchableOpacity> 
                 <View style={theme == "light" ? styles.profileBottom : styles.profileBottomDark}>
                     <TouchableOpacity style={styles.editBtn} onPress={handleEditCancel}>
                         <Text style={styles.editText}>{editando ? 'Cancelar' : 'Editar perfil'}</Text>
@@ -334,194 +342,209 @@ export default function PerfilInstituicao({ navigation }) {
     );
 }
 const styles = StyleSheet.create({
-safeArea: {
-    flex: 1,
-    backgroundColor: '#FCD28D',
-},
-safeAreaDark: {
-    flex: 1,
-    backgroundColor: '#522a91',
-},
-profileTop: {
-    backgroundColor: '#FFBE31',
-    alignItems: 'center',
-    paddingTop: 20,
-    paddingBottom: 60,
-},
-profileTopDark:{
-    backgroundColor: '#8a62bbff',
-    alignItems: 'center',
-    paddingTop: 20,
-    paddingBottom: 60,
-},
-profileBottom: {
-    backgroundColor: '#FCD28D',
-    alignItems: 'center',
-    paddingTop: 80,
-},
-profileBottomDark:{
-    backgroundColor: '#522a91',
-    alignItems: 'center',
-    paddingTop: 80,
-},
-profilePicWrapper: {
-    display: 'flex',
-    justifyContent: 'center',
-    position: 'absolute',
-    backgroundColor: '#D9D9D9',
-    borderRadius: 100,
-    alignItems: 'center',
-    zIndex: 2,
-    width: 120,
-    height: 120,
-    borderWidth: 2,
-    borderColor: '#FFF',
-    left: '50%',
-    top: '50%',
-    transform: [
-        { translateX: -60 },
-        { translateY: -60 }
-    ],
-},
-picText: {
-    fontFamily: 'PoppinsRegular',
-    fontSize: 12,
-    color: '#555',
-},
-nameTag: {
-    backgroundColor: '#fff',
-    paddingHorizontal: 20,
-    paddingVertical: 2,
-    borderRadius: 20,
-    alignItems: 'center'
-},
-nameText: {
-    fontFamily: 'PoppinsBold',
-    fontSize: 14,
-    color: '#000',
-},
-editBtn: {
-    backgroundColor: '#FFBE31',
-    borderRadius: 20,
-    paddingHorizontal: 20,
-    paddingVertical: 6,
-},
-editText: {
-    fontFamily: 'PoppinsRegular',
-    fontSize: 14,
-    color: '#000',
-},
-formContainer: {
-    alignItems: 'center',
-    paddingVertical: 20,
-    paddingBottom: 100,
-},
-label: {
-    width: '85%',
-    fontFamily: 'PoppinsBold',
-    fontSize: 14,
-    color: '#333',
-    marginTop: 10,
-},
-labelDark: {
-    width: '85%',
-    fontFamily: 'PoppinsBold',
-    fontSize: 14,
-    color: 'white',
-    marginTop: 10,
-},
-input: {
-    width: '85%',
-    minHeight: 45,
-    backgroundColor: '#F5F5F5',
-    borderRadius: 20,
-    paddingHorizontal: 15,
-    marginVertical: 8,
-    justifyContent: 'center',
-    fontFamily: 'PoppinsRegular',
-    color: '#000',
-    borderWidth: 1,
-    borderColor: '#ddd',
-    paddingVertical: 10,
-},
-inputDark:{
-    width: '85%',
-    minHeight: 45,
-    backgroundColor: '#B9B9B9',
-    borderRadius: 20,
-    paddingHorizontal: 15,
-    marginVertical: 8,
-    justifyContent: 'center',
-    fontFamily: 'PoppinsRegular',
-    color: '#000',
-    borderWidth: 1,
-    borderColor: '#555',
-    paddingVertical: 10,
-},
-errorText: {
-    width: '85%',
-    color: '#d9534f',
-    fontSize: 12,
-    fontFamily: 'PoppinsRegular',
-    marginTop: -4,
-    marginBottom: 8,
-},
-saveBtn: {
-    backgroundColor: '#522a91',
-    borderRadius: 20,
-    paddingHorizontal: 30,
-    paddingVertical: 10,
-    marginTop: 20,
-},
-saveBtnDark:{
-    backgroundColor: '#BB86FC',
-    borderRadius: 20,
-    paddingHorizontal: 30,
-    paddingVertical: 10,
-    marginTop: 20,
-},
-saveText: {
-    fontFamily: 'PoppinsBold',
-    fontSize: 16,
-    color: 'white',
-},
-button: {
-    backgroundColor: '#FFBE31',
-    paddingVertical: '3%',
-    width: '60%',
-    borderRadius: 20,
-    alignItems: 'center',
-    marginTop: '10%',
-    shadowColor: '#000',
-    shadowOffset: {
-        width: 0,
-        height: 3,
+    safeArea: {
+        flex: 1,
+        backgroundColor: '#FCD28D',
     },
-    shadowOpacity: 0.27,
-    shadowRadius: 4.65,
-    elevation: 6,
-},
-buttonText: {
-    fontSize: 14,
-    fontFamily: 'PoppinsRegular',
-},
-inputDisabled: {
-    backgroundColor: '#9a9a9aff',
-    color: '#3c3c3cff',
-},
-inputError: {
-    borderColor: '#d9534f',
-},
-cepContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    width: '85%',
-},
-perfilSemFoto: {
-    width: 120,
-    height: 120,
-    borderRadius: '50%',
-    borderWidth: 3,
-    borderColor: "#f1c40f",
+    safeAreaDark: {
+        flex: 1,
+        backgroundColor: '#522a91',
+    },
+    profileTop: {
+        backgroundColor: '#FFBE31',
+        alignItems: 'center',
+        paddingTop: 20,
+        paddingBottom: 60,
+    },
+    profileTopDark:{
+        backgroundColor: '#8a62bbff',
+        alignItems: 'center',
+        paddingTop: 20,
+        paddingBottom: 60,
+    },
+    profileBottom: {
+        backgroundColor: '#FCD28D',
+        alignItems: 'center',
+        paddingTop: 80,
+    },
+    profileBottomDark:{
+        backgroundColor: '#522a91',
+        alignItems: 'center',
+        paddingTop: 80,
+    },
+    profilePicWrapper: {
+        display: 'flex',
+        justifyContent: 'center',
+        position: 'absolute',
+        backgroundColor: '#D9D9D9',
+        borderRadius: 100,
+        alignItems: 'center',
+        zIndex: 2,
+        width: 120,
+        height: 120,
+        borderWidth: 2,
+        borderColor: '#FFF',
+        left: '50%',
+        top: '50%',
+        transform: [
+            { translateX: -60 },
+            { translateY: -60 }
+        ],
+    },
+    picText: {
+        fontFamily: 'PoppinsRegular',
+        fontSize: 12,
+        color: '#555',
+    },
+    nameTag: {
+        backgroundColor: '#fff',
+        paddingHorizontal: 20,
+        paddingVertical: 2,
+        borderRadius: 20,
+        alignItems: 'center'
+    },
+    nameText: {
+        fontFamily: 'PoppinsBold',
+        fontSize: 14,
+        color: '#000',
+    },
+    editBtn: {
+        backgroundColor: '#FFBE31',
+        borderRadius: 20,
+        paddingHorizontal: 20,
+        paddingVertical: 6,
+    },
+    editText: {
+        fontFamily: 'PoppinsRegular',
+        fontSize: 14,
+        color: '#000',
+    },
+    formContainer: {
+        alignItems: 'center',
+        paddingVertical: 20,
+        paddingBottom: 100,
+    },
+    label: {
+        width: '85%',
+        fontFamily: 'PoppinsBold',
+        fontSize: 14,
+        color: '#333',
+        marginTop: 10,
+    },
+    labelDark: {
+        width: '85%',
+        fontFamily: 'PoppinsBold',
+        fontSize: 14,
+        color: 'white',
+        marginTop: 10,
+    },
+    input: {
+        width: '85%',
+        minHeight: 45,
+        backgroundColor: '#F5F5F5',
+        borderRadius: 20,
+        paddingHorizontal: 15,
+        marginVertical: 8,
+        justifyContent: 'center',
+        fontFamily: 'PoppinsRegular',
+        color: '#000',
+        borderWidth: 1,
+        borderColor: '#ddd',
+        paddingVertical: 10,
+    },
+    inputDark:{
+        width: '85%',
+        minHeight: 45,
+        backgroundColor: '#B9B9B9',
+        borderRadius: 20,
+        paddingHorizontal: 15,
+        marginVertical: 8,
+        justifyContent: 'center',
+        fontFamily: 'PoppinsRegular',
+        color: '#000',
+        borderWidth: 1,
+        borderColor: '#555',
+        paddingVertical: 10,
+    },
+    errorText: {
+        width: '85%',
+        color: '#d9534f',
+        fontSize: 12,
+        fontFamily: 'PoppinsRegular',
+        marginTop: -4,
+        marginBottom: 8,
+    },
+    saveBtn: {
+        backgroundColor: '#522a91',
+        borderRadius: 20,
+        paddingHorizontal: 30,
+        paddingVertical: 10,
+        marginTop: 20,
+    },
+    saveBtnDark:{
+        backgroundColor: '#BB86FC',
+        borderRadius: 20,
+        paddingHorizontal: 30,
+        paddingVertical: 10,
+        marginTop: 20,
+    },
+    saveText: {
+        fontFamily: 'PoppinsBold',
+        fontSize: 16,
+        color: 'white',
+    },
+    button: {
+        backgroundColor: '#FFBE31',
+        paddingVertical: '3%',
+        width: '60%',
+        borderRadius: 20,
+        alignItems: 'center',
+        marginTop: '10%',
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 0,
+            height: 3,
+        },
+        shadowOpacity: 0.27,
+        shadowRadius: 4.65,
+        elevation: 6,
+    },
+    buttonText: {
+        fontSize: 14,
+        fontFamily: 'PoppinsRegular',
+    },
+    inputDisabled: {
+        backgroundColor: '#9a9a9aff',
+        color: '#3c3c3cff',
+    },
+    inputError: {
+        borderColor: '#d9534f',
+    },
+    cepContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        width: '85%',
+    },
+    perfilSemFoto: {
+        width: 120,
+        height: 120,
+        borderRadius: '50%',
+        borderWidth: 3,
+        borderColor: "#f1c40f",
+    },
+    editIconContainer: {
+        position: 'absolute',
+        bottom: 0,
+        right: 0,
+        backgroundColor: '#FFBE31',
+        borderRadius: 20,
+        padding: 8,
+        borderWidth: 2,
+        borderColor: '#FFF',    
+        elevation: 4,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
     },
 });

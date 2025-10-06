@@ -17,7 +17,7 @@ import { useNavigation } from '@react-navigation/native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { CheckBox } from 'react-native-elements';
 import Header from '../../components/Header';
-import FooterSemIcones from '../../components/FooterSemIcones';
+import FooterComIcones from '../../components/FooterComIcones';
 import { Feather } from '@expo/vector-icons';
 import useApi from '../../hooks/useApi';
 import { TextInputMask } from 'react-native-masked-text';
@@ -29,7 +29,7 @@ export default function CadastroAluno({ navigation }) {
     const [senha, setSenha] = useState('');
     const [confSenha, setconfSenha] = useState('');
     const [telefone, setTelefone] = useState('');
-    const [sexo, setSexo] = useState('');
+    const [genero, setGenero] = useState('');
     const [check, setCheck] = useState(false);
     const [errors, setErrors] = useState({});
     const [senhaVisivel, setSenhaVisivel] = useState(false);
@@ -177,8 +177,8 @@ export default function CadastroAluno({ navigation }) {
             isValid = false;
         }
 
-        if (!sexo) {
-            newErrors.sexo = 'Selecione o sexo.';
+        if (!genero) {
+            newErrors.genero = 'Selecione o gênero.';
             isValid = false;
         }
 
@@ -216,7 +216,7 @@ export default function CadastroAluno({ navigation }) {
                     'Content-Type': 'application/json',
                     'Accept': 'application/json',
                 },
-                body: JSON.stringify({ cpf, email, senha, endereco: enderecoCompleto, sexo, telefone }),
+                body: JSON.stringify({ cpf, email, senha, endereco: enderecoCompleto, genero, telefone }),
             });
             console.log("Status:", response.status);
 
@@ -383,24 +383,24 @@ export default function CadastroAluno({ navigation }) {
                             {errors.telefone && <Text style={styles.errorText}>{errors.telefone}</Text>}
                         </View>
                         <View style={styles.inputGroup}>
-                            <Text style={styles.label}>Sexo:</Text>
+                            <Text style={styles.label}>Gênero:</Text>
                             <View style={styles.pickerWrapper}>
                                 <Picker
-                                    selectedValue={sexo}
-                                    onValueChange={(itemValue) => setSexo(itemValue)}
+                                    selectedValue={genero}
+                                    onValueChange={(itemValue) => setGenero(itemValue)}
                                     style={[
                                         styles.picker,
-                                        { color: sexo === '' ? '#888' : '#000' }
+                                        { color: genero === '' ? '#888' : '#000' }
                                     ]}
                                 >
-                                    <Picker.Item label="Selecione o sexo" value="" />
+                                    <Picker.Item label="Selecione o genero" value="" />
                                     <Picker.Item label="Masculino" value="Masculino" />
                                     <Picker.Item label="Feminino" value="Feminino" />
                                     <Picker.Item label="Neutro" value="Neutro" />
                                     <Picker.Item label="Prefiro não informar" value="Prefiro não informar" />
                                 </Picker>
                             </View>
-                            {errors.sexo && <Text style={styles.errorText}>{errors.sexo}</Text>}
+                            {errors.genero && <Text style={styles.errorText}>{errors.genero}</Text>}
                         </View>
 
                         <View style={styles.inputGroup}>
@@ -464,7 +464,7 @@ export default function CadastroAluno({ navigation }) {
                 </TouchableOpacity>
             </View>
 
-            <FooterSemIcones />
+            <FooterComIcones nav={navigation}/>
         </SafeAreaView>
     );
 }

@@ -17,7 +17,7 @@ import { useNavigation } from '@react-navigation/native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { CheckBox } from 'react-native-elements';
 import Header from '../../components/Header';
-import FooterSemIcones from '../../components/FooterSemIcones';
+import FooterComIcones from '../../components/FooterComIcones';
 import { Feather } from '@expo/vector-icons';
 import useApi from '../../hooks/useApi';
 import { TextInputMask } from 'react-native-masked-text';
@@ -31,13 +31,11 @@ export default function CadastroResponsavel({ navigation }) { //Não é erro, é
     const [confSenha, setconfSenha] = useState('');
     const [telefone, setTelefone] = useState('');
     const [cpf, setCpf] = useState('');
-    const [sexo, setSexo] = useState('');
+    const [genero, setGenero] = useState('');
     const [check, setCheck] = useState(false);
     const [errors, setErrors] = useState({});
     const [senhaVisivel, setSenhaVisivel] = useState(false);
     const [confSenhaVisivel, setConfSenhaVisivel] = useState(false);
-
-    // --- NOVOS ESTADOS PARA O ENDEREÇO ---
     const [cep, setCep] = useState('');
     const [logradouro, setLogradouro] = useState('');
     const [numero, setNumero] = useState('');
@@ -138,8 +136,8 @@ export default function CadastroResponsavel({ navigation }) { //Não é erro, é
                 isValid = false;
             }
         }
-        if (!sexo) {
-            newErrors.sexo = 'Selecione o sexo.';
+        if (!genero) {
+            newErrors.genero = 'Selecione o gênero.';
             isValid = false;
         }
 
@@ -204,19 +202,16 @@ export default function CadastroResponsavel({ navigation }) { //Não é erro, é
                     'Content-Type': 'application/json',
                     'Accept': 'application/json',
                 },
-                body: JSON.stringify({ cpf, email, senha, endereco: enderecoCompleto, sexo, telefone }),
+                body: JSON.stringify({ cpf, email, senha, endereco: enderecoCompleto, genero, telefone }),
             });
             console.log("Status:", response.status);
 
-            // Verificação se a resposta foi bem-sucedida (status 200-299)
             if (response.ok) {
-                // Tenta parsear a resposta como JSON
                 const data = await response.json();
                 console.log("Resposta JSON:", data);
                 Alert.alert('Sucesso', 'Responsavel cadastrado com sucesso!');
-                navigation.navigate('Login'); // Navegar após sucesso
+                navigation.navigate('Login'); 
             } else {
-                // Se a resposta não for 2xx, tenta obter o texto do erro
                 const errorText = await response.text();
                 console.error("Erro na resposta do servidor:", errorText);
                 Alert.alert('Erro', `Falha ao cadastrar. Resposta do servidor: ${response.status} ${response.statusText}`);
@@ -358,24 +353,24 @@ export default function CadastroResponsavel({ navigation }) { //Não é erro, é
                         {/* --- FIM DO NOVO BLOCO DE ENDEREÇO --- */}
 
                         <View style={styles.inputGroup}>
-                            <Text style={styles.label}>Sexo:</Text>
+                            <Text style={styles.label}>Gênero:</Text>
                             <View style={styles.pickerWrapper}>
                                 <Picker
-                                    selectedValue={sexo}
-                                    onValueChange={(itemValue) => setSexo(itemValue)}
+                                    selectedValue={genero}
+                                    onValueChange={(itemValue) => setGenero(itemValue)}
                                     style={[
                                         styles.picker,
-                                        { color: sexo === '' ? '#888' : '#000' } // preto para placeholder, cinza para os demais
+                                        { color: genero === '' ? '#888' : '#000' } // preto para placeholder, cinza para os demais
                                     ]}
                                 >
-                                    <Picker.Item label="Selecione o sexo" value="" />
+                                    <Picker.Item label="Selecione o gênero" value="" />
                                     <Picker.Item label="Masculino" value="Masculino" />
                                     <Picker.Item label="Feminino" value="Feminino" />
                                     <Picker.Item label="Neutro" value="Neutro" />
                                     <Picker.Item label="Prefiro não informar" value="Prefiro não informar" />
                                 </Picker>
                             </View>
-                            {errors.sexo && <Text style={styles.errorText}>{errors.sexo}</Text>}
+                            {errors.genero && <Text style={styles.errorText}>{errors.genero}</Text>}
                         </View>
                         <View style={styles.inputGroup}>
                             <Text style={styles.label}>Telefone:</Text>
@@ -455,7 +450,7 @@ export default function CadastroResponsavel({ navigation }) { //Não é erro, é
                     <Text style={styles.buttonText}>Cadastrar</Text>
                 </TouchableOpacity>
             </View>
-            <FooterSemIcones />
+            <FooterComIcones nav={navigation}/>
         </SafeAreaView>
     );
 }
