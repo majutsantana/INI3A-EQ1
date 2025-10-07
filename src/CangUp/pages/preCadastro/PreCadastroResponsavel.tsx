@@ -14,11 +14,11 @@ import {
  import { MaterialIcons } from '@expo/vector-icons';
  import HeaderComLogout from '../../components/HeaderComLogout';
  import FooterComIcones from '../../components/FooterComIcones';
- import { useSafeAreaInsets } from 'react-native-safe-area-context';
  import { TextInputMask } from 'react-native-masked-text';
  import AsyncStorage from '@react-native-async-storage/async-storage';
 import useApi from '../../hooks/useApi';
 import { AuthContext } from '../../components/AuthContext';
+import { useTheme } from '../../context/ThemeContext';
 
 
 type errorType ={
@@ -41,6 +41,7 @@ export default function PreCadastroResponsavel({ navigation }) {
     const [CPF, setCPF] = useState('');
     const { url } = useApi();
     const {logout} = useContext(AuthContext);
+    const { theme} = useTheme();
 
     const validateForm = () => {
      let newErrors = {};
@@ -147,25 +148,15 @@ export default function PreCadastroResponsavel({ navigation }) {
         console.error('Erro ao cadastrar responsavel:', error);
       }
     };
-
-
-    const insets = useSafeAreaInsets();
    
     return(
-      <SafeAreaView style={{flex: 1,
-        backgroundColor: '#FFD88D',
-        paddingTop: insets.top,
-        paddingBottom: insets.bottom,
-        paddingLeft: insets.left,
-        paddingRight: insets.right,}}>
+      <SafeAreaView style={theme == "light" ? styles.safeArea : styles.safeAreaDark}>
         <StatusBar backgroundColor="#B9A6DA" barStyle="dark-content" />
         <HeaderComLogout/>
-
-
         <View style={styles.content}>
-          <View style={styles.formContainer}>
+          <View style={theme == "light" ? styles.formContainer : styles.formContainerDark}>
           <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-          <MaterialIcons name="arrow-back" size={28} color="#000" />
+          <MaterialIcons name="arrow-back" size={28} style={theme == "light" ? styles.iconBack : styles.iconBackDark}/>
           </TouchableOpacity>
             <ScrollView
               contentContainerStyle={styles.scrollContent}
@@ -173,25 +164,25 @@ export default function PreCadastroResponsavel({ navigation }) {
               showsVerticalScrollIndicator={false}
             >
               <View style={styles.inputGroup}>
-                <Text style={styles.label}>Nome:</Text>
+                <Text style={theme == "light" ? styles.label : styles.labelDark}>Nome:</Text>
                 <TextInput
-                  style={styles.input}
+                  style={theme === "light" ? styles.input : styles.inputDark}
                   placeholder="Digite o nome"
-                  placeholderTextColor="#888"
+                  placeholderTextColor="#696969ff"
                   value={nome}
                   onChangeText={setNome}
                 />
                 {errors.nome && <Text style={styles.errorText}>{errors.nome}</Text>}
               </View>
                 <View style={styles.inputGroup}>
-                <Text style={styles.label}>CPF:</Text>
+                <Text style={theme == "light" ? styles.label : styles.labelDark}>CPF:</Text>
                 <TextInputMask
                   type={'cpf'}
                   value={CPF}
                   onChangeText={text => setCPF(text)}
                   placeholder="000.000.000-00"
-                  placeholderTextColor="#888"
-                  style={styles.input}
+                  placeholderTextColor="#696969ff"
+                  style={theme === "light" ? styles.input : styles.inputDark}
                 />
                 {errors.CPF && <Text style={styles.errorText}>{errors.CPF}</Text>}
               </View>
@@ -209,7 +200,12 @@ export default function PreCadastroResponsavel({ navigation }) {
 }
 const styles = StyleSheet.create({
   safeArea: {
-   
+    flex: 1,
+    backgroundColor: '#FFD88D'
+  },
+  safeAreaDark: {
+    flex: 1,
+    backgroundColor: '#522a91',
   },
   content: {
     flex: 1,
@@ -223,6 +219,18 @@ const styles = StyleSheet.create({
   formContainer: {
     flex: 1,
     backgroundColor: '#F5F5F5',
+    borderRadius: 30,
+    padding: '5%',
+    width: '90%',
+    shadowColor: '#000',
+    shadowOffset: { width: 2, height: 6 },
+    shadowOpacity: 0.15,
+    shadowRadius: 4.65,
+    elevation: 1,
+  },
+  formContainerDark: {
+    flex: 1,
+    backgroundColor: '#313233',
     borderRadius: 30,
     padding: '5%',
     width: '90%',
@@ -246,9 +254,39 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginBottom: '2%',
     fontFamily: 'PoppinsRegular',
+    color: '#000',
+  },
+  labelDark: {
+    fontWeight: 'bold',
+    fontSize: 16,
+    marginBottom: '2%',
+    fontFamily: 'PoppinsRegular',
+    color: '#fff',
+  },
+  iconBack:{
+    color:'#000'
+  },
+  iconBackDark:{
+    color:'#fff'
   },
   input: {
     backgroundColor: '#d9d9d9',
+    borderRadius: 25,
+    paddingHorizontal: '5%',
+    paddingVertical: '5%',
+    fontSize: 16,
+    fontFamily: 'PoppinsRegular',
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 3,
+    },
+    shadowOpacity: 0.27,
+    shadowRadius: 4.65,
+    elevation: 6,
+  },
+  inputDark:{
+    backgroundColor: '#B9B9B9',
     borderRadius: 25,
     paddingHorizontal: '5%',
     paddingVertical: '5%',

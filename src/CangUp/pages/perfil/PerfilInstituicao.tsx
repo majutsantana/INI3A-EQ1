@@ -34,7 +34,7 @@ export default function PerfilInstituicao({ navigation }) {
     const [errors, setErrors] = useState<{ telefone?: string, cep?: string }>({});
     const { url } = useApi();
     const { logout } = useContext(AuthContext);
-    const { theme, toggleTheme, colors } = useTheme();
+    const { theme} = useTheme();
     const [cep, setCep] = useState('');
     const [logradouro, setLogradouro] = useState('');
     const [numero, setNumero] = useState('');
@@ -514,7 +514,7 @@ const styles = StyleSheet.create({
         fontFamily: 'PoppinsRegular',
     },
     inputDisabled: {
-        backgroundColor: '#9a9a9aff',
+        backgroundColor: '#B9B9B9',
         color: '#3c3c3cff',
     },
     inputError: {

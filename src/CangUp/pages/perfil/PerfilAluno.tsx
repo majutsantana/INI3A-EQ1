@@ -231,7 +231,7 @@ export default function PerfilAluno({ navigation }) {
         <SafeAreaView style={theme == "light" ? styles.safeArea : styles.safeAreaDark}>
             <HeaderComLogout />
             <View>
-                <View style={styles.profileTop}><View style={styles.nameTag}><Text style={styles.nameText}>{aluno.nome}</Text></View></View>
+                <View style={theme == "light" ? styles.profileTop : styles.profileTopDark}><View style={styles.nameTag}><Text style={styles.nameText}>{aluno.nome}</Text></View></View>
                 <TouchableOpacity 
                     style={styles.profilePicWrapper} 
                     onPress={editando ? pickImage : undefined} 
@@ -241,7 +241,7 @@ export default function PerfilAluno({ navigation }) {
                         source={
                             imagem ? { uri: imagem } : require("../../assets/images/FotoPerfil.png")
                         }
-                        style={styles.perfilSemFoto}
+                        style={theme == "light" ? styles.perfilSemFoto : styles.perfilSemFotoDark}
                     />
                     {editando && (  
                         <View style={styles.editIconContainer}>
@@ -257,13 +257,13 @@ export default function PerfilAluno({ navigation }) {
             </View>
             <ScrollView contentContainerStyle={styles.formContainer}>
                 <Text style={theme == "light" ? styles.label : styles.labelDark}>Nome:</Text>
-                <TextInput style={[theme == "light" ? styles.label : styles.labelDark, editando && styles.inputDisabled]} value={aluno.nome} editable={false} />
+                <TextInput style={[theme == "light" ? styles.input : styles.inputDark, editando && styles.inputDisabled]} value={aluno.nome} editable={false} />
                 
-                <Text style={styles.label}>RA:</Text>
-                <TextInput style={[theme == "light" ? styles.label : styles.labelDark, editando && styles.inputDisabled]} value={aluno.ra} editable={false} />
+                <Text style={theme == "light" ? styles.label : styles.labelDark}>RA:</Text>
+                <TextInput style={[theme == "light" ? styles.input : styles.inputDark, editando && styles.inputDisabled]} value={aluno.ra} editable={false} />
                 
-                <Text style={styles.label}>Email:</Text>
-                <TextInput style={[theme == "light" ? styles.label : styles.labelDark, editando && styles.inputDisabled]} value={aluno.email} editable={false} />
+                <Text style={theme == "light" ? styles.label : styles.labelDark}>Email:</Text>
+                <TextInput style={[theme == "light" ? styles.input : styles.inputDark, editando && styles.inputDisabled]} value={aluno.email} editable={false} />
                 
                 <Text style={theme == "light" ? styles.label : styles.labelDark}>Endereço:</Text>
                  {editando ? (
@@ -300,7 +300,9 @@ export default function PerfilAluno({ navigation }) {
                 <TextInputMask
                     style={[
                         editando? 
-                        styles.input: styles.viewingModeInput, errors.telefone && styles.inputError]}
+                        styles.input:
+                        theme === "light" ? styles.input : styles.inputDark,
+                        errors.telefone && styles.inputError ]}
                     type={'cel-phone'}
                     options={{ maskType: 'BRL', withDDD: true, dddMask: '(99) ' }}
                     placeholder="(99) 99999-9999"
@@ -359,7 +361,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingTop: 80,
     },
-     profilePicWrapper: {
+    profilePicWrapper: {
         display: 'flex',
         justifyContent: 'center',
         position: 'absolute',
@@ -479,13 +481,9 @@ const styles = StyleSheet.create({
         color: '#fff',
     },
     inputDisabled: {
-        backgroundColor: '#E0E0E0',
-        color: '#888',
+        backgroundColor: '#9a9a9aff',
+        color: '#3c3c3cff',
     },
-    viewingModeInput: {
-      backgroundColor: '#F5F5F5',
-      color: '#000'
-    },  
     cepContainer: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -496,7 +494,14 @@ const styles = StyleSheet.create({
         height: 120,
         borderRadius: '50%',
         borderWidth: 3,
-        borderColor: "#BEACDE",
+        borderColor: "#beacde",
+    },
+    perfilSemFotoDark: {
+        width: 120,
+        height: 120,
+        borderRadius: '50%',
+        borderWidth: 3,
+        borderColor: "#FFBE31",
     },
     editIconContainer: {
         position: 'absolute',
