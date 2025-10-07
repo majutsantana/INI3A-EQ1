@@ -22,6 +22,7 @@ import { Feather } from '@expo/vector-icons';
 import useApi from '../../hooks/useApi';
 import { TextInputMask } from 'react-native-masked-text';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useTheme } from '../../context/ThemeContext';
 
 
 export default function CadastroResponsavel({ navigation }) { //Não é erro, é só o vscode dando trabalho
@@ -43,6 +44,7 @@ export default function CadastroResponsavel({ navigation }) { //Não é erro, é
     const [cidade, setCidade] = useState('');
     const [uf, setUf] = useState('');
     const [loadingCep, setLoadingCep] = useState(false); // Para mostrar indicador de carregamento
+    const { theme} = useTheme();
 
     const toggleSenhaVisibilidade = () => {
         setSenhaVisivel(!senhaVisivel);
@@ -246,7 +248,7 @@ export default function CadastroResponsavel({ navigation }) { //Não é erro, é
     }
 
     return (
-        <SafeAreaView style={styles.safeArea}>
+        <SafeAreaView style={theme == "light" ? styles.safeArea : styles.safeAreaDark}>
             <StatusBar backgroundColor="#B9A6DA" barStyle="dark-content" />
             <Header />
 
@@ -460,6 +462,10 @@ const styles = StyleSheet.create({
     safeArea: {
         flex: 1,
         backgroundColor: '#FFD88D',
+    },
+    safeAreaDark: {
+        flex: 1,
+        backgroundColor: '#522a91',
     },
     content: {
         flex: 1,

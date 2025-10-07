@@ -238,7 +238,7 @@ export default function PerfilResponsavel({ navigation }) { //Navigation não es
                         source={
                             imagem ? { uri: imagem } : require("../../assets/images/FotoPerfil.png")
                         }
-                        style={styles.perfilSemFoto}
+                        style={theme == "light" ? styles.perfilSemFoto : styles.perfilSemFotoDark}
                     />
                     {editando && (  
                         <View style={styles.editIconContainer}>
@@ -302,7 +302,7 @@ export default function PerfilResponsavel({ navigation }) { //Navigation não es
                 )}
 
                 <Text style={theme == "light" ? styles.label : styles.labelDark}>CPF:</Text>
-                <TextInput style={[styles.input, editando && styles.inputDisabled]} value={responsavel.cpf} editable={false} />
+                <TextInput style={[theme == "light" ? styles.input : styles.inputDark, editando && styles.inputDisabled]} value={responsavel.cpf} editable={false} />
 
                 <Text style={theme == "light" ? styles.label : styles.labelDark}>Telefone para contato:</Text>
                 <TextInputMask
@@ -507,8 +507,8 @@ const styles = StyleSheet.create({
         fontFamily: 'PoppinsRegular',
     },
     inputDisabled: {
-        backgroundColor: '#E0E0E0',
-        color: '#888',
+        backgroundColor: '#9a9a9aff',
+        color: '#3c3c3cff',
     },
     inputError: {
         borderColor: '#d9534f',
@@ -523,7 +523,14 @@ const styles = StyleSheet.create({
         height: 120,
         borderRadius: '50%',
         borderWidth: 3,
-        borderColor: "#BEACDE",
+        borderColor: "#beacde",
+    },
+    perfilSemFotoDark: {
+        width: 120,
+        height: 120,
+        borderRadius: '50%',
+        borderWidth: 3,
+        borderColor: "#FFBE31",
     },
     editIconContainer: {
         position: 'absolute',
