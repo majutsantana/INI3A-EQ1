@@ -9,7 +9,7 @@ import useApi from '../hooks/useApi';
 import { AuthContext } from '../components/AuthContext';
 import { Switch } from 'react-native-elements';
 import { useTheme } from '../context/ThemeContext';
-import getStyles from './style'; 
+import getStyles from './style';
 
 type _perfil = {
   rotulo: string,
@@ -28,17 +28,38 @@ export default function Login({ navigation }) {
   const [emailRecuperacao, setEmailRecuperacao] = useState('');
   const { login: contextLogin } = useContext(AuthContext);
   const { theme, toggleTheme, colors } = useTheme();
-
-  // Chame a função getStyles dentro do componente para obter o objeto de estilos
   const styles = getStyles();
+
+  const [errorModalVisible, setErrorModalVisible] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
 
   const toggleSenhaVisibilidade = () => {
     setSenhaVisivel(!senhaVisivel);
   };
 
   const login = async () => {
-    if (!username || !senha) {
-      Alert.alert("Erro", "Preencha todos os campos.");
+    const erros = [];
+
+    if (!tipoDeLogin) {
+      erros.push("Tipo de Login");
+    }
+    if (!username) {
+      erros.push("E-mail");
+    }
+    if (!senha) {
+      erros.push("Senha");
+    }
+
+    if (erros.length > 0) {
+      let mensagemDeErro;
+      if (erros.length === 1) {
+        mensagemDeErro = `Por favor, preencha o campo: ${erros[0]}.`;
+      } else {
+        mensagemDeErro = `Por favor, preencha os seguintes campos: ${erros.join(', ')}.`;
+      }
+      
+      setErrorMessage(mensagemDeErro);
+      setErrorModalVisible(true);
       return;
     }
 
@@ -53,8 +74,8 @@ export default function Login({ navigation }) {
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
-        Alert.alert("Erro", errorData.detail || "Falha no login");
+        setErrorMessage("Os campos Email ou Senha estão incorretos."); // Mensagem fixa para credenciais inválidas
+        setErrorModalVisible(true);
         return;
       }
 
@@ -68,19 +89,19 @@ export default function Login({ navigation }) {
         await contextLogin(token, tipoDeLogin);
         if (tipoDeLogin === "inst" && IdInst) {
           await AsyncStorage.setItem("id_instituicao", IdInst);
-        }
-        else if (tipoDeLogin === "alun"){
+        } else if (tipoDeLogin === "alun") {
           await AsyncStorage.setItem("id_aluno", IdAlun);
-        }
-        else{
+        } else {
           await AsyncStorage.setItem("id_responsavel", IdResp);
         }
       } else {
-        Alert.alert("Erro", "Token não recebido.");
+        setErrorMessage("Token não recebido do servidor.");
+        setErrorModalVisible(true);
       }
     } catch (error) {
       console.error("Erro ao fazer login:", error);
-      Alert.alert("Erro", "Não foi possível conectar ao servidor.");
+      setErrorMessage("Não foi possível conectar ao servidor. Verifique sua conexão.");
+      setErrorModalVisible(true);
     }
   };
 
@@ -123,22 +144,22 @@ export default function Login({ navigation }) {
     <View style={styles.container}>
       <View style={styles.header}>
         <Image
-          source={theme == "light" ? require('../assets/logo-cangUp-horizontal-claro.svg') : require('../assets/logo-cangUp-horizontal-escuro.svg')} //deixar as fotos centralizadas
+          source={theme == "light" ? require('../assets/logo-cangUp-horizontal-claro.svg') : require('../assets/logo-cangUp-horizontal-escuro.svg')}
           style={styles.image}
         />
       </View>
 
       <View style={styles.body}>
-          <View style={styles.olivia}>
-            <Text style={styles.title}>Bem-vindo de volta!</Text>
-            <TouchableOpacity onPress={toggleTheme} style={{marginLeft: 10}}>
-              {theme === 'dark' ? (
-                <FontAwesome name="moon-o" size={28} color={colors.text} />
-              ) : (
-                <Feather name="sun" size={28} color={colors.text} />
-              )}
-            </TouchableOpacity>
-          </View>
+        <View style={styles.olivia}>
+          <Text style={styles.title}>Bem-vindo de volta!</Text>
+          <TouchableOpacity onPress={toggleTheme} style={{ marginLeft: 10 }}>
+            {theme === 'dark' ? (
+              <FontAwesome name="moon-o" size={28} color={colors.text} />
+            ) : (
+              <Feather name="sun" size={28} color={colors.text} />
+            )}
+          </TouchableOpacity>
+        </View>
 
         <View style={styles.pickerWrapper}>
           <Picker
@@ -146,7 +167,7 @@ export default function Login({ navigation }) {
             onValueChange={(itemValue) => setTipoDeLogin(itemValue)}
             style={[
               styles.picker,
-              { color: tipoDeLogin === '' ? '#5B5B5B' : '#000' }
+              { color: tipoDeLogin === '' ? '#5B5B5B' : colors.text }
             ]}
           >
             <Picker.Item label="Selecione o tipo de Login" value="" />
@@ -182,7 +203,7 @@ export default function Login({ navigation }) {
         <TouchableOpacity style={styles.button} onPress={login}>
           <Text style={styles.buttonText}>Login</Text>
         </TouchableOpacity>
-            
+
         <View>
           <TouchableOpacity onPress={getDados}>
             <Text style={styles.linkText}>Esqueci minha senha</Text>
@@ -198,21 +219,17 @@ export default function Login({ navigation }) {
         </View>
       </View>
 
+      {/* Modal de Recuperar Senha */}
       <Modal
         animationType="slide"
         transparent={true}
         visible={modalVisible}
         onRequestClose={() => setModalVisible(false)}
       >
-        <View style={{
-          flex: 1,
-          backgroundColor: 'rgba(0,0,0,0.5)',
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}>
+        <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center' }}>
           <View style={{
             width: '85%',
-            backgroundColor: colors.background, 
+            backgroundColor: colors.background,
             borderRadius: 20,
             padding: 20,
             alignItems: 'center',
@@ -225,7 +242,6 @@ export default function Login({ navigation }) {
             <Text style={{ fontSize: 18, fontFamily: 'PoppinsBold', marginBottom: 10, color: colors.text }}>
               Recuperar Senha
             </Text>
-
             <TextInput
               style={{
                 width: '100%',
@@ -241,7 +257,6 @@ export default function Login({ navigation }) {
               value={emailRecuperacao}
               onChangeText={setEmailRecuperacao}
             />
-
             <TouchableOpacity
               style={{
                 backgroundColor: theme === 'light' ? '#FFBE31' : '#E8A326',
@@ -261,9 +276,51 @@ export default function Login({ navigation }) {
             >
               <Text style={{ fontFamily: 'PoppinsBold', color: colors.text }}>Enviar</Text>
             </TouchableOpacity>
-
             <TouchableOpacity onPress={() => setModalVisible(false)}>
               <Text style={{ fontFamily: 'PoppinsRegular', color: theme === 'light' ? '#522a91' : '#BB86FC' }}>Cancelar</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Modal para exibir erros */}
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={errorModalVisible}
+        onRequestClose={() => setErrorModalVisible(false)}
+      >
+        <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center' }}>
+          <View style={{
+            width: '85%',
+            backgroundColor: colors.background,
+            borderRadius: 20,
+            padding: 20,
+            alignItems: 'center',
+            shadowColor: colors.text,
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.25,
+            shadowRadius: 4,
+            elevation: 5,
+          }}>
+            <Text style={{ fontSize: 18, fontFamily: 'PoppinsBold', marginBottom: 15, color: colors.text }}>
+              Atenção
+            </Text>
+            <Text style={{ fontSize: 16, fontFamily: 'PoppinsRegular', color: colors.text, textAlign: 'center', marginBottom: 20 }}>
+              {errorMessage}
+            </Text>
+            <TouchableOpacity
+              style={{
+                backgroundColor: theme === 'light' ? '#FFBE31' : '#E8A326',
+                paddingVertical: 10,
+                paddingHorizontal: 20,
+                borderRadius: 10,
+                width: '100%',
+                alignItems: 'center',
+              }}
+              onPress={() => setErrorModalVisible(false)}
+            >
+              <Text style={{ fontFamily: 'PoppinsBold', color: colors.text }}>OK</Text>
             </TouchableOpacity>
           </View>
         </View>
