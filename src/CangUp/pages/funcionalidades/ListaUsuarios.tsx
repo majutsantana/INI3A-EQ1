@@ -18,6 +18,7 @@ import FooterComIcones from '../../components/FooterComIcones';
 import useApi from '../../hooks/useApi';
 import { AuthContext } from '../../components/AuthContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useTheme } from '../../context/ThemeContext';
 
 type Aluno = {
     id: number;
@@ -52,6 +53,7 @@ export default function ListaInstituicoes({ navigation }) {
     const [busca, setBusca] = useState('');
     const { url } = useApi();
     const { logout, token } = useContext(AuthContext);
+    const { theme, toggleTheme, colors } = useTheme();
 
     const loadFonts = async () => {
         try {
@@ -224,9 +226,9 @@ export default function ListaInstituicoes({ navigation }) {
     }
 
     const CardItem = ({ item, type }: { item: Aluno | Responsavel, type: 'aluno' | 'responsavel' }) => (
-        <View style={styles.cardItem}>
+        <View style={theme === 'light' ? styles.cardItem : styles.cardItemDark}>
             <TouchableOpacity 
-                style={styles.fabExcluir} 
+                style={styles.fabExcluir} // Este FAB pode manter o mesmo estilo vermelho
                 onPress={() => 
                     type === 'aluno' 
                     ? handleExcluirAluno(item.id, item.nome) 
@@ -242,22 +244,24 @@ export default function ListaInstituicoes({ navigation }) {
                     ? { uri: item.imagem }
                     : require("../../assets/images/FotoPerfil.png") 
                 }
-                style={styles.fotoItem}
+                style={theme === 'light' ? styles.fotoItem : styles.fotoItemDark}
             />
             
             <View style={styles.infoContainer}>
-                <Text style={styles.nomeItem}>{item.nome}</Text>
+                <Text style={theme === 'light' ? styles.nomeItem : styles.nomeItemDark}>
+                    {item.nome}
+                </Text>
                 
                 {type === 'aluno' && 'ra' in item && (
-                    <Text style={styles.infoItem}> 🧑‍🎓 RA: {item.ra}</Text>
+                    <Text style={theme === 'light' ? styles.infoItem : styles.infoItemDark}> 🧑‍🎓 RA: {item.ra}</Text>
                 )}
                 {'cpf' in item && (
-                    <Text style={styles.infoItem}> 🪪 CPF: {item.cpf}</Text>
+                    <Text style={theme === 'light' ? styles.infoItem : styles.infoItemDark}> 🪪 CPF: {item.cpf}</Text>
                 )}
                 {item.email ? (
-                    <Text style={styles.infoItem}> 📧 E-mail: {item.email}</Text>
+                    <Text style={theme === 'light' ? styles.infoItem : styles.infoItemDark}> 📧 E-mail: {item.email}</Text>
                 ) : (
-                    <Text style={styles.cadastroPendenteText}>
+                    <Text style={theme === 'light' ? styles.cadastroPendenteText : styles.cadastroPendenteTextDark}> 
                         {type === 'aluno' ? 'Aluno' : 'Responsável'} não finalizou o cadastro!
                     </Text>
                 )}
@@ -266,28 +270,28 @@ export default function ListaInstituicoes({ navigation }) {
     );
 
     return (
-        <SafeAreaView style={styles.safeArea}>
+        <SafeAreaView style={theme === 'light' ? styles.safeArea : styles.safeAreaDark}>
             <HeaderComLogout />
 
             <ScrollView contentContainerStyle={styles.scrollViewContainer}>
-                <Text style={styles.tituloAba}>
+                <Text style={theme === 'light' ? styles.tituloAba : styles.tituloAbaDark}>
                     {activeTab === 'alunos' ? 'Lista de Alunos' : 'Lista de Responsáveis'}
                 </Text>
 
-                <View style={styles.inputBuscaContainer}>
+                <View style={theme === 'light' ? styles.inputBuscaContainer : styles.inputBuscaContainerDark}>
                     <TextInput
-                        style={styles.inputBusca}
+                        style={theme === 'light' ? styles.inputBusca : styles.inputBuscaDark}
                         placeholder={activeTab === 'alunos' ? "Buscar aluno..." : "Buscar responsável..."}
-                        placeholderTextColor="#888"
+                        placeholderTextColor={theme === 'light' ? "#888" : "#AAA"}
                         value={busca}
                         onChangeText={setBusca}
                     />
-                    <Feather name="search" size={20} color="#888" style={styles.iconeBusca} />
+                    <Feather name="search" size={20} color={theme === 'light' ? "#888" : "#AAA"} style={styles.iconeBusca} />
                 </View>
 
                 {activeTab === 'alunos' ? (
                     alunosFiltrados.length === 0 ? (
-                        <Text style={styles.textoDia}>Nenhum aluno encontrado.</Text>
+                        <Text style={theme === 'light' ? styles.textoDia : styles.textoDiaDark}>Nenhum aluno encontrado.</Text>
                     ) : (
                         alunosFiltrados.map((alun) => (
                             <CardItem key={alun.id} item={alun} type="aluno" />
@@ -295,7 +299,7 @@ export default function ListaInstituicoes({ navigation }) {
                     )
                 ) : (
                     responsaveisFiltrados.length === 0 ? (
-                        <Text style={styles.textoDia}>Nenhum responsável encontrado.</Text>
+                        <Text style={theme === 'light' ? styles.textoDia : styles.textoDiaDark}>Nenhum responsável encontrado.</Text>
                     ) : (
                         responsaveisFiltrados.map((resp) => (
                             <CardItem key={resp.id} item={resp} type="responsavel" />
@@ -306,18 +310,30 @@ export default function ListaInstituicoes({ navigation }) {
 
             <View style={styles.tabContainer}>
                 <TouchableOpacity
-                    style={[styles.tabButton, activeTab === 'alunos' && styles.activeTabButton]}
+                    style={[
+                        styles.tabButton, 
+                        activeTab === 'alunos' ? (theme === 'dark' ? styles.activeTabButtonDark : styles.activeTabButton) : (theme === 'dark' && styles.tabButtonDark) 
+                    ]}
                     onPress={() => { setActiveTab('alunos'); setBusca(''); }}
                 >
-                    <Text style={[styles.tabText, activeTab === 'alunos' && styles.activeTabText]}>
+                    <Text style={[
+                        styles.tabText, 
+                        activeTab === 'alunos' ? styles.activeTabText : theme === 'dark' && styles.tabTextDark
+                    ]}>
                         Lista de Alunos
                     </Text>
                 </TouchableOpacity>
                 <TouchableOpacity
-                    style={[styles.tabButton, activeTab === 'responsaveis' && styles.activeTabButton]}
+                    style={[
+                        styles.tabButton, 
+                        activeTab === 'responsaveis' ? (theme === 'dark' ? styles.activeTabButtonDark : styles.activeTabButton) : (theme === 'dark' && styles.tabButtonDark) 
+                    ]}
                     onPress={() => { setActiveTab('responsaveis'); setBusca(''); }}
                 >
-                    <Text style={[styles.tabText, activeTab === 'responsaveis' && styles.activeTabText]}>
+                    <Text style={[
+                        styles.tabText, 
+                        activeTab === 'responsaveis' ? styles.activeTabText : theme === 'dark' && styles.tabTextDark
+                    ]}>
                         Lista de Responsáveis
                     </Text>
                 </TouchableOpacity>
@@ -330,13 +346,23 @@ export default function ListaInstituicoes({ navigation }) {
 const styles = StyleSheet.create({
     safeArea: {
         flex: 1,
-        backgroundColor: '#FCD28D',
+        backgroundColor: '#FCD28D', 
+    },
+    safeAreaDark: {
+        flex: 1,
+        backgroundColor: '#522a91', 
     },
     loadingContainer: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: '#FCD28D'
+    },
+    loadingContainerDark: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#3D3D3D'
     },
     scrollViewContainer: {
         padding: 20,
@@ -345,13 +371,156 @@ const styles = StyleSheet.create({
     tituloAba: {
         fontFamily: 'PoppinsBold',
         fontSize: 18,
-        color: '#3D3D3D',
+        color: '#3D3D3D', 
         textAlign: 'center',
         marginBottom: 20,
     },
+    tituloAbaDark: {
+        fontFamily: 'PoppinsBold',
+        fontSize: 18,
+        color: 'white', 
+        textAlign: 'center',
+        marginBottom: 20,
+    },
+    
+    inputBuscaContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: '#FFF',
+        borderRadius: 15,
+        paddingHorizontal: 15,
+        marginBottom: 20,
+        borderWidth: 1,
+        borderColor: '#DDD',
+        height: 50,
+    },
+    inputBuscaContainerDark: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: '#555',
+        borderRadius: 15,
+        paddingHorizontal: 15,
+        marginBottom: 20,
+        borderWidth: 1,
+        borderColor: '#333',
+        height: 50,
+    },
+    inputBusca: {
+        flex: 1,
+        fontFamily: 'PoppinsRegular',
+        fontSize: 14,
+        color: '#333',
+        padding: 0,
+    },
+    inputBuscaDark: {
+        flex: 1,
+        fontFamily: 'PoppinsRegular',
+        fontSize: 14,
+        color: '#FFF',
+        padding: 0,
+    },
+    iconeBusca: {
+        marginLeft: 10,
+    },
+    
+    cardItem: {
+        marginBottom: 15,
+        padding: 15,
+        backgroundColor: '#FFF', 
+        borderRadius: 15,
+        shadowColor: '#000',
+        shadowOpacity: 0.1,
+        shadowRadius: 5,
+        elevation: 2,
+        position: "relative",
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    cardItemDark: {
+        marginBottom: 15,
+        padding: 15,
+        backgroundColor: '#555', 
+        borderRadius: 15,
+        shadowColor: '#000',
+        shadowOpacity: 0.3,
+        shadowRadius: 5,
+        elevation: 2,
+        position: "relative",
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    fotoItem: {
+        width: 60,
+        height: 60,
+        borderRadius: 30, 
+        marginRight: 15,
+        borderWidth: 2,
+        borderColor: '#522a91', 
+        backgroundColor: '#E0E0E0', 
+    },
+    fotoItemDark: {
+        width: 60,
+        height: 60,
+        borderRadius: 30, 
+        marginRight: 15,
+        borderWidth: 2,
+        borderColor: '#E8A326', 
+        backgroundColor: '#E0E0E0', 
+    },
+    infoContainer: {
+        flex: 1,
+    },
+    nomeItem: {
+        fontFamily: 'PoppinsBold',
+        fontSize: 16,
+        color: '#522a91', 
+        marginBottom: 8,
+    },
+    nomeItemDark: {
+        fontFamily: 'PoppinsBold',
+        fontSize: 16,
+        color: '#E8A326', 
+        marginBottom: 8,
+    },
+    infoItem: {
+        fontFamily: 'PoppinsRegular',
+        fontSize: 14,
+        color: '#333', 
+    },
+    infoItemDark: {
+        fontFamily: 'PoppinsRegular',
+        fontSize: 14,
+        color: '#E0E0E0', 
+    },
+    cadastroPendenteText: {
+        fontFamily: 'PoppinsRegular',
+        fontSize: 14,
+        color: '#522a91', 
+        marginTop: 5,
+        fontStyle: 'italic',
+    },
+    cadastroPendenteTextDark: {
+        fontFamily: 'PoppinsRegular',
+        fontSize: 14,
+        color: '#E8A326', 
+        marginTop: 5,
+        fontStyle: 'italic',
+    },
+    textoDia: {
+        fontFamily: 'PoppinsRegular',
+        fontSize: 14,
+        color: '#666',
+        textAlign: 'center',
+    },
+    textoDiaDark: {
+        fontFamily: 'PoppinsRegular',
+        fontSize: 14,
+        color: '#AAA',
+        textAlign: 'center',
+    },
     tabContainer: {
         flexDirection: 'row',
-        backgroundColor: '#522a91',
+        backgroundColor: 'transparent', 
         padding: 0,
         marginHorizontal: '5%',
         borderRadius: 15,
@@ -366,104 +535,32 @@ const styles = StyleSheet.create({
         backgroundColor: '#522a91', 
         borderWidth: 0,
     },
+    tabButtonDark: {
+        backgroundColor: '#E8A326', 
+    },
     activeTabButton: {
-        backgroundColor: '#733FC9',
+        backgroundColor: '#733FC9', 
+    },
+    activeTabButtonDark: {
+        backgroundColor: '#fcc753', 
     },
     tabText: {
         fontFamily: 'PoppinsRegular',
         fontSize: 14,
-        color: '#BEACDE',
+        color: '#BEACDE', 
+    },
+    tabTextDark: {
+        color: '#F8E0B0', 
     },
     activeTabText: {
         fontFamily: 'PoppinsBold',
-        color: '#fff',
+        color: '#fff', 
         fontWeight: 'bold',
     },
-
-    inputBuscaContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        backgroundColor: '#FFF',
-        borderRadius: 15,
-        paddingHorizontal: 15,
-        marginBottom: 20,
-        borderWidth: 1,
-        borderColor: '#DDD',
-        height: 50,
-    },
-    inputBusca: {
-        flex: 1,
-        fontFamily: 'PoppinsRegular',
-        fontSize: 14,
-        color: '#333',
-        padding: 0,
-    },
-    iconeBusca: {
-        marginLeft: 10,
-    },
-    
-    cardItem: {
-        marginBottom: 15,
-        padding: 15,
-        backgroundColor: '#FFF',
-        borderRadius: 15,
-        shadowColor: '#000',
-        shadowOpacity: 0.1,
-        shadowRadius: 5,
-        elevation: 2,
-        position: "relative",
-        flexDirection: 'row',
-        alignItems: 'center',
-    },
-    fotoItem: {
-        width: 60,
-        height: 60,
-        borderRadius: 30, 
-        marginRight: 15,
-        borderWidth: 2,
-        borderColor: '#BEACDE',
-        backgroundColor: '#E0E0E0', 
-    },
-    fotoPlaceholder: {
-        width: 60,
-        height: 60,
-        borderRadius: 30,
-        backgroundColor: '#E0E0E0',
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginRight: 15,
-    },
-    fotoPlaceholderText: {
-        fontFamily: 'PoppinsRegular',
-        fontSize: 12,
-        color: '#666',
-    },
-    infoContainer: {
-        flex: 1,
-    },
-    nomeItem: {
+    activeTabTextDark: {
         fontFamily: 'PoppinsBold',
-        fontSize: 16,
-        color: '#522a91',
-        marginBottom: 8,
-    },
-    infoItem: {
-        fontFamily: 'PoppinsRegular',
-        fontSize: 14,
-        color: '#333',
-    },
-    cadastroPendenteText: {
-        fontFamily: 'PoppinsRegular',
-        fontSize: 14,
-        color: '#522a91',
-        marginTop: 5,
-        fontStyle: 'italic',
-    },
-    textoDia: {
-        fontFamily: 'PoppinsRegular',
-        fontSize: 14,
-        color: '#666',
-        textAlign: 'center',
+        color: '#3D3D3D', 
+        fontWeight: 'bold',
     },
     fabExcluir: {
         position: "absolute",

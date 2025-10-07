@@ -210,12 +210,11 @@ const styles = StyleSheet.create({
         borderColor: '#DDD',
     },
     inputBuscaDark: {
-        backgroundColor: '#555555',
+        backgroundColor: '#555',
         borderRadius: 15,
         padding: 12,
         fontFamily: 'PoppinsRegular',
         fontSize: 14,
-        color: '#FFF',
         marginBottom: 20,
         borderWidth: 1,
         borderColor: '#333',
