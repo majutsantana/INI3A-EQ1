@@ -247,9 +247,9 @@ export default function CadastroInstituicao({ navigation }) {
 
 
       <View style= {styles.content} >
-        <View style={styles.formContainer}>
+        <View style={theme == "light" ? styles.formContainer : styles.formContainerDark}>
           <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-            <MaterialIcons name="arrow-back" size={28} color="#000" />
+            <MaterialIcons name="arrow-back" size={28} style={theme == "light" ? styles.iconBack : styles.iconBackDark} />
           </TouchableOpacity>
           <ScrollView
             contentContainerStyle={styles.scrollContent}
@@ -257,11 +257,11 @@ export default function CadastroInstituicao({ navigation }) {
             showsVerticalScrollIndicator={false}
           >
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>Nome:</Text>
+              <Text style={theme == "light" ? styles.label : styles.labelDark}>Nome:</Text>
               <TextInput
-                style={styles.input}
+                style={theme == "light" ? styles.input : styles.inputDark}
                 placeholder="Digite o nome"
-                placeholderTextColor="#888"
+                placeholderTextColor="#999"
                 value={nome}
                 onChangeText={setNome}
               />
@@ -269,11 +269,11 @@ export default function CadastroInstituicao({ navigation }) {
             </View>
 
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>Email da instituição:</Text>
+              <Text style={theme == "light" ? styles.label : styles.labelDark}>Email da instituição:</Text>
               <TextInput
-                style={styles.input}
+                style={theme == "light" ? styles.input : styles.inputDark}
                 placeholder="Digite o email"
-                placeholderTextColor="#888"
+                placeholderTextColor="#999"
                 value={email}
                 onChangeText={setEmail}
                 keyboardType="email-address"
@@ -284,11 +284,11 @@ export default function CadastroInstituicao({ navigation }) {
 
             {/* --- INÍCIO DO NOVO BLOCO DE ENDEREÇO --- */}
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>Endereço da instituição</Text>
+              <Text style={theme == "light" ? styles.label : styles.labelDark}>Endereço da instituição</Text>
 
               <View style={styles.cepContainer}>
                 <TextInputMask
-                  style={[styles.input, { flex: 1 }]}
+                  style={[theme == "light" ? styles.input : styles.inputDark, { flex: 1 }]}
                   type={'zip-code'}
                   placeholder="Digite o CEP"
                   placeholderTextColor="#888"
@@ -304,7 +304,7 @@ export default function CadastroInstituicao({ navigation }) {
 
             <View style={styles.inputGroup}>
               <TextInput
-                style={styles.input}
+                style={theme == "light" ? styles.input : styles.inputDark}
                 placeholder="Logradouro (Rua, Av...)"
                 placeholderTextColor="#888"
                 value={logradouro}
@@ -315,7 +315,7 @@ export default function CadastroInstituicao({ navigation }) {
 
             <View style={styles.inputGroup}>
               <TextInput
-                style={styles.input}
+                style={theme == "light" ? styles.input : styles.inputDark}
                 placeholder="Número"
                 placeholderTextColor="#888"
                 value={numero}
@@ -327,7 +327,7 @@ export default function CadastroInstituicao({ navigation }) {
 
             <View style={styles.inputGroup}>
               <TextInput
-                style={styles.input}
+                style={theme == "light" ? styles.input : styles.inputDark}
                 placeholder="Bairro"
                 placeholderTextColor="#888"
                 value={bairro}
@@ -338,7 +338,7 @@ export default function CadastroInstituicao({ navigation }) {
 
             <View style={styles.inputGroup}>
               <TextInput
-                style={styles.input}
+                style={theme == "light" ? styles.input : styles.inputDark}
                 placeholder="Cidade"
                 placeholderTextColor="#888"
                 value={cidade}
@@ -349,7 +349,7 @@ export default function CadastroInstituicao({ navigation }) {
 
             <View style={styles.inputGroup}>
               <TextInput
-                style={styles.input}
+                style={theme == "light" ? styles.input : styles.inputDark}
                 placeholder="UF"
                 placeholderTextColor="#888"
                 value={uf}
@@ -362,22 +362,22 @@ export default function CadastroInstituicao({ navigation }) {
             {/* --- FIM DO NOVO BLOCO DE ENDEREÇO --- */}
 
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>CNPJ:</Text>
+              <Text style={theme == "light" ? styles.label : styles.labelDark}>CNPJ:</Text>
               <TextInputMask
                 type={'cnpj'}
                 value={cnpj}
                 onChangeText={text => setcnpj(text)}
                 placeholder="00.000.000/0000-00"
                 placeholderTextColor={"#888"}
-                style={styles.input}
+                style={theme == "light" ? styles.input : styles.inputDark}
               />
               {errors.cnpj && <Text style={styles.errorText}>{errors.cnpj}</Text>}
             </View>
 
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>Telefone:</Text>
+              <Text style={theme == "light" ? styles.label : styles.labelDark}>Telefone:</Text>
               <TextInputMask
-                style={styles.input}
+                style={theme == "light" ? styles.input : styles.inputDark} 
                 type={'cel-phone'}
                 options={{
                   maskType: 'BRL',
@@ -393,12 +393,12 @@ export default function CadastroInstituicao({ navigation }) {
             </View>
 
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>Senha:</Text>
-              <View style={styles.passwordContainer}>
+              <Text style={theme == "light" ? styles.label : styles.labelDark}>Senha:</Text>
+              <View style={theme == "light" ? styles.passwordContainer : styles.passwordContainerDark}>
                 <TextInput
                   style={styles.passwordInput}
                   placeholder="Digite a senha"
-                  placeholderTextColor="#888"
+                  placeholderTextColor="#999"
                   value={senha}
                   onChangeText={setSenha}
                   secureTextEntry={!senhaVisivel}
@@ -407,7 +407,7 @@ export default function CadastroInstituicao({ navigation }) {
                   <Feather
                     name={senhaVisivel ? 'eye' : 'eye-off'}
                     size={20}
-                    color="#888"
+                    color="#999"
                   />
                 </TouchableOpacity>
               </View>
@@ -415,8 +415,8 @@ export default function CadastroInstituicao({ navigation }) {
             </View>
 
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>Confirme a senha:</Text>
-              <View style={styles.passwordContainer}>
+              <Text style={theme == "light" ? styles.label : styles.labelDark}>Confirme a senha:</Text>
+              <View style={theme == "light" ? styles.passwordContainer : styles.passwordContainerDark}>
                 <TextInput
                   style={styles.passwordInput}
                   placeholder="Redigite a senha"
@@ -437,14 +437,14 @@ export default function CadastroInstituicao({ navigation }) {
             </View>
 
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>Plano da instituição:</Text>
-              <View style={styles.pickerWrapper}>
+              <Text style={theme == "light" ? styles.label : styles.labelDark}>Plano da instituição:</Text>
+              <View style={theme == "light" ? styles.pickerWrapper : styles.pickerWrapperDark}>
                 <Picker
                   selectedValue={plano}
                   onValueChange={(itemValue) => setPlano(itemValue)}
                   style={[
-                    styles.picker,
-                    { color: plano === '' ? '#888' : '#000' }
+                    theme == "light" ? styles.picker : styles.pickerDark,
+                    { color: plano === '' ? '#999' : '#000' }
                   ]}
                 >
                   <Picker.Item label="Selecione o plano" value="" />
@@ -508,6 +508,18 @@ const styles = StyleSheet.create({
     shadowRadius: 4.65,
     elevation: 1,
   },
+  formContainerDark: {
+    flex: 1,
+    backgroundColor: '#313233',
+    borderRadius: 30,
+    padding: '5%',
+    width: '90%',
+    shadowColor: '#000',
+    shadowOffset: { width: 2, height: 6 },
+    shadowOpacity: 0.15,
+    shadowRadius: 4.65,
+    elevation: 1,
+  },
   scrollContent: {
     flexGrow: 1,
     paddingBottom: '2%',
@@ -517,14 +529,44 @@ const styles = StyleSheet.create({
     padding: '1%',
     marginBottom: '2%',
   },
+  iconBack:{
+    color:'#000'
+  },
+  iconBackDark:{
+    color:'#fff'
+  },
   label: {
     fontWeight: 'bold',
     fontSize: 16,
     marginBottom: '2%',
     fontFamily: 'PoppinsRegular',
+    color: '#000',
+  },
+  labelDark: {
+    fontWeight: 'bold',
+    fontSize: 16,
+    marginBottom: '2%',
+    fontFamily: 'PoppinsRegular',
+    color: '#fff',
   },
   input: {
     backgroundColor: '#d9d9d9',
+    borderRadius: 25,
+    paddingHorizontal: '5%',
+    paddingVertical: '5%',
+    fontSize: 16,
+    fontFamily: 'PoppinsRegular',
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 3,
+    },
+    shadowOpacity: 0.27,
+    shadowRadius: 4.65,
+    elevation: 6,
+  },
+  inputDark:{
+    backgroundColor: '#B9B9B9',
     borderRadius: 25,
     paddingHorizontal: '5%',
     paddingVertical: '5%',
@@ -543,6 +585,17 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#d9d9d9',
+    borderRadius: 30,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.27,
+    shadowRadius: 4.65,
+    elevation: 6,
+  },
+  passwordContainerDark: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#B9B9B9',
     borderRadius: 30,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 3 },
@@ -585,6 +638,30 @@ const styles = StyleSheet.create({
     backgroundColor: '#d9d9d9',
     borderWidth: 0,
   },
+  pickerWrapperDark: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: '5%',
+    paddingVertical: '5%',
+    borderRadius: 25,
+    overflow: 'hidden',
+    backgroundColor: '#b9b9b9',
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 3,
+    },
+    shadowOpacity: 0.27,
+    shadowRadius: 4.65,
+    elevation: 6,
+  },
+  pickerDark: {
+    width: '100%',
+    fontSize: 16,
+    fontFamily: 'PoppinsRegular',
+    backgroundColor: '#b9b9b9',
+    borderWidth: 0,
+  },
   button: {
     backgroundColor: '#FFBE31',
     paddingVertical: '5%',
@@ -623,7 +700,7 @@ const styles = StyleSheet.create({
   textCheck: {
     fontSize: 14,
     fontFamily: 'PoppinsRegular',
-    color: '#522a91',
+    color: '#FFBE31',
   },
   errorText: {
     color: 'red',
