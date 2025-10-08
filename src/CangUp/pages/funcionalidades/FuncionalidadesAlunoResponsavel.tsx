@@ -14,6 +14,7 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import HeaderComLogout from '../../components/HeaderComLogout';
 import FooterComIcones from '../../components/FooterComIcones';
+import { useTheme } from '../../context/ThemeContext';
 
 const STORAGE_KEY = '@horarios_config';
 
@@ -34,6 +35,7 @@ export default function FuncionalidadesAlunoResponsavel({ navigation }) {
     const [currentDiaId, setCurrentDiaId] = useState(null);
     const [currentTipo, setCurrentTipo] = useState(null);
     const [time, setTime] = useState(new Date());
+    const {theme} = useTheme();
 
     const loadFonts = async () => {
         try {
@@ -122,20 +124,20 @@ export default function FuncionalidadesAlunoResponsavel({ navigation }) {
     }
 
     return (
-        <SafeAreaView style={styles.safeArea}>
+        <SafeAreaView style={theme == "light"? styles.safeArea : styles.safeAreaDark}>
             <HeaderComLogout/>
 
             <ScrollView contentContainerStyle={styles.scrollViewContainer}>
-                <View style={styles.containerPrincipal}>
-                    <Text style={styles.tituloAba}>Horários</Text>
+                <View style={theme == "light"? styles.containerPrincipal : styles.containerPrincipalDark}>
+                    <Text style={theme == "light" ? styles.tituloAba : styles.tituloAbaDark}>Horários</Text>
                     {dias.map(dia => (
                         <View key={dia.id} style={styles.cardDia}>
-                            <View style={styles.headerDia}>
+                            <View style={theme == "light" ? styles.headerDia : styles.headerDiaDark}>
                                 <Text style={styles.textoDia}>{dia.nome}</Text>
                             </View>    
                             <View style={styles.secaoHorarios}>
                                 <View style={styles.blocoHorario}>
-                                    <Text style={styles.labelHorario}>Início</Text>
+                                    <Text style={theme == "light" ? styles.labelHorario : styles.labelHorarioDark}>Início</Text>
                                     <View style={styles.circuloHorario}>
                                         <Text style={styles.textoTempo}>{dia.inicio || '--:--'}</Text>
                                     </View>
@@ -147,7 +149,7 @@ export default function FuncionalidadesAlunoResponsavel({ navigation }) {
                                     </TouchableOpacity>
                                 </View>
                                 <View style={styles.blocoHorario}>
-                                    <Text style={styles.labelHorario}>Fim</Text>
+                                    <Text style={theme == "light" ? styles.labelHorario : styles.labelHorarioDark}>Fim</Text>
                                     <View style={styles.circuloHorario}>
                                         <Text style={styles.textoTempo}>{dia.fim || '--:--'}</Text>
                                     </View>
@@ -191,6 +193,10 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: '#FCD28D',
     },
+    safeAreaDark: {
+        flex: 1,
+        backgroundColor: '#522a91',
+    },
     loadingContainer: {
         flex: 1, 
         justifyContent: 'center', 
@@ -203,13 +209,26 @@ const styles = StyleSheet.create({
     containerPrincipal: {
         margin: 20,
         padding: 15,
-        backgroundColor: 'rgba(255, 255, 255, 0.8)',
+        backgroundColor: '#f5f5f5',
+        borderRadius: 25,
+    },
+    containerPrincipalDark: {
+        margin: 20,
+        padding: 15,
+        backgroundColor: '#313233',
         borderRadius: 25,
     },
     tituloAba: {
         fontFamily: 'PoppinsBold',
         fontSize: 16,
-        color: '#3D3D3D',
+        color: '#000',
+        textAlign: 'center',
+        marginBottom: 20,
+    },
+    tituloAbaDark: {
+        fontFamily: 'PoppinsBold',
+        fontSize: 16,
+        color: '#fff',
         textAlign: 'center',
         marginBottom: 20,
     },
@@ -218,6 +237,13 @@ const styles = StyleSheet.create({
     },
     headerDia: {
         backgroundColor: '#EAEAEA',
+        paddingVertical: 10,
+        borderRadius: 15,
+        alignItems: 'center',
+        marginBottom: 10,
+    },
+    headerDiaDark: {
+        backgroundColor: '#5b5b5b',
         paddingVertical: 10,
         borderRadius: 15,
         alignItems: 'center',
@@ -239,7 +265,13 @@ const styles = StyleSheet.create({
     labelHorario: {
         fontFamily: 'PoppinsRegular',
         fontSize: 14,
-        color: '#666',
+        color: '#000',
+        marginBottom: 8,
+    },
+    labelHorarioDark: {
+        fontFamily: 'PoppinsRegular',
+        fontSize: 14,
+        color: '#fff',
         marginBottom: 8,
     },
     circuloHorario: {
@@ -256,7 +288,7 @@ const styles = StyleSheet.create({
     textoTempo: {
         fontFamily: 'PoppinsBold',
         fontSize: 18,
-        color: '#333',
+        color: '#000',
     },
     botaoAdicionar: {
         backgroundColor: '#FFBE31',
@@ -267,7 +299,7 @@ const styles = StyleSheet.create({
     textoBotao: {
         fontFamily: 'PoppinsRegular',
         fontSize: 14,
-        color: '#3D3D3D',
+        color: '#000',
     },
     botoesAcaoContainer: {
         flexDirection: 'row',

@@ -19,7 +19,8 @@ import {
   import useApi from '../../hooks/useApi';
   import { TextInputMask } from 'react-native-masked-text';
   import AsyncStorage from '@react-native-async-storage/async-storage';
-import { AuthContext } from '../../components/AuthContext';
+  import { AuthContext } from '../../components/AuthContext';
+  import { useTheme } from '../../context/ThemeContext';
 
   type Responsavel = {
     id: number;
@@ -63,6 +64,7 @@ import { AuthContext } from '../../components/AuthContext';
     const [errors, setErrors] = useState({});
     const { url } = useApi();
     const { logout } = useContext(AuthContext);
+    const {theme} = useTheme();
   
     const handlePlacaChange = (maskedText, rawText) => {
         const text = rawText || '';
@@ -208,17 +210,17 @@ import { AuthContext } from '../../components/AuthContext';
     }
   
     return (
-      <SafeAreaView style={styles.safeArea}>
+      <SafeAreaView style={theme == "light" ? styles.safeArea : styles.safeAreaDark}>
         <StatusBar backgroundColor="#B9A6DA" barStyle="dark-content" />
-        <Header />
+        <Header/>
   
         <View style={styles.content}>
-          <View style={styles.formContainer}>
+          <View style={theme == "light" ? styles.formContainer : styles.formContainerDark}>
             <View style={styles.topo}>
               <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-              <MaterialIcons name="arrow-back" size={28} color="#000" />
+              <MaterialIcons name="arrow-back" size={28} style={theme == "light" ? styles.iconBack : styles.iconBackDark}/>
               </TouchableOpacity>
-              <Text style={styles.tituloAba}>Veículo</Text>
+              <Text style={theme == "light" ? styles.tituloAba : styles.tituloAbaDark}>Veículo</Text>
             </View>
             
             <ScrollView
@@ -228,27 +230,27 @@ import { AuthContext } from '../../components/AuthContext';
             >
               
               <View style={styles.inputGroup}>
-                <Text style={styles.label}>Modelo:</Text>
+                <Text style={theme == "light" ? styles.label : styles.labelDark}>Modelo:</Text>
                 <TextInput
-                  style={styles.input}
+                  style={theme == "light" ? styles.input : styles.inputDark}
                   placeholder="Digite o modelo"
-                  placeholderTextColor="#888"
+                  placeholderTextColor="#5b5b5b"
                   value={modelo}
                   onChangeText={setModelo}
                 />
                 {errors.modelo && <Text style={styles.errorText}>{errors.modelo}</Text>}
               </View>
               <View style={styles.inputGroup}>
-                <Text style={styles.label}>Placa:</Text>
+                <Text style={theme == "light" ? styles.label : styles.labelDark}>Placa:</Text>
                 <TextInputMask
-                    style={styles.input}
+                    style={theme == "light" ? styles.input : styles.inputDark}
                     type={'custom'}
                     options={{
                     // 'S' aceita letras e números, permitindo ambos os formatos de placa
                         mask: 'AAA-9S99' 
                       }}
                       placeholder="ABC-1234 ou ABC-1D23"
-                      placeholderTextColor="#888"
+                      placeholderTextColor="#5b5b5b"
                       value={placa}
                       onChangeText={text => setPlaca(text.toUpperCase())}
                       autoCapitalize="characters"
@@ -256,11 +258,11 @@ import { AuthContext } from '../../components/AuthContext';
               </View>
               {errors.placa && <Text style={styles.errorText}>{errors.placa}</Text>}
               <View style={styles.inputGroup}>
-                <Text style={styles.label}>Cor:</Text>
+                <Text style={theme == "light" ? styles.label : styles.labelDark}>Cor:</Text>
                 <TextInput
-                  style={styles.input}
+                  style={theme == "light" ? styles.input : styles.inputDark}
                   placeholder="Digite a cor"
-                  placeholderTextColor="#888"
+                  placeholderTextColor="#5b5b5b"
                   value={cor}
                   onChangeText={setCor}
                 />
@@ -268,17 +270,16 @@ import { AuthContext } from '../../components/AuthContext';
               </View>
               
               <View style={styles.inputGroup}>
-                <Text style={styles.label}>Assentos Disponíveis:</Text>
+                <Text style={theme == "light" ? styles.label : styles.labelDark}>Assentos Disponíveis:</Text>
                 <TextInput
-                  style={styles.input}
+                  style={theme == "light" ? styles.input : styles.inputDark}
                   placeholder="Digite a quantidade de assentos:"
-                  placeholderTextColor="#888"
+                  placeholderTextColor="#5b5b5b"
                   value={qtde_assentos}
                   onChangeText={setQtdeAssentos}
                 /> 
               </View>
               {errors.qtde_assentos && <Text style={styles.errorText}>{errors.qtde_assentos}</Text>}
-  
             </ScrollView>
           </View>
   
@@ -288,7 +289,7 @@ import { AuthContext } from '../../components/AuthContext';
           </TouchableOpacity>
         </View>
   
-        <FooterComIcones />
+        <FooterComIcones /*nav={navigation}*/ /> 
       </SafeAreaView>
     );
   }
@@ -298,6 +299,10 @@ import { AuthContext } from '../../components/AuthContext';
     safeArea: {
       flex: 1,
       backgroundColor: '#FFD88D',
+    },
+    safeAreaDark: {
+      flex: 1,
+      backgroundColor: '#522a91',
     },
     content: {
       flex: 1,
@@ -319,6 +324,24 @@ import { AuthContext } from '../../components/AuthContext';
       shadowRadius: 4.65,
       elevation: 1,
     },
+    formContainerDark: {
+      flex: 1,
+      backgroundColor: '#333',
+      borderRadius: 30,
+      padding: '5%',
+      width: '90%',
+      shadowColor: '#000',
+      shadowOffset: { width: 2, height: 6 },
+      shadowOpacity: 0.15,
+      shadowRadius: 4.65,
+      elevation: 1,
+    },
+    iconBack:{
+      color:'#000'
+    },
+    iconBackDark:{
+      color:'#fff'
+    },
     scrollContent: {
       flexGrow: 1,
       paddingBottom: '2%',
@@ -333,7 +356,14 @@ import { AuthContext } from '../../components/AuthContext';
       fontSize: 16,
       marginBottom: '3%',
       fontFamily: 'PoppinsRegular',
-      textAlign: 'center',
+      color:'#000',
+    },
+    labelDark: {
+      fontWeight: 'bold',
+      fontSize: 16,
+      marginBottom: '2%',
+      fontFamily: 'PoppinsRegular',
+      color: '#fff',
     },
     topo: {
       flexDirection:'row',
@@ -355,10 +385,32 @@ import { AuthContext } from '../../components/AuthContext';
       shadowRadius: 4.65,
       elevation: 6,
     },
+    inputDark: {
+      backgroundColor: '#b9b9b9',
+      borderRadius: 25,
+      paddingHorizontal: '5%',
+      paddingVertical: '5%',
+      fontSize: 16,
+      fontFamily: 'PoppinsRegular',
+      shadowColor: "white",
+      shadowOffset: {
+      width: 0,
+      height: 3,
+      },
+      shadowOpacity: 0.27,
+      shadowRadius: 4.65,
+      elevation: 6,
+    },
     tituloAba: {
       fontFamily: 'PoppinsBold',
       fontSize: 20,
-      color: '#333',
+      color: '#000',
+      marginBottom: 10,
+    },
+    tituloAbaDark: {
+      fontFamily: 'PoppinsBold',
+      fontSize: 20,
+      color: '#fff',
       marginBottom: 10,
     },
     button: {
@@ -393,43 +445,43 @@ import { AuthContext } from '../../components/AuthContext';
       textAlign: 'center',
     },
     customNumericContainer: {
-  		flexDirection: 'row',
-  		alignItems: 'center',
-  		justifyContent: 'center',
-  		alignSelf: 'center',
-  		backgroundColor: '#d9d9d9',
-  		borderRadius: 25,
-  		height: 50,
-  		width: '60%',
-  		shadowColor: "#000",
-  		shadowOffset: {
-  			width: 0,
-  			height: 3,
-  		},
-  		shadowOpacity: 0.27,
-  		shadowRadius: 4.65,
-  		elevation: 6,
-  	},
-  	customNumericButton: {
-  		width: '40%',
-  		height: '100%',
-  		justifyContent: 'center',
-  		alignItems: 'center',
-  	},
-  	customNumericButtonText: {
-  		fontSize: 24,
-  		fontWeight: 'bold',
-  		color: '#3D3D3D',
-  	},
-  	customNumericInputView: {
-  		height: '100%',
-  		justifyContent: 'center',
-      alignItems:'center'
-  	},
-  	customNumericValueText: {
-  		fontSize: 20,
-  		fontFamily: 'PoppinsBold',
-  		color: '#3D3D3D',
-  	},
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      alignSelf: 'center',
+      backgroundColor: '#d9d9d9',
+      borderRadius: 25,
+      height: 50,
+      width: '60%',
+      shadowColor: "#000",
+      shadowOffset: {
+        width: 0,
+        height: 3,
+      },
+      shadowOpacity: 0.27,
+      shadowRadius: 4.65,
+      elevation: 6,
+    },
+    customNumericButton: {
+      width: '40%',
+      height: '100%',
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    customNumericButtonText: {
+      fontSize: 24,
+      fontWeight: 'bold',
+      color: '#3D3D3D',
+    },
+    customNumericInputView: {
+      height: '100%',
+      justifyContent: 'center',
+        alignItems:'center'
+    },
+    customNumericValueText: {
+      fontSize: 20,
+      fontFamily: 'PoppinsBold',
+      color: '#3D3D3D',
+    },
   });
   

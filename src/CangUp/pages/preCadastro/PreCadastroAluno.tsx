@@ -156,54 +156,54 @@ export default function PreCadastroAluno({ navigation }) {
 
       <View style={theme == "light" ? styles.content : styles.contentDark}>
         <View style={theme == "light" ? styles.formContainer : styles.formContainerDark}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={theme == "light" ? styles.backButton : styles.backButtonDark}>
-        <MaterialIcons name="arrow-back" size={28} color="#000" />
+        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+        <MaterialIcons name="arrow-back" size={28} style={theme == "light" ? styles.iconBack : styles.iconBackDark}/>
         </TouchableOpacity>
           <ScrollView
-            contentContainerStyle={theme == "light" ? styles.scrollContent : styles.scrollContentDark}
+            contentContainerStyle= {styles.scrollContent} 
             keyboardShouldPersistTaps="handled"
             showsVerticalScrollIndicator={false}
           >
-            <View style={theme == "light" ? styles.inputGroup : styles.inputGroupDark}>
+            <View style={styles.inputGroup}>
                <Text style={theme == "light" ? styles.label : styles.labelDark}>Nome:</Text>
                <TextInput
                  style={theme == "light" ? styles.input : styles.inputDark}
                  placeholder="Digite o nome"
-                 placeholderTextColor="#888"
+                 placeholderTextColor="#5b5b5b"
                  value={nome}
                  onChangeText={setNome}
                />
                {errors.nome && <Text style={styles.errorText}>{errors.nome}</Text>}
              </View>
-             <View style={theme == "light" ? styles.inputGroup : styles.inputGroupDark}>
+             <View style={styles.inputGroup}>
                <Text style={theme == "light" ? styles.label : styles.labelDark}>Número de matrícula/RA:</Text>
                <TextInput
                  style={theme == "light" ? styles.input : styles.inputDark}
                  placeholder="Digite o número de matrícula"
-                 placeholderTextColor="#888"
+                 placeholderTextColor="#5b5b5b"
                  value={RA}
                  onChangeText={setRA}
                />
                {errors.RA && <Text style={styles.errorText}>{errors.RA}</Text>}
               </View>
-              <View style={theme == "light" ? styles.inputGroup : styles.inputGroupDark}>
-               <Text style={styles.label}>CPF:</Text>
+              <View style={styles.inputGroup}>
+               <Text style={theme == "light" ? styles.label : styles.labelDark}>CPF:</Text>
                <TextInputMask
                  type={'cpf'}
                  value={CPF}
                  onChangeText={text => setCPF(text)}
                  placeholder="000.000.000-00"
-                 style={styles.input}
-                 placeholderTextColor="#888"
+                 style={theme == "light" ? styles.input : styles.inputDark}
+                 placeholderTextColor="#5b5b5b"
                />
                {errors.CPF && <Text style={styles.errorText}>{errors.CPF}</Text>}
               </View>
           </ScrollView>
         </View>
  
-        <TouchableOpacity style={theme == "light" ? styles.button : styles.buttonDark}
+        <TouchableOpacity style={styles.button}
           onPress= {handlePreCadastro}>
-          <Text style={theme == "light" ? styles.buttonText : styles.buttonTextDark}>Cadastrar Aluno</Text>
+          <Text style={styles.buttonText}>Cadastrar Aluno</Text>
         </TouchableOpacity>
       </View>
       <FooterComIcones nav={navigation}/>
@@ -215,9 +215,9 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: '#FFD88D',
     },
-     safeAreaDark: {
-        flex: 1,
-        backgroundColor: '#522a91',
+    safeAreaDark: {
+      flex: 1,
+      backgroundColor: '#522a91',
     },
     content: {
         flex: 1,
@@ -264,16 +264,13 @@ const styles = StyleSheet.create({
         paddingBottom: '2%',
         margin: '5%',
     },
-    scrollContentDark: {
-        flexGrow: 1,
-        paddingBottom: '2%',
-        margin: '5%',
+    iconBack:{
+      color:'#000'
+    },
+    iconBackDark:{
+      color:'#fff'
     },
     inputGroup: {
-        padding:'1%',
-        marginBottom:'2%',
-    },
-    inputGroupDark: {
         padding:'1%',
         marginBottom:'2%',
     },
@@ -282,12 +279,14 @@ const styles = StyleSheet.create({
         fontSize: 16,
         marginBottom: '2%',
         fontFamily: 'PoppinsRegular',
+        color: '#000',
     },
     labelDark: {
         fontWeight: 'bold',
         fontSize: 16,
         marginBottom: '2%',
         fontFamily: 'PoppinsRegular',
+        color: '#fff',
     },
     input: {
         backgroundColor: '#d9d9d9',
@@ -306,7 +305,7 @@ const styles = StyleSheet.create({
         elevation: 6,
     },
     inputDark: {
-        backgroundColor: '#666',
+        backgroundColor: '#b9b9b9',
         borderRadius: 25,
         paddingHorizontal: '5%',
         paddingVertical: '5%',
@@ -337,27 +336,7 @@ const styles = StyleSheet.create({
         shadowRadius: 4.65,
         elevation: 6,
     },
-    buttonDark: {
-        backgroundColor: '#FFBE31',
-        paddingVertical: '5%',
-        width:'60%',
-        borderRadius: 20,
-        alignItems: 'center',
-        marginTop: '10%',
-        shadowColor: '#000',
-        shadowOffset: {
-        width: 0,
-        height: 3,
-        },
-        shadowOpacity: 0.27,
-        shadowRadius: 4.65,
-        elevation: 6,
-    },
     buttonText: {
-        fontSize: 18,
-        fontFamily: 'PoppinsRegular',
-    },
-    buttonTextDark: {
         fontSize: 18,
         fontFamily: 'PoppinsRegular',
     },
@@ -365,9 +344,6 @@ const styles = StyleSheet.create({
         height:'15%',
     },
     backButton: {
-        alignSelf: 'flex-start',
-    },
-    backButtonDark: {
         alignSelf: 'flex-start',
     },
     errorText: {
@@ -383,7 +359,7 @@ const styles = StyleSheet.create({
         columnGap: 10,
         fontSize: 14,
         alignItems:'center',
-        color:'#888',
+        color:'#5b5b5b',
     },
 });
     

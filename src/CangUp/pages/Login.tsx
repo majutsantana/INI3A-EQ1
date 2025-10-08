@@ -167,7 +167,7 @@ export default function Login({ navigation }) {
             onValueChange={(itemValue) => setTipoDeLogin(itemValue)}
             style={[
               styles.picker,
-              { color: tipoDeLogin === '' ? '#5B5B5B' : colors.text }
+              { color: tipoDeLogin === '' ? '#5B5B5B' : '#000' }
             ]}
           >
             <Picker.Item label="Selecione o tipo de Login" value="" />

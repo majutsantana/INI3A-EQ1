@@ -41,7 +41,7 @@ export default function PreCadastroResponsavel({ navigation }) {
     const [CPF, setCPF] = useState('');
     const { url } = useApi();
     const {logout} = useContext(AuthContext);
-    const { theme} = useTheme();
+    const { theme } = useTheme();
 
     const validateForm = () => {
      let newErrors = {};
