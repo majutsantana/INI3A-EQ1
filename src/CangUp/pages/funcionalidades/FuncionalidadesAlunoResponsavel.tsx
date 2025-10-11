@@ -133,7 +133,7 @@ export default function FuncionalidadesAlunoResponsavel({ navigation }) {
                     {dias.map(dia => (
                         <View key={dia.id} style={styles.cardDia}>
                             <View style={theme == "light" ? styles.headerDia : styles.headerDiaDark}>
-                                <Text style={styles.textoDia}>{dia.nome}</Text>
+                                <Text style={theme == "light" ? styles.textoDia : styles.textoDiaDark}>{dia.nome}</Text>
                             </View>    
                             <View style={styles.secaoHorarios}>
                                 <View style={styles.blocoHorario}>
@@ -253,6 +253,11 @@ const styles = StyleSheet.create({
         fontFamily: 'PoppinsBold',
         fontSize: 16,
         color: '#555',
+    },
+    textoDiaDark: {
+        fontFamily: 'PoppinsBold',
+        fontSize: 16,
+        color: '#fff',
     },
     secaoHorarios: {
         flexDirection: 'row',
