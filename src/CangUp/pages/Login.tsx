@@ -87,6 +87,11 @@ export default function Login({ navigation }) {
 
       if (token) {
         await contextLogin(token, tipoDeLogin);
+
+        // <<< CORREÇÃO PRINCIPAL - ESTA LINHA FOI ADICIONADA >>>
+        // Aqui salvamos o login do usuário para usar em outras telas.
+        await AsyncStorage.setItem('userLogin', username);
+        
         if (tipoDeLogin === "inst" && IdInst) {
           await AsyncStorage.setItem("id_instituicao", IdInst);
         } else if (tipoDeLogin === "alun") {
@@ -181,6 +186,7 @@ export default function Login({ navigation }) {
           placeholderTextColor="#5B5B5B"
           value={username}
           onChangeText={setusername}
+          autoCapitalize="none"
         />
         <View style={styles.passwordContainer}>
           <TextInput

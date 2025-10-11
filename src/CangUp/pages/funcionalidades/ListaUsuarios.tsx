@@ -9,7 +9,8 @@ import {
     TextInput,
     TouchableOpacity,
     Alert,
-    Image
+    Image,
+    Modal, // Importação adicionada
 } from 'react-native';
 import * as Font from 'expo-font';
 import { Feather } from '@expo/vector-icons';
@@ -20,6 +21,7 @@ import { AuthContext } from '../../components/AuthContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useTheme } from '../../context/ThemeContext';
 
+// Tipos de dados
 type Aluno = {
     id: number;
     nome: string;
@@ -39,13 +41,15 @@ type Responsavel = {
     imagem?: string;
 }
 
+// ATUALIZADO: Adicionado o e-mail, que é necessário para a confirmação
 type Instituicao = {
     id: number;
+    email: string;
 }
 
-export default function ListaInstituicoes({ navigation }) {
+export default function ListaUsuarios({ navigation }) {
     const [fontsLoaded, setFontsLoaded] = useState(false);
-    const [activeTab, setActiveTab] = useState<'alunos' | 'responsaveis'>('alunos'); // Novo estado para a aba ativa
+    const [activeTab, setActiveTab] = useState<'alunos' | 'responsaveis'>('alunos');
     const [alunos, setAlunos] = useState<Aluno[]>([]);
     const [responsaveis, setResponsaveis] = useState<Responsavel[]>([]);
     const [loading, setLoading] = useState(true);
@@ -54,6 +58,12 @@ export default function ListaInstituicoes({ navigation }) {
     const { url } = useApi();
     const { logout, token } = useContext(AuthContext);
     const { theme, toggleTheme, colors } = useTheme();
+
+    // NOVOS ESTADOS PARA O MODAL
+    const [modalVisivel, setModalVisivel] = useState(false);
+    const [usuarioParaExcluir, setUsuarioParaExcluir] = useState<Aluno | Responsavel | null>(null);
+    const [textoConfirmacao, setTextoConfirmacao] = useState('');
+    const [erroConfirmacao, setErroConfirmacao] = useState('');
 
     const loadFonts = async () => {
         try {
@@ -70,14 +80,9 @@ export default function ListaInstituicoes({ navigation }) {
     const fetchInstituicao = async () => {
         try {
             const token = await AsyncStorage.getItem("jwt");
-            if (!token) {
-                Alert.alert("Erro", "Você precisa estar logado.");
-                logout();
-                return;
-            }
             const id = await AsyncStorage.getItem("id_instituicao");
-            if (!id) {
-                Alert.alert("Erro", "ID da instituição não encontrado.");
+            if (!token || !id) {
+                Alert.alert("Erro", "Sessão inválida. Por favor, faça login novamente.");
                 logout();
                 return;
             }
@@ -85,8 +90,7 @@ export default function ListaInstituicoes({ navigation }) {
                 method: "GET", headers: { "Authorization": `Bearer ${token}` }
             });
             if (!res.ok) {
-                Alert.alert("Erro", "Falha ao carregar dados da instituição.");
-                return;
+                throw new Error("Falha ao carregar dados da instituição.");
             }
             const data = await res.json();
             setInstituicao(data);
@@ -99,14 +103,12 @@ export default function ListaInstituicoes({ navigation }) {
     const fetchAlunos = async () => {
         try {
             const token = await AsyncStorage.getItem('jwt');
-            const response = await fetch(`${url}/api/alunos`,
-                {
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": `Bearer ${token}`,
-                    }
+            const response = await fetch(`${url}/api/alunos`, {
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`,
                 }
-            );
+            });
             if (!response.ok) throw new Error("Erro ao buscar alunos");
             const data: Aluno[] = await response.json();
             setAlunos(data);
@@ -118,20 +120,18 @@ export default function ListaInstituicoes({ navigation }) {
     const fetchResponsaveis = async () => {
         try {
             const token = await AsyncStorage.getItem('jwt');
-            const response = await fetch(`${url}/api/responsaveis`,
-                {
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": `Bearer ${token}`,
-                    }
+            const response = await fetch(`${url}/api/responsaveis`, {
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`,
                 }
-            );
+            });
             if (!response.ok) throw new Error("Erro ao buscar responsáveis");
             const data: Responsavel[] = await response.json();
             setResponsaveis(data);
         } catch (error) {
             console.error("Erro ao buscar responsáveis:", error);
-        } 
+        }
     };
     
     const fetchData = async () => {
@@ -146,64 +146,69 @@ export default function ListaInstituicoes({ navigation }) {
     };
 
     useEffect(() => {
-        fetchData();
-    }, []);
+        const unsubscribe = navigation.addListener('focus', () => {
+            fetchData();
+        });
+        return unsubscribe;
+    }, [navigation]);
 
-    const handleExcluirAluno = async (id: number, nome: string) => {
-        if (confirm("Deseja mesmo excluir o aluno " + nome + "?")) {
-            try {
-                const token = await AsyncStorage.getItem('jwt');
-                const response = await fetch(`${url}/api/alunos/${id}`, {
-                    method: "DELETE",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": `Bearer ${token}`,
-                    },
-                });
-
-                if (!response.ok) {
-                    const errorBody = await response.text();
-                    throw new Error(`Falha na API: ${response.status} - ${errorBody}`);
-                }
-
-                setAlunos(prevAlunos =>
-                    prevAlunos.filter(alun => alun.id !== id)
-                );
-                Alert.alert("Sucesso", `Aluno ${nome} excluído.`);
-
-            } catch (error) {
-                console.error("Erro durante o processo de exclusão:", error);
-                Alert.alert("Erro", "Não foi possível excluir o aluno.");
-            }
-        }
+    // NOVA LÓGICA DE EXCLUSÃO COM MODAL
+    const abrirModalExclusao = (usuario: Aluno | Responsavel) => {
+        setUsuarioParaExcluir(usuario);
+        setModalVisivel(true);
+        setTextoConfirmacao('');
+        setErroConfirmacao('');
     };
 
-    const handleExcluirResponsavel = async (id: number, nome: string) => {
-        if (confirm("Deseja mesmo excluir o responsável " + nome + "?")) {
-            try {
-                const token = await AsyncStorage.getItem('jwt');
-                const response = await fetch(`${url}/api/responsaveis/${id}`, {
-                    method: "DELETE",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": `Bearer ${token}`,
-                    },
-                });
+    const handleInputChange = (text: string) => {
+        setTextoConfirmacao(text);
+        if (erroConfirmacao) setErroConfirmacao('');
+    };
 
-                if (!response.ok) {
-                    const errorBody = await response.text();
-                    throw new Error(`Falha na API: ${response.status} - ${errorBody}`);
-                }
+    const handleConfirmarExclusao = async () => {
+        if (!usuarioParaExcluir || !instituicao?.email) {
+            setErroConfirmacao('Erro interno. Não foi possível carregar os dados para confirmação.');
+            return;
+        }
 
-                setResponsaveis(prevResponsaveis =>
-                    prevResponsaveis.filter(resp => resp.id !== id)
-                );
-                Alert.alert("Sucesso", `Responsável ${nome} excluído.`);
+        const stringEsperada = `${instituicao.email}/${usuarioParaExcluir.cpf}`;
+        const stringDigitada = textoConfirmacao.trim();
 
-            } catch (error) {
-                console.error("Erro durante o processo de exclusão:", error);
-                Alert.alert("Erro", "Não foi possível excluir o responsável.");
+        if (stringDigitada !== stringEsperada) {
+            setErroConfirmacao('Confirmação inválida. Verifique o e-mail da instituição e o CPF do usuário.');
+            return;
+        }
+
+        const ehAluno = 'ra' in usuarioParaExcluir;
+        const endpoint = ehAluno ? 'alunos' : 'responsaveis';
+        const tipoUsuario = ehAluno ? 'Aluno' : 'Responsável';
+
+        try {
+            const authToken = await AsyncStorage.getItem('jwt');
+            const response = await fetch(`${url}/api/${endpoint}/${usuarioParaExcluir.id}`, {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${authToken}`,
+                },
+            });
+
+            if (!response.ok) {
+                throw new Error(`Falha na API: ${response.status}`);
             }
+
+            if (ehAluno) {
+                setAlunos(prev => prev.filter(item => item.id !== usuarioParaExcluir.id));
+            } else {
+                setResponsaveis(prev => prev.filter(item => item.id !== usuarioParaExcluir.id));
+            }
+
+            setModalVisivel(false);
+            Alert.alert('Sucesso', `${tipoUsuario} excluído com sucesso.`);
+
+        } catch (error) {
+            console.error(`Erro ao excluir ${tipoUsuario}:`, error);
+            Alert.alert('Erro', `Não foi possível excluir o ${tipoUsuario}.`);
         }
     };
 
@@ -227,18 +232,15 @@ export default function ListaInstituicoes({ navigation }) {
 
     const CardItem = ({ item, type }: { item: Aluno | Responsavel, type: 'aluno' | 'responsavel' }) => (
         <View style={theme === 'light' ? styles.cardItem : styles.cardItemDark}>
+            {/* MODIFICADO: OnPress agora abre o modal */}
             <TouchableOpacity 
-                style={styles.fabExcluir} // Este FAB pode manter o mesmo estilo vermelho
-                onPress={() => 
-                    type === 'aluno' 
-                    ? handleExcluirAluno(item.id, item.nome) 
-                    : handleExcluirResponsavel(item.id, item.nome)
-                }
+                style={styles.fabExcluir}
+                onPress={() => abrirModalExclusao(item)}
             >
                 <Feather name="trash-2" size={18} color="#fff" />
             </TouchableOpacity>
             
-             <Image
+            <Image
                 source={
                     item.imagem
                     ? { uri: item.imagem }
@@ -294,7 +296,7 @@ export default function ListaInstituicoes({ navigation }) {
                         <Text style={theme === 'light' ? styles.textoDia : styles.textoDiaDark}>Nenhum aluno encontrado.</Text>
                     ) : (
                         alunosFiltrados.map((alun) => (
-                            <CardItem key={alun.id} item={alun} type="aluno" />
+                            <CardItem key={`aluno-${alun.id}`} item={alun} type="aluno" />
                         ))
                     )
                 ) : (
@@ -302,7 +304,7 @@ export default function ListaInstituicoes({ navigation }) {
                         <Text style={theme === 'light' ? styles.textoDia : styles.textoDiaDark}>Nenhum responsável encontrado.</Text>
                     ) : (
                         responsaveisFiltrados.map((resp) => (
-                            <CardItem key={resp.id} item={resp} type="responsavel" />
+                            <CardItem key={`resp-${resp.id}`} item={resp} type="responsavel" />
                         ))
                     )
                 )}
@@ -339,6 +341,52 @@ export default function ListaInstituicoes({ navigation }) {
                 </TouchableOpacity>
             </View>
             <FooterComIcones nav={navigation}/>
+
+            {/* NOVO: MODAL DE CONFIRMAÇÃO */}
+            <Modal
+                animationType="fade"
+                transparent={true}
+                visible={modalVisivel}
+                onRequestClose={() => setModalVisivel(false)}
+            >
+                <View style={styles.modalOverlay}>
+                    <View style={theme === 'light' ? styles.modalView : styles.modalViewDark}>
+                        <TouchableOpacity style={styles.closeButton} onPress={() => setModalVisivel(false)}>
+                            <Feather name="x" size={24} color={theme === 'light' ? '#333' : '#FFF'} />
+                        </TouchableOpacity>
+                        
+                        <Text style={theme === 'light' ? styles.modalTitle : styles.modalTitleDark}>Confirmar Exclusão</Text>
+                        <Text style={theme === 'light' ? styles.modalText : styles.modalTextDark}>
+                            Para excluir <Text style={{ fontFamily: 'PoppinsBold' }}>{usuarioParaExcluir?.nome}</Text>, digite o texto abaixo:
+                        </Text>
+                        
+                        <Text style={theme === 'light' ? styles.modalFormatText : styles.modalFormatTextDark}>
+                            {instituicao?.email}/{usuarioParaExcluir?.cpf}
+                        </Text>
+
+                        <TextInput
+                            style={theme === 'light' ? styles.modalInput : styles.modalInputDark}
+                            placeholder="email-instituicao/cpf-usuario"
+                            placeholderTextColor="#999"
+                            value={textoConfirmacao}
+                            onChangeText={handleInputChange}
+                            autoCapitalize="none"
+                            autoCorrect={false}
+                        />
+                        
+                        {erroConfirmacao ? <Text style={styles.errorText}>{erroConfirmacao}</Text> : null}
+
+                        <View style={styles.modalButtonContainer}>
+                            <TouchableOpacity
+                                style={[styles.modalButton, styles.confirmButton]}
+                                onPress={handleConfirmarExclusao}
+                            >
+                                <Text style={styles.buttonText}>Excluir</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                </View>
+            </Modal>
         </SafeAreaView>
     );
 }
@@ -358,12 +406,6 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         backgroundColor: '#FCD28D'
     },
-    loadingContainerDark: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: '#3D3D3D'
-    },
     scrollViewContainer: {
         padding: 20,
         paddingBottom: 80,
@@ -382,7 +424,6 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         marginBottom: 20,
     },
-    
     inputBuscaContainer: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -422,7 +463,6 @@ const styles = StyleSheet.create({
     iconeBusca: {
         marginLeft: 10,
     },
-    
     cardItem: {
         marginBottom: 15,
         padding: 15,
@@ -575,5 +615,40 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.2,
         shadowOffset: { width: 0, height: 2 },
         shadowRadius: 3,
+    },
+    // ESTILOS PARA O MODAL
+    modalOverlay: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0, 0, 0, 0.6)' },
+    modalView: { margin: 20, backgroundColor: 'white', borderRadius: 20, padding: 25, paddingTop: 40, alignItems: 'center', shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.25, shadowRadius: 4, elevation: 5, width: '90%' },
+    modalViewDark: { margin: 20, backgroundColor: '#333', borderRadius: 20, padding: 25, paddingTop: 40, alignItems: 'center', shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.25, shadowRadius: 4, elevation: 5, width: '90%' },
+    closeButton: {
+        position: 'absolute',
+        top: 15,
+        right: 15,
+    },
+    modalTitle: { fontFamily: 'PoppinsBold', fontSize: 18, marginBottom: 15, color: '#333' },
+    modalTitleDark: { fontFamily: 'PoppinsBold', fontSize: 18, marginBottom: 15, color: '#FFF' },
+    modalText: { fontFamily: 'PoppinsRegular', fontSize: 14, marginBottom: 10, textAlign: 'center', color: '#333' },
+    modalTextDark: { fontFamily: 'PoppinsRegular', fontSize: 14, marginBottom: 10, textAlign: 'center', color: '#FFF' },
+    modalFormatText: { fontFamily: 'PoppinsBold', fontSize: 14, color: '#522a91', backgroundColor: '#f0f0f0', padding: 8, borderRadius: 5, marginBottom: 20, textAlign: 'center' },
+    modalFormatTextDark: { fontFamily: 'PoppinsBold', fontSize: 14, color: '#E8A326', backgroundColor: '#555', padding: 8, borderRadius: 5, marginBottom: 20, textAlign: 'center' },
+    modalInput: { width: '100%', borderWidth: 1, borderColor: '#ccc', padding: 10, borderRadius: 10, fontFamily: 'PoppinsRegular', marginBottom: 10, textAlign: 'center' },
+    modalInputDark: { width: '100%', borderWidth: 1, borderColor: '#777', padding: 10, borderRadius: 10, fontFamily: 'PoppinsRegular', marginBottom: 10, color: '#FFF', backgroundColor: '#555', textAlign: 'center' },
+    errorText: { color: '#E53935', fontFamily: 'PoppinsRegular', marginBottom: 15 },
+    modalButtonContainer: { 
+        width: '100%', 
+        marginTop: 10 
+    },
+    modalButton: { 
+        borderRadius: 10, 
+        paddingVertical: 12, 
+        elevation: 2,
+    },
+    confirmButton: { 
+        backgroundColor: '#E53935' 
+    },
+    buttonText: { 
+        color: 'white', 
+        fontFamily: 'PoppinsBold', 
+        textAlign: 'center' 
     },
 });
