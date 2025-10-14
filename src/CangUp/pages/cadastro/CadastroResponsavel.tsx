@@ -250,13 +250,13 @@ export default function CadastroResponsavel({ navigation }) { //Não é erro, é
     return (
         <SafeAreaView style={theme == "light" ? styles.safeArea : styles.safeAreaDark}>
             <StatusBar backgroundColor="#B9A6DA" barStyle="dark-content" />
-            <Header />
+            <Header/>
 
 
             <View style={styles.content}>
-                <View style={styles.formContainer}>
+                <View style={theme == "light" ? styles.formContainer : styles.formContainerDark}>
                     <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-                        <MaterialIcons name="arrow-back" size={28} color="#000" />
+                        <MaterialIcons name="arrow-back" size={28} style={theme == "light" ? styles.icon : styles.iconDark}/>
                     </TouchableOpacity>
                     <ScrollView
                         contentContainerStyle={styles.scrollContent}
@@ -265,26 +265,25 @@ export default function CadastroResponsavel({ navigation }) { //Não é erro, é
                     >
 
                         <View style={styles.inputGroup}>
-                            <Text style={styles.label}>Email:</Text>
+                            <Text style={theme == "light" ? styles.label : styles.labelDark}>Email:</Text>
                             <TextInput
-                                style={styles.input}
+                                style={theme == "light" ? styles.input : styles.inputDark}
                                 placeholder="Digite o email"
-                                placeholderTextColor="#888"
+                                placeholderTextColor="#5b5b5b"
                                 value={email}
                                 onChangeText={setEmail}
                             />
                             {errors.email && <Text style={styles.errorText}>{errors.email}</Text>}
                         </View>
-
-                        {/* --- INÍCIO DO NOVO BLOCO DE ENDEREÇO --- */}
+                        
                         <View style={styles.inputGroup}>
-                            <Text style={styles.label}>Endereço</Text>
+                            <Text style={theme == "light" ? styles.label : styles.labelDark}>Endereço</Text>
                             <View style={styles.cepContainer}>
                                 <TextInputMask
-                                    style={[styles.input, { flex: 1 }]}
+                                    style={[theme == "light" ? styles.input : styles.inputDark, { flex: 1 }]}
                                     type={'zip-code'}
                                     placeholder="Digite o CEP"
-                                    placeholderTextColor="#888"
+                                    placeholderTextColor="#5b5b5b"
                                     value={cep}
                                     onChangeText={setCep}
                                     onBlur={buscarCep}
@@ -297,9 +296,9 @@ export default function CadastroResponsavel({ navigation }) { //Não é erro, é
 
                         <View style={styles.inputGroup}>
                             <TextInput
-                                style={styles.input}
+                                style={theme == "light" ? styles.input : styles.inputDark}
                                 placeholder="Logradouro (Rua, Av...)"
-                                placeholderTextColor="#888"
+                                placeholderTextColor="#5b5b5b"
                                 value={logradouro}
                                 onChangeText={setLogradouro}
                             />
@@ -308,9 +307,9 @@ export default function CadastroResponsavel({ navigation }) { //Não é erro, é
 
                         <View style={styles.inputGroup}>
                             <TextInput
-                                style={styles.input}
+                                style={theme == "light" ? styles.input : styles.inputDark}
                                 placeholder="Número"
-                                placeholderTextColor="#888"
+                                placeholderTextColor="#5b5b5b"
                                 value={numero}
                                 onChangeText={setNumero}
                                 keyboardType="numeric"
@@ -320,9 +319,9 @@ export default function CadastroResponsavel({ navigation }) { //Não é erro, é
 
                         <View style={styles.inputGroup}>
                             <TextInput
-                                style={styles.input}
+                                style={theme == "light" ? styles.input : styles.inputDark}
                                 placeholder="Bairro"
-                                placeholderTextColor="#888"
+                                placeholderTextColor="#5b5b5b"
                                 value={bairro}
                                 onChangeText={setBairro}
                             />
@@ -331,9 +330,9 @@ export default function CadastroResponsavel({ navigation }) { //Não é erro, é
 
                         <View style={styles.inputGroup}>
                             <TextInput
-                                style={styles.input}
+                                style={theme == "light" ? styles.input : styles.inputDark}
                                 placeholder="Cidade"
-                                placeholderTextColor="#888"
+                                placeholderTextColor="#5b5b5b"
                                 value={cidade}
                                 onChangeText={setCidade}
                             />
@@ -342,9 +341,9 @@ export default function CadastroResponsavel({ navigation }) { //Não é erro, é
 
                         <View style={styles.inputGroup}>
                             <TextInput
-                                style={styles.input}
+                                style={theme == "light" ? styles.input : styles.inputDark}
                                 placeholder="UF"
-                                placeholderTextColor="#888"
+                                placeholderTextColor="#5b5b5b"
                                 value={uf}
                                 onChangeText={setUf}
                                 maxLength={2}
@@ -352,17 +351,16 @@ export default function CadastroResponsavel({ navigation }) { //Não é erro, é
                             />
                             {errors.uf && <Text style={styles.errorText}>{errors.uf}</Text>}
                         </View>
-                        {/* --- FIM DO NOVO BLOCO DE ENDEREÇO --- */}
 
                         <View style={styles.inputGroup}>
-                            <Text style={styles.label}>Gênero:</Text>
-                            <View style={styles.pickerWrapper}>
+                            <Text style={theme == "light" ? styles.label : styles.labelDark}>Gênero:</Text>
+                            <View style={theme == "light" ? styles.pickerWrapper : styles.pickerWrapperDark}>
                                 <Picker
                                     selectedValue={genero}
                                     onValueChange={(itemValue) => setGenero(itemValue)}
                                     style={[
-                                        styles.picker,
-                                        { color: genero === '' ? '#888' : '#000' } // preto para placeholder, cinza para os demais
+                                        theme == "light" ? styles.picker : styles.pickerDark,
+                                        { color: genero === '' ? '#5b5b5b' : '#000' } // preto para placeholder, cinza para os demais
                                     ]}
                                 >
                                     <Picker.Item label="Selecione o gênero" value="" />
@@ -375,9 +373,9 @@ export default function CadastroResponsavel({ navigation }) { //Não é erro, é
                             {errors.genero && <Text style={styles.errorText}>{errors.genero}</Text>}
                         </View>
                         <View style={styles.inputGroup}>
-                            <Text style={styles.label}>Telefone:</Text>
+                            <Text style={theme == "light" ? styles.label : styles.labelDark}>Telefone:</Text>
                             <TextInputMask
-                                style={styles.input}
+                                style={theme == "light" ? styles.input : styles.inputDark}
                                 type={'cel-phone'}
                                 options={{
                                     maskType: 'BRL',
@@ -385,20 +383,19 @@ export default function CadastroResponsavel({ navigation }) { //Não é erro, é
                                     dddMask: '(99) '
                                 }}
                                 placeholder="(99) 99999-9999"
-                                placeholderTextColor="#888"
+                                placeholderTextColor="#5b5b5b"
                                 value={telefone}
                                 onChangeText={setTelefone}
                             />
                             {errors.telefone && <Text style={styles.errorText}>{errors.telefone}</Text>}
                         </View>
                         <View style={styles.inputGroup}>
-                            <Text style={styles.label}>Senha:</Text>
-                            <View style={styles.passwordContainer}>
-
+                            <Text style={theme == "light" ? styles.label : styles.labelDark}>Senha:</Text>
+                            <View style={theme == "light" ? styles.passwordContainer : styles.passwordContainerDark}>
                                 <TextInput
                                     style={styles.passwordInput}
                                     placeholder="Digite a senha"
-                                    placeholderTextColor="#888"
+                                    placeholderTextColor="#5b5b5b"
                                     value={senha}
                                     onChangeText={setSenha}
                                     secureTextEntry={!senhaVisivel}
@@ -407,20 +404,20 @@ export default function CadastroResponsavel({ navigation }) { //Não é erro, é
                                     <Feather
                                         name={senhaVisivel ? 'eye' : 'eye-off'}
                                         size={20}
-                                        color="#888"
+                                        color="#5b5b5b"
                                     />
                                 </TouchableOpacity>
                             </View>
                             {errors.senha && <Text style={styles.errorText}>{errors.senha}</Text>}
                         </View>
                         <View style={styles.inputGroup}>
-                            <Text style={styles.label}>Confirme a senha:</Text>
-                            <View style={styles.passwordContainer}>
+                            <Text style={theme == "light" ? styles.label : styles.labelDark}>Confirme a senha:</Text>
+                            <View style={theme == "light" ? styles.passwordContainer : styles.passwordContainerDark}>
 
                                 <TextInput
                                     style={styles.passwordInput}
                                     placeholder="Redigite a senha"
-                                    placeholderTextColor="#888"
+                                    placeholderTextColor="#5b5b5b"
                                     value={confSenha}
                                     onChangeText={setconfSenha}
                                     secureTextEntry={!confSenhaVisivel}
@@ -429,7 +426,7 @@ export default function CadastroResponsavel({ navigation }) { //Não é erro, é
                                     <Feather
                                         name={confSenhaVisivel ? 'eye' : 'eye-off'}
                                         size={20}
-                                        color="#888"
+                                        color="#5b5b5b"
                                     />
                                 </TouchableOpacity>
                             </View>
@@ -440,7 +437,7 @@ export default function CadastroResponsavel({ navigation }) { //Não é erro, é
                                 checked={check}
                                 onPress={() => setCheck(!check)} />
                             <TouchableOpacity>
-                                <Text style={styles.textCheck}>Termos de uso</Text>
+                                <Text style={theme == "light" ? styles.textCheck : styles.textCheckDark}>Termos de uso</Text>
                             </TouchableOpacity>
                         </View>
                         {errors.check && <Text style={styles.errorText}>{errors.check}</Text>}
@@ -487,6 +484,18 @@ const styles = StyleSheet.create({
         shadowRadius: 4.65,
         elevation: 1,
     },
+    formContainerDark: {
+        flex: 1,
+        backgroundColor: '#333',
+        borderRadius: 30,
+        padding: '5%',
+        width: '90%',
+        shadowColor: '#000',
+        shadowOffset: { width: 2, height: 6 },
+        shadowOpacity: 0.15,
+        shadowRadius: 4.65,
+        elevation: 1,
+    },
     scrollContent: {
         flexGrow: 1,
         paddingBottom: '2%',
@@ -501,9 +510,33 @@ const styles = StyleSheet.create({
         fontSize: 16,
         marginBottom: '2%',
         fontFamily: 'PoppinsRegular',
+        color:'#000'
+    },
+    labelDark: {
+        fontWeight: 'bold',
+        fontSize: 16,
+        marginBottom: '2%',
+        fontFamily: 'PoppinsRegular',
+        color:'#fff'
     },
     input: {
         backgroundColor: '#d9d9d9',
+        borderRadius: 25,
+        paddingHorizontal: '5%',
+        paddingVertical: '5%',
+        fontSize: 16,
+        fontFamily: 'PoppinsRegular',
+        shadowColor: "#000",
+        shadowOffset: {
+            width: 0,
+            height: 3,
+        },
+        shadowOpacity: 0.27,
+        shadowRadius: 4.65,
+        elevation: 6,
+    },
+    inputDark: {
+        backgroundColor: '#b9b9b9',
         borderRadius: 25,
         paddingHorizontal: '5%',
         paddingVertical: '5%',
@@ -522,6 +555,17 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         backgroundColor: '#d9d9d9',
+        borderRadius: 30,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 3 },
+        shadowOpacity: 0.27,
+        shadowRadius: 4.65,
+        elevation: 6,
+    },
+    passwordContainerDark: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: '#b9b9b9',
         borderRadius: 30,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 3 },
@@ -557,11 +601,35 @@ const styles = StyleSheet.create({
         shadowRadius: 4.65,
         elevation: 6,
     },
+    pickerWrapperDark: {
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingHorizontal: '5%',
+        paddingVertical: '5%',
+        borderRadius: 25,
+        overflow: 'hidden',
+        backgroundColor: '#b9b9b9',
+        shadowColor: "#000",
+        shadowOffset: {
+            width: 0,
+            height: 3,
+        },
+        shadowOpacity: 0.27,
+        shadowRadius: 4.65,
+        elevation: 6,
+    },
     picker: {
         width: '100%',
         fontSize: 16,
         fontFamily: 'PoppinsRegular',
         backgroundColor: '#d9d9d9',
+        borderWidth: 0,
+    },
+    pickerDark: {
+        width: '100%',
+        fontSize: 16,
+        fontFamily: 'PoppinsRegular',
+        backgroundColor: '#b9b9b9',
         borderWidth: 0,
     },
     button: {
@@ -587,6 +655,12 @@ const styles = StyleSheet.create({
     seta: {
         height: '15%',
     },
+    icon:{
+        color: '#000'
+    },
+    iconDark:{
+        color: '#fff'
+    },
     backButton: {
         alignSelf: 'flex-start',
     },
@@ -604,6 +678,11 @@ const styles = StyleSheet.create({
         fontFamily: 'PoppinsRegular',
         color: '#522a91',
     },
+    textCheckDark: {
+        fontSize: 14,
+        fontFamily: 'PoppinsRegular',
+        color: '#BB86FC',
+    },
     errorText: {
         color: 'red',
         fontSize: 12,
@@ -617,7 +696,7 @@ const styles = StyleSheet.create({
         columnGap: 10,
         fontSize: 14,
         alignItems: 'center',
-        color: '#888',
+        color: '#5b5b5b',
     },
     cepContainer: {
         flexDirection: 'row',
