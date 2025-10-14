@@ -1,21 +1,11 @@
-import React, { useState } from 'react';
-import { View, StyleSheet, TouchableOpacity, Modal, SafeAreaView, Text, Appearance } from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import Feather from 'react-native-vector-icons/Feather';
+import {React} from 'react';
+import { View, StyleSheet, TouchableOpacity} from 'react-native';
 import { useTheme } from '../context/ThemeContext';
-
+import { Feather, FontAwesome } from '@expo/vector-icons';
 
 const Header = () => {
- const [visible, setVisible] = useState(false);
  const {theme, toggleTheme} = useTheme();
- const options = [
-   {
-     title: 'Mudar modo',
-     icon: 'moon-o',
-     action: () => alert('publicar'),
-   }
- ];
+
 
  return (
    <View style={theme == "light" ? styles.header : styles.headerDark}>

@@ -228,7 +228,7 @@ export default function PerfilInstituicao({ navigation }) {
                 >
                     <Image
                         source={
-                            imagem ? { uri: imagem } : require("../../assets/images/FotoPerfil.png")
+                            imagem ? { uri: imagem } : require("../../assets/foto_perfil.png")
                         }
                         style={styles.perfilSemFoto}
                     />

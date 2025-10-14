@@ -236,7 +236,7 @@ export default function PerfilResponsavel({ navigation }) { //Navigation não es
                 >
                     <Image
                         source={
-                            imagem ? { uri: imagem } : require("../../assets/images/FotoPerfil.png")
+                            imagem ? { uri: imagem } : require("../../assets/foto_perfil.png")
                         }
                         style={theme == "light" ? styles.perfilSemFoto : styles.perfilSemFotoDark}
                     />

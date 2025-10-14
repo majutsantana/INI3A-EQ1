@@ -34,7 +34,7 @@ export const AuthProvider = ({ children }) => {
             const perfil = await AsyncStorage.getItem('perfil');
 
             if (token && token !== "null" && token !== "undefined" && token.trim() !== "") {
-                const response = await fetch("http://localhost:8000/api/usuario", {
+                const response = await fetch(url + "/api/usuario", {
                     headers: {
                         "Authorization": `Bearer ${token}`,
                         "Accept": "application/json"

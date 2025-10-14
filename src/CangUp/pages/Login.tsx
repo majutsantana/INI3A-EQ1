@@ -7,7 +7,6 @@ import FooterSemIcones from '../components/FooterSemIcones';
 import { Picker } from '@react-native-picker/picker';
 import useApi from '../hooks/useApi';
 import { AuthContext } from '../components/AuthContext';
-import { Switch } from 'react-native-elements';
 import { useTheme } from '../context/ThemeContext';
 import getStyles from './style';
 
@@ -29,9 +28,9 @@ export default function Login({ navigation }) {
   const { login: contextLogin } = useContext(AuthContext);
   const { theme, toggleTheme, colors } = useTheme();
   const styles = getStyles();
-
   const [errorModalVisible, setErrorModalVisible] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  let { url } = useApi();
 
   const toggleSenhaVisibilidade = () => {
     setSenhaVisivel(!senhaVisivel);
@@ -64,7 +63,6 @@ export default function Login({ navigation }) {
     }
 
     try {
-      let { url } = useApi();
       const response = await fetch(url + "/api/login", {
         method: "POST",
         headers: {
@@ -74,7 +72,7 @@ export default function Login({ navigation }) {
       });
 
       if (!response.ok) {
-        setErrorMessage("Os campos Email ou Senha estão incorretos."); // Mensagem fixa para credenciais inválidas
+        setErrorMessage("Os campos Email ou Senha estão incorretos."); 
         setErrorModalVisible(true);
         return;
       }
@@ -87,9 +85,6 @@ export default function Login({ navigation }) {
 
       if (token) {
         await contextLogin(token, tipoDeLogin);
-
-        // <<< CORREÇÃO PRINCIPAL - ESTA LINHA FOI ADICIONADA >>>
-        // Aqui salvamos o login do usuário para usar em outras telas.
         await AsyncStorage.setItem('userLogin', username);
         
         if (tipoDeLogin === "inst" && IdInst) {
@@ -133,9 +128,18 @@ export default function Login({ navigation }) {
 
   const renderPerfis = () => {
     return perfis.map(p =>
-      <Picker.Item key={p.id} label={p.nome} value={p.rotulo} />
-    )
+      <Picker.Item key={p.id} label={p.nome} value={p.id} />)
   }
+  useEffect(() => {
+    loadFonts();
+    fetch(`${url}/api/perfis`)
+      .then(r => r.json())
+      .then(r => {
+        console.log("Perfis vindas da API:", r);
+        setPerfis(r);
+      })
+      .catch(err => console.error("Erro no fetch:", err));
+  }, []);
 
   if (!fontsLoaded) {
     return (
@@ -149,7 +153,7 @@ export default function Login({ navigation }) {
     <View style={styles.container}>
       <View style={styles.header}>
         <Image
-          source={theme == "light" ? require('../assets/logo-cangUp-horizontal-claro.svg') : require('../assets/logo-cangUp-horizontal-escuro.svg')}
+          source={theme == "light" ? require('../assets/images/logo-cangUp-horizontal-claro.png') : require('../assets/images/logo-cangUp-horizontal-escuro.png')}
           style={styles.image}
         />
       </View>
@@ -225,7 +229,6 @@ export default function Login({ navigation }) {
         </View>
       </View>
 
-      {/* Modal de Recuperar Senha */}
       <Modal
         animationType="slide"
         transparent={true}
@@ -274,7 +277,7 @@ export default function Login({ navigation }) {
                 marginBottom: 10,
               }}
               onPress={() => {
-                fetch("http://localhost:8000/api/recuperar-senha", { method: "post", body: emailRecuperacao });
+                fetch("eq1.ini3a.projetoscti.com.br/api/recuperar-senha", { method: "post", body: emailRecuperacao });
                 Alert.alert("Solicitação enviada", "Se o e-mail existir, você receberá instruções.");
                 setModalVisible(false);
                 setEmailRecuperacao('');
@@ -289,7 +292,6 @@ export default function Login({ navigation }) {
         </View>
       </Modal>
 
-      {/* Modal para exibir erros */}
       <Modal
         animationType="fade"
         transparent={true}

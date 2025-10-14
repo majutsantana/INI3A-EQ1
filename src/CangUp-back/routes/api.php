@@ -1,6 +1,5 @@
 <?php
 
-
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AdminController;
@@ -12,8 +11,6 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\ResponsavelController;
 use App\Http\Controllers\VeiculoController;
 
-// Rota pública de login
-// --- Autenticação e Recuperação de Senha ---
 Route::post('/login', [LoginController::class, 'login']);
 Route::post('/recuperar-senha', [LoginController::class, 'recuperarSenha']);
 
@@ -41,10 +38,9 @@ Route::middleware(['jwt.auth'])->group(function () {
 
 
     // --- Usuário Autenticado ---
-    Route::get('/usuario', [UserController::class, 'me']); // Pega dados do usuário logado
+    Route::get('/usuario', [UserController::class, 'me']); 
 
 
-    // --- Gerenciamento de Instituições (CRUD completo para usuários autenticados) ---
     Route::get('/instituicoes/{id}', [InstituicaoController::class, 'show']);      // Listar uma instituição
     Route::post('/instituicoes', [InstituicaoController::class, 'store']);       // Criar instituição (protegido)
     Route::put('/instituicoes/{id}', [InstituicaoController::class, 'update']);    // Atualizar instituição

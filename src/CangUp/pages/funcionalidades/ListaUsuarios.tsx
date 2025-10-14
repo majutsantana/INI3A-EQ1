@@ -244,7 +244,7 @@ export default function ListaUsuarios({ navigation }) {
                 source={
                     item.imagem
                     ? { uri: item.imagem }
-                    : require("../../assets/images/FotoPerfil.png") 
+                    : require("../../assets/foto_perfil.png") 
                 }
                 style={theme === 'light' ? styles.fotoItem : styles.fotoItemDark}
             />

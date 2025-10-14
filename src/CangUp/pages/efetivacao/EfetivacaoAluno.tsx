@@ -19,6 +19,7 @@ import FooterSemIcones from '../../components/FooterSemIcones';
 import useApi from '../../hooks/useApi';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useTheme } from '../../context/ThemeContext';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 type errorType = {
   nome: string | undefined,
@@ -143,7 +144,7 @@ export default function EfetivacaoAluno({ navigation }) { //Navigation não é e
   }, []);
 
   return (
-    <SafeAreaView style={theme == "light" ? styles.safeArea : styles.safeAreaDark}>
+    <SafeAreaProvider style={theme == "light" ? styles.safeArea : styles.safeAreaDark}>
       <StatusBar backgroundColor="#B9A6DA" barStyle="dark-content" />
       <Header />
 
@@ -165,10 +166,10 @@ export default function EfetivacaoAluno({ navigation }) { //Navigation não é e
                   onValueChange={(itemValue) => setInstituicao(itemValue)}
                   style={[
                     theme == "light"? styles.picker : styles.pickerDark,
-                    { color: instituicao === null ? '#5b5b5b' : '#000' }
+                    { color: instituicao === null ? '#000' : '#5b5b5b' }
                   ]}
                 >
-                  <Picker.Item label="Selecione a instituição" value="" />
+                  <Picker.Item label="Selecione a instituição" value=""/>
                   {renderInst()}
                 </Picker>
               </View>
@@ -190,7 +191,7 @@ export default function EfetivacaoAluno({ navigation }) { //Navigation não é e
               <Text style={theme == "light" ? styles.label : styles.labelDark}>Número de matrícula/RA:</Text>
               <TextInput
                 style={theme == "light" ? styles.input : styles.inputDark}
-                placeholder="Digite o número de matrícula"
+                placeholder="Digite o n° de matrícula"
                 placeholderTextColor="#5b5b5b"
                 value={RA}
                 onChangeText={setRA}
@@ -218,7 +219,7 @@ export default function EfetivacaoAluno({ navigation }) { //Navigation não é e
         </TouchableOpacity>
       </View>
       <FooterSemIcones />
-    </SafeAreaView>
+    </SafeAreaProvider>
   );
 }
 const styles = StyleSheet.create({
@@ -234,7 +235,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: '5%',
     paddingTop: '10%',
-    paddingBottom: '25%',
+    paddingBottom: '5%',
     justifyContent: 'space-between',
     alignItems: 'center',
   },
@@ -278,15 +279,13 @@ const styles = StyleSheet.create({
     marginBottom: '2%',
   },
   label: {
-    fontWeight: 'bold',
     fontSize: 16,
-    fontFamily: 'PoppinsRegular',
+    fontFamily: 'PoppinsBold',
     color:'black'
   },
   labelDark: {
-    fontWeight: 'bold',
     fontSize: 16,
-    fontFamily: 'PoppinsRegular',
+    fontFamily: 'PoppinsBold',
     color : 'white',
   },
   input: {
@@ -322,10 +321,11 @@ const styles = StyleSheet.create({
     elevation: 6,
   },
   pickerWrapper: {
+    fontFamily: 'PoppinsRegular',
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: '5%',
-    paddingVertical: '5%',
+    paddingVertical: '1%',
     borderRadius: 25,
     overflow: 'hidden',
     backgroundColor: '#d9d9d9',
@@ -339,10 +339,11 @@ const styles = StyleSheet.create({
     elevation: 6,
   },
   pickerWrapperDark: {
+    fontFamily: 'PoppinsRegular',
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: '5%',
-    paddingVertical: '5%',
+    paddingVertical: '1%',
     borderRadius: 25,
     overflow: 'hidden',
     backgroundColor: '#b9b9b9',
@@ -375,7 +376,7 @@ const styles = StyleSheet.create({
     width: '60%',
     borderRadius: 20,
     alignItems: 'center',
-    marginTop: '10%',
+    marginTop: '5%',
     shadowColor: '#000',
     shadowOffset: {
       width: 0,

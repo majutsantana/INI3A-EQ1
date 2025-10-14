@@ -1,10 +1,8 @@
 import React, { useContext } from 'react';
 import { View, StyleSheet, TouchableOpacity, Alert } from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import Feather from 'react-native-vector-icons/Feather';
 import { AuthContext } from './AuthContext';
 import { useTheme } from '../context/ThemeContext';
+import { Feather, FontAwesome, Icon} from '@expo/vector-icons';
 
 const HeaderComLogout = () => {
   const { logout } = useContext(AuthContext);

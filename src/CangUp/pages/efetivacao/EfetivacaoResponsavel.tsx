@@ -215,7 +215,7 @@ const styles = StyleSheet.create({
         flex: 1,
         paddingHorizontal: '5%',
         paddingTop: '10%',
-        paddingBottom: '25%',
+        paddingBottom: '5%',
         justifyContent: 'space-between',
         alignItems: 'center',
     },
@@ -253,17 +253,15 @@ const styles = StyleSheet.create({
         marginBottom:'2%',
     },
     label: {
-        fontWeight: 'bold',
         fontSize: 16,
         marginBottom: '2%',
-        fontFamily: 'PoppinsRegular',
+        fontFamily: 'PoppinsBold',
         color: 'black'
     },
     labelDark: {
-        fontWeight: 'bold',
         fontSize: 16,
         marginBottom: '2%',
-        fontFamily: 'PoppinsRegular',
+        fontFamily: 'PoppinsBold',
         color: 'white'
     },
     input: {
@@ -302,7 +300,6 @@ const styles = StyleSheet.create({
       alignItems: 'center',
       justifyContent: 'center',
       paddingHorizontal: '5%',
-      paddingVertical: '5%',
       borderRadius: 25,
       overflow: 'hidden',
       backgroundColor: '#d9d9d9',
@@ -319,7 +316,7 @@ const styles = StyleSheet.create({
       alignItems: 'center',
       justifyContent: 'center',
       paddingHorizontal: '5%',
-      paddingVertical: '5%',
+      paddingVertical: '1%',
       borderRadius: 25,
       overflow: 'hidden',
       backgroundColor: '#b9b9b9',
@@ -358,7 +355,7 @@ const styles = StyleSheet.create({
         width:'60%',
         borderRadius: 20,
         alignItems: 'center',
-        marginTop: '10%',
+        marginTop: '5%',
         shadowColor: '#000',
         shadowOffset: {
         width: 0,

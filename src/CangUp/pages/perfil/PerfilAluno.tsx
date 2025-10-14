@@ -239,7 +239,7 @@ export default function PerfilAluno({ navigation }) {
                 >
                     <Image
                         source={
-                            imagem ? { uri: imagem } : require("../../assets/images/FotoPerfil.png")
+                            imagem ? { uri: imagem } : require("../../assets/foto_perfil.png")
                         }
                         style={theme == "light" ? styles.perfilSemFoto : styles.perfilSemFotoDark}
                     />

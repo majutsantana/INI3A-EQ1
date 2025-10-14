@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
-import { useTheme } from '../context/ThemeContext';
-import useApi from '../hooks/useApi';
+import { useTheme } from '../../context/ThemeContext';
+import useApi from '../../hooks/useApi';
 
 export default function RedefinirSenha({ navigation }) { //Navigation não está dando erro, é bug
   const [email, setEmail] = useState('');
@@ -44,7 +44,7 @@ export default function RedefinirSenha({ navigation }) { //Navigation não está
       }
 
       Alert.alert('Sucesso', 'Senha redefinida com sucesso!');
-      navigation.navigate('Login'); //componente Login, se der erro é pra alterar o nome
+      navigation.navigate('Login'); 
     } catch (error) {
       console.error(error);
       Alert.alert('Erro', 'Não foi possível redefinir a senha.');
