@@ -528,7 +528,7 @@ const styles = StyleSheet.create({
     perfilSemFoto: {
         width: 120,
         height: 120,
-        borderRadius: '50%',
+        borderRadius: 500,
         borderWidth: 3,
         borderColor: "#f1c40f",
     },

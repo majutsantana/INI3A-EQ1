@@ -1,12 +1,21 @@
-import React from 'react';
+import React, { use, useEffect } from 'react';
 import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import { Ionicons} from '@expo/vector-icons';
 import { useTheme } from '../context/ThemeContext';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const FooterComIcones = (props) => {
   const {theme} = useTheme();
+  const [perfil, setPerfil] = React.useState('');
 
-  let perfil = localStorage.getItem('perfil');
+  async function getProfile(){
+    setPerfil(await AsyncStorage.getItem('perfil'));
+  }
+
+  useEffect(() => {
+    getProfile();
+  }, []);
+
   let footer;
 
   switch(perfil){

@@ -521,14 +521,14 @@ const styles = StyleSheet.create({
     perfilSemFoto: {
         width: 120,
         height: 120,
-        borderRadius: '50%',
+        borderRadius: 500,
         borderWidth: 3,
         borderColor: "#beacde",
     },
     perfilSemFotoDark: {
         width: 120,
         height: 120,
-        borderRadius: '50%',
+        borderRadius: 500,
         borderWidth: 3,
         borderColor: "#FFBE31",
     },

@@ -2,16 +2,28 @@ import React, { useContext } from 'react';
 import { View, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { AuthContext } from './AuthContext';
 import { useTheme } from '../context/ThemeContext';
-import { Feather, FontAwesome, Icon} from '@expo/vector-icons';
+import { Feather, FontAwesome} from '@expo/vector-icons';
 
 const HeaderComLogout = () => {
   const { logout } = useContext(AuthContext);
   const { theme, toggleTheme } = useTheme();
 
   const handleLogout = () => {
-    if (window.confirm("Você deseja mesmo sair?")) { //nao funciona em mobile
-      logout();
-    }
+    Alert.alert(
+      "Sair",
+      "Você deseja mesmo sair da sua conta?", 
+      [
+        {
+          text: "Cancelar",
+          style: "cancel"
+        },
+        { 
+          text: "Sair", 
+          onPress: () => logout(), 
+          style: 'destructive'
+        }
+      ]
+    );
   }
   return (
     <View style={theme === "light" ? styles.header : styles.headerDark}>
@@ -24,7 +36,7 @@ const HeaderComLogout = () => {
           )}
         </TouchableOpacity>
         <TouchableOpacity onPress={handleLogout}>
-          <Icon name="logout" size={28} color={theme === "light" ? "#000" : "white"} />
+          <Feather name="log-out" size={28} color={theme === "light" ? "#000" : "white"} />
         </TouchableOpacity>
       </View>
     </View>

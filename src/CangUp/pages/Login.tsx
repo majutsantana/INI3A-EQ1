@@ -88,11 +88,11 @@ export default function Login({ navigation }) {
         await AsyncStorage.setItem('userLogin', username);
         
         if (tipoDeLogin === "inst" && IdInst) {
-          await AsyncStorage.setItem("id_instituicao", IdInst);
-        } else if (tipoDeLogin === "alun") {
-          await AsyncStorage.setItem("id_aluno", IdAlun);
-        } else {
-          await AsyncStorage.setItem("id_responsavel", IdResp);
+          await AsyncStorage.setItem("id_instituicao", String(IdInst));
+        } else if (tipoDeLogin === "alun" && String(IdAlun)) {
+          await AsyncStorage.setItem("id_aluno", String(IdAlun));
+        } else if (tipoDeLogin === "resp" && IdResp) {
+          await AsyncStorage.setItem("id_responsavel", String(IdResp));
         }
       } else {
         setErrorMessage("Token não recebido do servidor.");
@@ -128,7 +128,7 @@ export default function Login({ navigation }) {
 
   const renderPerfis = () => {
     return perfis.map(p =>
-      <Picker.Item key={p.id} label={p.nome} value={p.id} />)
+      <Picker.Item key={p.id} label={p.nome} value={p.rotulo} />)
   }
   useEffect(() => {
     loadFonts();
