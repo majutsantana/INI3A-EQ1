@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { useNavigation } from '@react-navigation/core';
 import {
-    SafeAreaView,
     StyleSheet,
     Text,
     View,
@@ -20,6 +19,7 @@ import useApi from '../../hooks/useApi';
 import { AuthContext } from '../../components/AuthContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useTheme } from '../../context/ThemeContext';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 type Instituicao = {
     id: number;
@@ -169,7 +169,7 @@ export default function ListaInstituicoes({ navigation }) {
     ).sort((a, b) => a.nome.localeCompare(b.nome, 'pt', { sensitivity: 'base' }));
 
     return (
-        <SafeAreaView style={theme == "light" ? styles.safeArea : styles.safeAreaDark}>
+        <SafeAreaProvider style={theme == "light" ? styles.safeArea : styles.safeAreaDark}>
             <HeaderComLogout />
 
             <ScrollView contentContainerStyle={styles.scrollViewContainer}>
@@ -254,7 +254,7 @@ export default function ListaInstituicoes({ navigation }) {
                     </View>
                 </View>
             </Modal>
-        </SafeAreaView>
+        </SafeAreaProvider>
     );
 }
 

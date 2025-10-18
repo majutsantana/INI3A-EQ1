@@ -1,7 +1,6 @@
 import {
     ActivityIndicator,
     Alert,
-    SafeAreaView,
     ScrollView,
     StatusBar,
     StyleSheet,
@@ -23,6 +22,7 @@ import useApi from '../../hooks/useApi';
 import { TextInputMask } from 'react-native-masked-text';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useTheme } from '../../context/ThemeContext';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 export default function CadastroAluno({ navigation }) {
     const [fontsLoaded, setFontsLoaded] = useState(false);
@@ -261,7 +261,7 @@ export default function CadastroAluno({ navigation }) {
     }
 
     return (
-        <SafeAreaView style={theme == "light"? styles.safeArea : styles.safeAreaDark}>
+        <SafeAreaProvider style={theme == "light"? styles.safeArea : styles.safeAreaDark}>
             <StatusBar backgroundColor="#B9A6DA" barStyle="dark-content" />
             <Header/>
 
@@ -466,7 +466,7 @@ export default function CadastroAluno({ navigation }) {
             </View>
 
             <FooterComIcones nav={navigation}/>
-        </SafeAreaView>
+        </SafeAreaProvider>
     );
 }
 

@@ -1,7 +1,6 @@
 import {
     ActivityIndicator,
     Alert,
-    SafeAreaView,
     ScrollView,
     StatusBar,
     StyleSheet,
@@ -210,7 +209,7 @@ import {
     }
   
     return (
-      <SafeAreaView style={theme == "light" ? styles.safeArea : styles.safeAreaDark}>
+      <SafeAreaProvider style={theme == "light" ? styles.safeArea : styles.safeAreaDark}>
         <StatusBar backgroundColor="#B9A6DA" barStyle="dark-content" />
         <Header/>
   
@@ -290,7 +289,7 @@ import {
         </View>
   
         <FooterComIcones /*nav={navigation}*/ /> 
-      </SafeAreaView>
+      </SafeAreaProvider>
     );
   }
   

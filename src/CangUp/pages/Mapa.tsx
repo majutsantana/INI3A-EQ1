@@ -1,7 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import {
     Image,
-    SafeAreaView,
     View,
     StyleSheet,
     TextInput,
@@ -20,6 +19,7 @@ import {
     LocationAccuracy
 } from 'expo-location';
 import { FontAwesome } from '@expo/vector-icons'; // Importando ícones
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 export default function Mapa({ navigation }) {
     const [location, setLocation] = useState < LocationObject | null > (null);
@@ -149,7 +149,7 @@ export default function Mapa({ navigation }) {
 
 
     return (
-        <SafeAreaView style = {styles.container} >
+        <SafeAreaProvider style = {styles.container} >
             <View style = {styles.searchContainer} >
                 <TextInput
                     style = {styles.input}
@@ -215,7 +215,7 @@ export default function Mapa({ navigation }) {
                     <Text style = {styles.loadingText} > Carregando mapa e localização... </Text>
                 </View>
             )}
-        </SafeAreaView>
+        </SafeAreaProvider>
     );
 }
 
@@ -226,7 +226,7 @@ const styles = StyleSheet.create({
     },
     searchContainer: {
         position: 'absolute',
-        top: 60, // Ajuste para SafeAreaView
+        top: 60,
         left: 10,
         right: 10,
         flexDirection: 'row',

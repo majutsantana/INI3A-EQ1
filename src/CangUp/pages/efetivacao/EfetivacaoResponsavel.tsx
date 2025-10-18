@@ -1,6 +1,5 @@
 import {
   ActivityIndicator,
-  SafeAreaView,
   ScrollView,
   StatusBar,
   StyleSheet,
@@ -19,6 +18,7 @@ import FooterSemIcones from '../../components/FooterSemIcones';
 import useApi from '../../hooks/useApi';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useTheme } from '../../context/ThemeContext';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 type errorType ={ 
   nome : string | undefined,
@@ -136,7 +136,7 @@ export default function EfetivacaoAluno({ navigation }) { //Navigation não é e
       }, []);
     
     return(
-      <SafeAreaView style={theme == "light" ? styles.safeArea : styles.safeAreaDark}>
+      <SafeAreaProvider style={theme == "light" ? styles.safeArea : styles.safeAreaDark}>
       <StatusBar backgroundColor="#B9A6DA" barStyle="dark-content" />
       <Header/>
 
@@ -199,7 +199,7 @@ export default function EfetivacaoAluno({ navigation }) { //Navigation não é e
         </TouchableOpacity>
       </View>
       <FooterSemIcones/>
-    </SafeAreaView>
+    </SafeAreaProvider>
     );
 }
 const styles = StyleSheet.create({

@@ -1,6 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
 import {
-    SafeAreaView,
     StyleSheet,
     Text,
     View,
@@ -21,6 +20,7 @@ import { useTheme } from '../../context/ThemeContext';
 import { AuthContext } from '../../components/AuthContext';
 import * as ImagePicker from "expo-image-picker";
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 type Responsavel = {
     id: number;
@@ -225,7 +225,7 @@ export default function PerfilResponsavel({ navigation }) { //Navigation não es
     }
 
     return (
-        <SafeAreaView style={theme == "light" ? styles.safeArea : styles.safeAreaDark}>
+        <SafeAreaProvider style={theme == "light" ? styles.safeArea : styles.safeAreaDark}>
             <HeaderComLogout />
             <View>
                 <View style={theme == "light" ? styles.profileTop : styles.profileTopDark}><View style={styles.nameTag}><Text style={styles.nameText}>{responsavel.nome}</Text></View></View>
@@ -335,7 +335,7 @@ export default function PerfilResponsavel({ navigation }) { //Navigation não es
                 <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('CadastroVeiculo')}><Text style={styles.buttonText}>Cadastro de veículo</Text></TouchableOpacity>
             </ScrollView>
             <FooterComIcones nav={navigation}/>
-        </SafeAreaView>
+        </SafeAreaProvider>
     );
 }
 

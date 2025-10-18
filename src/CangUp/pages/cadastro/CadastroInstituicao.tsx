@@ -1,6 +1,5 @@
 import {
   ActivityIndicator,
-  SafeAreaView,
   ScrollView,
   StatusBar,
   StyleSheet,
@@ -21,6 +20,7 @@ import { TextInputMask } from 'react-native-masked-text';
 import useApi from '../../hooks/useApi';
 import HeaderComLogout from '../../components/HeaderComLogout';
 import { useTheme } from '../../context/ThemeContext';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 export default function CadastroInstituicao({ navigation }) {
   const [fontsLoaded, setFontsLoaded] = useState(false);
@@ -241,7 +241,7 @@ export default function CadastroInstituicao({ navigation }) {
   }6
 
   return (
-    <SafeAreaView style={theme == "light" ? styles.safeArea : styles.safeAreaDark}>
+    <SafeAreaProvider style={theme == "light" ? styles.safeArea : styles.safeAreaDark}>
       <StatusBar backgroundColor="#B9A6DA" barStyle="dark-content" />
       <HeaderComLogout/>
 
@@ -474,7 +474,7 @@ export default function CadastroInstituicao({ navigation }) {
         </TouchableOpacity>
       </View>
       <FooterSemIcones/>
-    </SafeAreaView>
+    </SafeAreaProvider>
   );
 }
 
