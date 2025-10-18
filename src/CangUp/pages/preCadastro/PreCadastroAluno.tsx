@@ -1,5 +1,4 @@
 import {
-  SafeAreaView,
   ScrollView,
   StatusBar,
   StyleSheet,
@@ -20,6 +19,7 @@ import useApi from '../../hooks/useApi';
 import HeaderComLogout from '../../components/HeaderComLogout';
 import { AuthContext } from '../../components/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 type errorType ={ 
   nome : string | undefined,
@@ -150,7 +150,7 @@ export default function PreCadastroAluno({ navigation }) {
     };
     
     return(
-      <SafeAreaView style={theme == "light" ? styles.safeArea : styles.safeAreaDark}>
+      <SafeAreaProvider style={theme == "light" ? styles.safeArea : styles.safeAreaDark}>
       <StatusBar backgroundColor="#B9A6DA" barStyle="dark-content" />
       <HeaderComLogout/>
 
@@ -207,7 +207,7 @@ export default function PreCadastroAluno({ navigation }) {
         </TouchableOpacity>
       </View>
       <FooterComIcones nav={navigation}/>
-    </SafeAreaView>
+    </SafeAreaProvider>
     );
 }
 const styles = StyleSheet.create({

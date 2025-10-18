@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react';
 import {
-    SafeAreaView, StyleSheet, Text, View, TextInput, TouchableOpacity,
+    StyleSheet, Text, View, TextInput, TouchableOpacity,
     Alert, ActivityIndicator, ScrollView, Image
 } from 'react-native';
 import * as Font from 'expo-font';
@@ -13,6 +13,7 @@ import { AuthContext } from '../../components/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
 import * as ImagePicker from "expo-image-picker";
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 type Instituicao = {
     id: number;
@@ -217,7 +218,7 @@ export default function PerfilInstituicao({ navigation }) {
     }
 
     return (
-         <SafeAreaView style={theme == "light" ? styles.safeArea : styles.safeAreaDark}>
+         <SafeAreaProvider style={theme == "light" ? styles.safeArea : styles.safeAreaDark}>
             <HeaderComLogout />
             <View>
                 <View style={theme == "light" ? styles.profileTop : styles.profileTopDark}><View style={styles.nameTag}><Text style={styles.nameText}>{instituicao.nome}</Text></View></View>
@@ -338,7 +339,7 @@ export default function PerfilInstituicao({ navigation }) {
                 <TouchableOpacity style={styles.button} onPress={() => navigation.navigate(`PreCadastroAluno`)}><Text style={styles.buttonText}>Cadastro de alunos</Text></TouchableOpacity>
             </ScrollView>
             <FooterComIcones nav={navigation} />
-        </SafeAreaView>
+        </SafeAreaProvider>
     );
 }
 const styles = StyleSheet.create({

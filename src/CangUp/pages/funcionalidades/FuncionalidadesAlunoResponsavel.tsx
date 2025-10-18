@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import {
-    SafeAreaView,
     StyleSheet,
     Text,
     View,
@@ -15,6 +14,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import HeaderComLogout from '../../components/HeaderComLogout';
 import FooterComIcones from '../../components/FooterComIcones';
 import { useTheme } from '../../context/ThemeContext';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 const STORAGE_KEY = '@horarios_config';
 
@@ -124,7 +124,7 @@ export default function FuncionalidadesAlunoResponsavel({ navigation }) {
     }
 
     return (
-        <SafeAreaView style={theme == "light"? styles.safeArea : styles.safeAreaDark}>
+        <SafeAreaProvider style={theme == "light"? styles.safeArea : styles.safeAreaDark}>
             <HeaderComLogout/>
 
             <ScrollView contentContainerStyle={styles.scrollViewContainer}>
@@ -184,7 +184,7 @@ export default function FuncionalidadesAlunoResponsavel({ navigation }) {
                     onChange={onTimeChange}
                 />
             )}
-        </SafeAreaView>
+        </SafeAreaProvider>
     );
 }
 

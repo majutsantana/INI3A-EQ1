@@ -1,6 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
 import {
-    SafeAreaView,
     StyleSheet,
     Text,
     View,
@@ -21,6 +20,7 @@ import { AuthContext } from '../../components/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import * as ImagePicker from "expo-image-picker";
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 type Aluno = {
     id: number;
@@ -228,7 +228,7 @@ export default function PerfilAluno({ navigation }) {
     }
 
     return (
-        <SafeAreaView style={theme == "light" ? styles.safeArea : styles.safeAreaDark}>
+        <SafeAreaProvider style={theme == "light" ? styles.safeArea : styles.safeAreaDark}>
             <HeaderComLogout />
             <View>
                 <View style={theme == "light" ? styles.profileTop : styles.profileTopDark}><View style={styles.nameTag}><Text style={styles.nameText}>{aluno.nome}</Text></View></View>
@@ -325,7 +325,7 @@ export default function PerfilAluno({ navigation }) {
                 {editando && <TouchableOpacity style={theme == "light" ? styles.saveBtn : styles.saveBtnDark} onPress={salvarEdicao}><Text style={styles.saveText}>Salvar Alterações</Text></TouchableOpacity>}
             </ScrollView>
             <FooterComIcones nav={navigation} />
-        </SafeAreaView>
+        </SafeAreaProvider>
     );
 }
 

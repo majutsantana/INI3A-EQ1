@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
 import {
-    SafeAreaView,
     StyleSheet,
     Text,
     View,
@@ -20,6 +19,7 @@ import useApi from '../../hooks/useApi';
 import { AuthContext } from '../../components/AuthContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useTheme } from '../../context/ThemeContext';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 // Tipos de dados
 type Aluno = {
@@ -272,7 +272,7 @@ export default function ListaUsuarios({ navigation }) {
     );
 
     return (
-        <SafeAreaView style={theme === 'light' ? styles.safeArea : styles.safeAreaDark}>
+        <SafeAreaProvider style={theme === 'light' ? styles.safeArea : styles.safeAreaDark}>
             <HeaderComLogout />
 
             <ScrollView contentContainerStyle={styles.scrollViewContainer}>
@@ -387,7 +387,7 @@ export default function ListaUsuarios({ navigation }) {
                     </View>
                 </View>
             </Modal>
-        </SafeAreaView>
+        </SafeAreaProvider>
     );
 }
 
