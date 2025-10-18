@@ -28,7 +28,7 @@ const FooterComIcones = (props) => {
           <TouchableOpacity onPress={() => props.nav.navigate(`ListaUsuarios`)}>
             <Ionicons name="home-outline" size={30} color="#fff" />
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => props.nav.navigate(`FuncionalidadesInsituicao`)}>
+          <TouchableOpacity onPress={() => props.nav.navigate(`HorariosInstituicao`)}>
             <Ionicons name="time-outline" size={30} color="#fff" />
           </TouchableOpacity>
         </>
@@ -43,7 +43,7 @@ const FooterComIcones = (props) => {
             <TouchableOpacity onPress={() => props.nav.navigate(`PerfilAluno`)}>
               <Ionicons name="home-outline" size={30} color="#fff" />
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => props.nav.navigate(`FuncionalidadesAlunoResponsavel`)}> 
+            <TouchableOpacity onPress={() => props.nav.navigate(`HorariosAlunoResponsavel`)}> 
               <Ionicons name="time-outline" size={30} color="#fff" />
             </TouchableOpacity>
             <TouchableOpacity onPress={() => props.nav.navigate(`PerfilAluno`)}> 
@@ -60,7 +60,7 @@ const FooterComIcones = (props) => {
             <TouchableOpacity onPress={() => props.nav.navigate(`PerfilAluno`)}>
               <Ionicons name="home-outline" size={30} color="#fff" />
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => props.nav.navigate(`FuncionalidadesAlunoResponsavel`)}> 
+            <TouchableOpacity onPress={() => props.nav.navigate(`HorariosAlunoResponsavel`)}> 
               <Ionicons name="time-outline" size={30} color="#fff" />
             </TouchableOpacity>
             <TouchableOpacity onPress={() => props.nav.navigate(`PerfilAluno`)}> 
@@ -82,7 +82,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#BEACDE',
     paddingVertical: 12,
     position: 'absolute',
-    bottom: 0,
+    bottom: 20,
     width: '100%',
   },
   footerDark: {

@@ -13,7 +13,8 @@ import CadastroInstituicao from './pages/cadastro/CadastroInstituicao';
 import CadastroResponsavel from './pages/cadastro/CadastroResponsavel';
 import EfetivacaoAluno from './pages/efetivacao/EfetivacaoAluno';
 import EfetivacaoResponsavel from './pages/efetivacao/EfetivacaoResponsavel';
-import FuncionalidadesAlunoResponsavel from './pages/funcionalidades/FuncionalidadesAlunoResponsavel';
+import HorariosAlunoResponsavel from './pages/funcionalidades/HorariosAlunoResponsavel';
+import HorariosInstituicao from './pages/funcionalidades/HorariosInstituicao';
 import Mapa from './pages/Mapa';
 //import CaronasAluno from './pages/caronas/CaronasAluno';
 //import CaronasResponsavel from './pages/caronas/CaronasResponsavel';
@@ -58,7 +59,8 @@ const AppStack = () => {
       <Stack.Screen name="PerfilResponsavel" component={PerfilResponsavel} options={{ headerShown: false }} />
       <Stack.Screen name="PreCadastroAluno" component={PreCadastroAluno} options={{ headerShown: false }} />
       <Stack.Screen name="PreCadastroResponsavel" component={PreCadastroResponsavel} options={{ headerShown: false }} />
-      <Stack.Screen name="FuncionalidadesAlunoResponsavel" component={FuncionalidadesAlunoResponsavel} options={{ headerShown: false }} />
+      <Stack.Screen name="HorariosAlunoResponsavel" component={HorariosAlunoResponsavel} options={{ headerShown: false }} />
+      <Stack.Screen name="HorariosInstituicao" component={HorariosInstituicao} options={{ headerShown: false }} />
       <Stack.Screen name="CadastroVeiculo" component={CadastroVeiculo} options={{ headerShown: false }} />
       <Stack.Screen name="ListaUsuarios" component={ListaUsuarios} options={{ headerShown: false }} />
       <Stack.Screen name="ListaInstituicoes" component={ListaInstituicoes} options={{ headerShown: false }} />
