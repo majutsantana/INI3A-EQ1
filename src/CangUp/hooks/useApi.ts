@@ -1,4 +1,4 @@
 function  useApi(){
-    return {url: "https://eq1.ini3a.projetoscti.com.br"};
+    return {url: "http://localhost:8000"}//https://eq1.ini3a.projetoscti.com.br"};
 }
 export default useApi;

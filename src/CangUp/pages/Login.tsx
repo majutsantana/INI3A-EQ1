@@ -277,7 +277,8 @@ export default function Login({ navigation }) {
                 marginBottom: 10,
               }}
               onPress={() => {
-                fetch("eq1.ini3a.projetoscti.com.br/api/recuperar-senha", { method: "post", body: emailRecuperacao });
+                let {url} = useApi();
+                fetch(url+"/api/recuperar-senha", { method: "post", body: JSON.stringify({email: emailRecuperacao })});
                 Alert.alert("Solicitação enviada", "Se o e-mail existir, você receberá instruções.");
                 setModalVisible(false);
                 setEmailRecuperacao('');
