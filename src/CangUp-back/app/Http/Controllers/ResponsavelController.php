@@ -105,24 +105,86 @@ class ResponsavelController extends Controller
     }
 
 
-    DB::table('perfil_usuario')->insert([
-        'usuario_id' => $usuario->id,
-        'perfil_id' => $perfil->id
-    ]);
+    // Criar perfil_usuario com tratamento de erro de sequência
+    try {
+        // Verificar se já existe antes de inserir
+        $perfilUsuarioExistente = DB::table('perfil_usuario')
+            ->where('usuario_id', $usuario->id)
+            ->where('perfil_id', $perfil->id)
+            ->first();
+        
+        if (!$perfilUsuarioExistente) {
+            // Se for erro de sequência, corrigir e tentar novamente
+            try {
+                DB::table('perfil_usuario')->insert([
+                    'usuario_id' => $usuario->id,
+                    'perfil_id' => $perfil->id
+                ]);
+            } catch (\Illuminate\Database\QueryException $e) {
+                if (strpos($e->getMessage(), 'perfil_usuario_pkey') !== false && 
+                    strpos($e->getMessage(), 'duplicate key') !== false) {
+                    
+                    \Log::warning('Sequência de perfil_usuario dessincronizada, tentando corrigir...', [
+                        'error' => $e->getMessage()
+                    ]);
+                    
+                    // Corrigir a sequência
+                    DB::statement("SELECT setval('perfil_usuario_id_seq', COALESCE((SELECT MAX(id) FROM perfil_usuario), 0) + 1, false)");
+                    
+                    // Tentar inserir novamente
+                    DB::table('perfil_usuario')->insert([
+                        'usuario_id' => $usuario->id,
+                        'perfil_id' => $perfil->id
+                    ]);
+                } else {
+                    throw $e; // Re-lançar se não for erro de sequência
+                }
+            }
+        }
+    } catch (\Exception $e) {
+        \Log::error('Erro ao criar perfil_usuario', [
+            'error' => $e->getMessage(),
+            'usuario_id' => $usuario->id,
+            'perfil_id' => $perfil->id
+        ]);
+        // Se falhar, retornar erro crítico pois o usuário não poderá fazer login sem perfil
+        return response()->json([
+            'error' => 'Erro ao associar perfil ao usuário. O usuário foi criado, mas não poderá fazer login até que o perfil seja associado manualmente.',
+            'message' => $e->getMessage()
+        ], 500);
+    }
 
-
-    $responsavel->email = $dados['email'];
-    $responsavel->genero = $dados['genero'];
-    $responsavel->endereco = $dados['endereco'];
-    $responsavel->telefone = $dados['telefone'];
-    $responsavel->update();
-
+    // Atualizar dados do responsável
+    try {
+        $responsavel->email = $dados['email'];
+        $responsavel->genero = $dados['genero'] ?? null;
+        $responsavel->endereco = $dados['endereco'] ?? null;
+        $responsavel->telefone = $dados['telefone'] ?? null;
+        $responsavel->save(); // Usar save() em vez de update() para melhor tratamento de erros
+        
+        // Recarregar o responsável para garantir que os dados estão atualizados
+        $responsavel->refresh();
+    } catch (\Exception $e) {
+        \Log::error('Erro ao atualizar dados do responsável', [
+            'error' => $e->getMessage(),
+            'responsavel_id' => $responsavel->id,
+            'dados' => $dados
+        ]);
+        // Mesmo se falhar, o usuário já foi criado, então retornamos sucesso parcial
+        return response()->json([
+            'message' => 'Usuário criado com sucesso, mas houve erro ao atualizar dados do responsável',
+            'warning' => 'Alguns dados podem não ter sido salvos. Tente fazer login e atualizar seu perfil.',
+            'usuario' => $usuario,
+            'responsavel' => $responsavel,
+            'error_details' => $e->getMessage()
+        ], 201);
+    }
 
     return response()->json([
         'message' => 'Responsavel cadastrado com sucesso',
         'responsavel' => $responsavel,
         'usuario' => $usuario
-    ], 201);
+    ], 201, [], JSON_UNESCAPED_UNICODE);
     }
 
     public function index()

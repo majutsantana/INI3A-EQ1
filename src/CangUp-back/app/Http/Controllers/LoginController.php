@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use App\Mail\ResetSenhaMail;
@@ -76,6 +77,11 @@ class LoginController extends Controller
      */
     public function recuperarSenha(Request $request)
     {
+        \Log::info('=== INICIANDO RECUPERAÇÃO DE SENHA ===', [
+            'email' => $request->email,
+            'timestamp' => now()->toDateTimeString()
+        ]);
+
         $request->validate([
             'email' => 'required|email'
         ]);
@@ -83,22 +89,135 @@ class LoginController extends Controller
         $usuario = Usuario::where('email', $request->email)->first();
 
         if (!$usuario) {
-            return response()->json(['detail' => 'E-mail não encontrado.'], 404);
+            \Log::warning('Email não encontrado na tabela usuarios', [
+                'email' => $request->email
+            ]);
+            // Por segurança, sempre retorna sucesso mesmo se o email não existir
+            return response()->json([
+                'message' => 'Se o e-mail existir, você receberá instruções.'
+            ], 200);
         }
+
+        \Log::info('Usuário encontrado', [
+            'usuario_id' => $usuario->id,
+            'email' => $usuario->email
+        ]);
 
         $token = Str::random(60);
 
-        DB::table('password_reset_tokens')->updateOrInsert(
-            [
+        \Log::info('Token gerado', [
+            'token_preview' => substr($token, 0, 10) . '...'
+        ]);
+
+        // Salvar token no banco
+        try {
+            DB::table('password_reset_tokens')->updateOrInsert(
+                ['email' => $request->email],
+                [
+                    'token' => $token,
+                    'created_at' => now()
+                ]
+            );
+            \Log::info('Token salvo no banco de dados');
+        } catch (\Exception $e) {
+            \Log::error('Erro ao salvar token no banco', [
+                'error' => $e->getMessage()
+            ]);
+            return response()->json([
+                'detail' => 'Erro ao processar solicitação. Tente novamente.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+
+        // Buscar nome do usuário (pode estar em alunos, responsaveis ou instituicoes)
+        $nome = $usuario->email; // Fallback para email se não encontrar nome
+        $aluno = Aluno::where('email', $request->email)->first();
+        if ($aluno) {
+            $nome = $aluno->nome;
+            \Log::info('Nome encontrado na tabela alunos', ['nome' => $nome]);
+        } else {
+            $responsavel = Responsavel::where('email', $request->email)->first();
+            if ($responsavel) {
+                $nome = $responsavel->nome;
+                \Log::info('Nome encontrado na tabela responsaveis', ['nome' => $nome]);
+            } else {
+                $instituicao = Instituicao::where('email', $request->email)->first();
+                if ($instituicao) {
+                    $nome = $instituicao->nome;
+                    \Log::info('Nome encontrado na tabela instituicoes', ['nome' => $nome]);
+                }
+            }
+        }
+
+        // Verificar configurações de email antes de tentar enviar
+        $mailHost = env('MAIL_HOST');
+        $mailUsername = env('MAIL_USERNAME');
+        $mailPassword = env('MAIL_PASSWORD');
+        
+        \Log::info('Configurações de email', [
+            'MAIL_MAILER' => env('MAIL_MAILER'),
+            'MAIL_HOST' => $mailHost ? 'configurado' : 'NÃO CONFIGURADO',
+            'MAIL_PORT' => env('MAIL_PORT'),
+            'MAIL_USERNAME' => $mailUsername ? 'configurado' : 'NÃO CONFIGURADO',
+            'MAIL_PASSWORD' => $mailPassword ? 'configurado' : 'NÃO CONFIGURADO',
+            'MAIL_ENCRYPTION' => env('MAIL_ENCRYPTION'),
+            'MAIL_FROM_ADDRESS' => env('MAIL_FROM_ADDRESS'),
+        ]);
+
+        if (empty($mailHost) || empty($mailUsername) || empty($mailPassword)) {
+            \Log::error('Configurações de email incompletas', [
+                'MAIL_HOST' => $mailHost,
+                'MAIL_USERNAME' => $mailUsername ? 'preenchido' : 'vazio',
+                'MAIL_PASSWORD' => $mailPassword ? 'preenchido' : 'vazio'
+            ]);
+            return response()->json([
+                'detail' => 'Configurações de email não estão completas. Contate o administrador.',
+            ], 500);
+        }
+
+        // Tentar enviar email
+        try {
+            \Log::info('Tentando enviar email...', [
+                'to' => $request->email,
+                'from' => env('MAIL_FROM_ADDRESS')
+            ]);
+
+            $mailResult = Mail::to($request->email)->send(new ResetSenhaMail($request->email, $nome, $token));
+            
+            \Log::info('Email enviado com sucesso!', [
                 'email' => $request->email,
-                'token' => $token,
-                'created_at' => now()
-            ]
-        );
+                'result' => $mailResult ? 'sucesso' : 'falha'
+            ]);
 
-        Mail::to($request->email)->send(new ResetSenhaMail($request->email, $usuario->nome, $token));
+        } catch (\Swift_TransportException $e) {
+            \Log::error('Erro de transporte ao enviar email (Swift_TransportException)', [
+                'error' => $e->getMessage(),
+                'email' => $request->email,
+                'trace' => $e->getTraceAsString()
+            ]);
+            return response()->json([
+                'detail' => 'Erro ao conectar ao servidor de email. Verifique as configurações.',
+                'error' => $e->getMessage()
+            ], 500);
+        } catch (\Exception $e) {
+            \Log::error('Erro ao enviar email de recuperação de senha', [
+                'error' => $e->getMessage(),
+                'error_class' => get_class($e),
+                'email' => $request->email,
+                'trace' => $e->getTraceAsString()
+            ]);
+            return response()->json([
+                'detail' => 'Erro ao enviar email. Verifique as configurações de email no servidor.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
 
-        return response()->json(['message' => 'E-mail de recuperação enviado com sucesso.']);
+        \Log::info('=== RECUPERAÇÃO DE SENHA CONCLUÍDA COM SUCESSO ===');
+
+        // Por segurança, sempre retorna a mesma mensagem
+        return response()->json([
+            'message' => 'Se o e-mail existir, você receberá instruções.'
+        ], 200);
     }
 
     /**

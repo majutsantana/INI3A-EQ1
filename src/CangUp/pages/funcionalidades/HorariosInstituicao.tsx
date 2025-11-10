@@ -15,27 +15,44 @@ import HeaderComLogout from '../../components/HeaderComLogout';
 import FooterComIcones from '../../components/FooterComIcones';
 import { useTheme } from '../../context/ThemeContext';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import useApi from '../../hooks/useApi';
+import { Ionicons } from '@expo/vector-icons';
 
-const STORAGE_KEY = '@horarios_config';
+const nomesDias = ['', 'SEGUNDA', 'TERÇA', 'QUARTA', 'QUINTA', 'SEXTA', 'SÁBADO'];
+const periodosPredefinidos = ['manha', 'tarde', 'noite'];
 
 const initialStateDias = [
-    { id: 1, nome: 'SEGUNDA', inicio: null, fim: null },
-    { id: 2, nome: 'TERÇA', inicio: null, fim: null },
-    { id: 3, nome: 'QUARTA', inicio: null, fim: null },
-    { id: 4, nome: 'QUINTA', inicio: null, fim: null },
-    { id: 5, nome: 'SEXTA', inicio: null, fim: null },
-    { id: 6, nome: 'SÁBADO', inicio: null, fim: null },
+    { id: 1, nome: 'SEGUNDA', periodos: [] },
+    { id: 2, nome: 'TERÇA', periodos: [] },
+    { id: 3, nome: 'QUARTA', periodos: [] },
+    { id: 4, nome: 'QUINTA', periodos: [] },
+    { id: 5, nome: 'SEXTA', periodos: [] },
+    { id: 6, nome: 'SÁBADO', periodos: [] },
 ];
 
-export default function FuncionalidadesAlunoResponsavel({ navigation }) {
+type Periodo = {
+    periodo?: string;
+    inicio: string;
+    fim: string;
+};
+
+type Dia = {
+    id: number;
+    nome: string;
+    periodos: Periodo[];
+};
+
+export default function HorariosInstituicao({ navigation }) {
+    const { url } = useApi();
     const [fontsLoaded, setFontsLoaded] = useState(false);
-    const [dias, setDias] = useState(initialStateDias);
-    const [horariosOriginais, setHorariosOriginais] = useState(initialStateDias);
+    const [dias, setDias] = useState<Dia[]>(initialStateDias);
+    const [horariosOriginais, setHorariosOriginais] = useState<Dia[]>(initialStateDias);
     const [showPicker, setShowPicker] = useState(false);
-    const [currentDiaId, setCurrentDiaId] = useState(null);
-    const [currentTipo, setCurrentTipo] = useState(null);
+    const [currentDiaId, setCurrentDiaId] = useState<number | null>(null);
+    const [currentPeriodoIndex, setCurrentPeriodoIndex] = useState<number | null>(null);
+    const [currentTipo, setCurrentTipo] = useState<string | null>(null);
     const [time, setTime] = useState(new Date());
-    const {theme} = useTheme();
+    const { theme } = useTheme();
 
     const loadFonts = async () => {
         try {
@@ -47,20 +64,101 @@ export default function FuncionalidadesAlunoResponsavel({ navigation }) {
             console.error("Erro ao carregar as fontes:", error);
         }
     };
+
+    const formatarHorario = (horario: string | undefined | null): string => {
+        if (!horario || horario === '--:--' || horario.trim() === '') {
+            return '--:--';
+        }
+        
+        // Remove espaços
+        const horarioLimpo = horario.trim();
+        
+        // Se já está no formato HH:mm, retorna direto
+        if (/^\d{2}:\d{2}$/.test(horarioLimpo)) {
+            return horarioLimpo;
+        }
+        
+        // Se está no formato HH:mm:ss (com segundos), remove os segundos
+        if (/^\d{2}:\d{2}:\d{2}$/.test(horarioLimpo)) {
+            return horarioLimpo.substring(0, 5); // Retorna apenas HH:mm
+        }
+        
+        // Se é um timestamp ISO, extrai apenas a hora LOCAL (não UTC)
+        if (horarioLimpo.includes('T')) {
+            try {
+                const date = new Date(horarioLimpo);
+                // IMPORTANTE: Usa getHours() e getMinutes() que retornam horário LOCAL
+                const hours = date.getHours().toString().padStart(2, '0');
+                const minutes = date.getMinutes().toString().padStart(2, '0');
+                return `${hours}:${minutes}`;
+            } catch (e) {
+                console.error("Erro ao formatar timestamp:", e);
+                return '--:--';
+            }
+        }
+        
+        // Tenta extrair HH:mm de qualquer formato (ex: "12:00:00" -> "12:00")
+        const match = horarioLimpo.match(/^(\d{2}):(\d{2})/);
+        if (match) {
+            return match[0]; // Retorna HH:mm
+        }
+        
+        console.warn("Formato de horário não reconhecido:", horario);
+        return '--:--';
+    };
     
     const carregarConfiguracoes = async () => {
         try {
-            const configsSalvas = await AsyncStorage.getItem(STORAGE_KEY);
-            if (configsSalvas !== null) {
-                const parsedConfigs = JSON.parse(configsSalvas);
-                setDias(parsedConfigs);
-                setHorariosOriginais(JSON.parse(JSON.stringify(parsedConfigs)));
+            const token = await AsyncStorage.getItem('jwt');
+            const idInst = await AsyncStorage.getItem('id_instituicao');
+            
+            if (!token || !idInst) {
+                Alert.alert("Erro", "Você precisa estar logado.");
+                return;
+            }
+
+            const response = await fetch(`${url}/api/instituicoes/${idInst}/horarios`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Accept': 'application/json'
+                }
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                console.log("Dados recebidos do backend:", JSON.stringify(data, null, 2));
+                
+                const horariosFormatados = data.map((diaData: any) => ({
+                    id: diaData.dia_semana,
+                    nome: nomesDias[diaData.dia_semana],
+                    periodos: (diaData.periodos || []).map((periodo: any) => {
+                        const inicioFormatado = periodo.inicio ? formatarHorario(periodo.inicio) : '';
+                        const fimFormatado = periodo.fim ? formatarHorario(periodo.fim) : '';
+                        
+                        console.log("Formatando período:", {
+                            original: { inicio: periodo.inicio, fim: periodo.fim },
+                            formatado: { inicio: inicioFormatado, fim: fimFormatado }
+                        });
+                        
+                        return {
+                            periodo: periodo.periodo || null,
+                            inicio: inicioFormatado,
+                            fim: fimFormatado,
+                        };
+                    }),
+                }));
+                
+                console.log("Horários formatados para exibição:", JSON.stringify(horariosFormatados, null, 2));
+                
+                setDias(horariosFormatados);
+                setHorariosOriginais(JSON.parse(JSON.stringify(horariosFormatados)));
             } else {
                 setHorariosOriginais(JSON.parse(JSON.stringify(initialStateDias)));
             }
         } catch (error) {
             console.error("Erro ao carregar as configurações:", error);
             Alert.alert("Erro", "Não foi possível carregar as configurações salvas.");
+            setHorariosOriginais(JSON.parse(JSON.stringify(initialStateDias)));
         }
     };
     
@@ -73,34 +171,155 @@ export default function FuncionalidadesAlunoResponsavel({ navigation }) {
         inicializar();
     }, []);
 
+    const adicionarPeriodo = (diaId: number) => {
+        setDias(diasAtuais =>
+            diasAtuais.map(dia => {
+                if (dia.id === diaId) {
+                    const periodoDisponivel = periodosPredefinidos.find(
+                        p => !dia.periodos.some(per => per.periodo === p)
+                    );
+                    return {
+                        ...dia,
+                        periodos: [
+                            ...dia.periodos,
+                            {
+                                periodo: periodoDisponivel || 'periodo',
+                                inicio: '',
+                                fim: '',
+                            }
+                        ]
+                    };
+                }
+                return dia;
+            })
+        );
+    };
+
+    const removerPeriodo = (diaId: number, periodoIndex: number) => {
+        setDias(diasAtuais =>
+            diasAtuais.map(dia => {
+                if (dia.id === diaId) {
+                    return {
+                        ...dia,
+                        periodos: dia.periodos.filter((_, index) => index !== periodoIndex)
+                    };
+                }
+                return dia;
+            })
+        );
+    };
+
     const salvarConfiguracoes = async () => {
         try {
-            const jsonValue = JSON.stringify(dias);
-            await AsyncStorage.setItem(STORAGE_KEY, jsonValue);
-            setHorariosOriginais(JSON.parse(JSON.stringify(dias)));
-            Alert.alert("Sucesso!", "Suas configurações de horário foram salvas.");
+            const token = await AsyncStorage.getItem('jwt');
+            const idInst = await AsyncStorage.getItem('id_instituicao');
+            
+            if (!token || !idInst) {
+                Alert.alert("Erro", "Você precisa estar logado.");
+                return;
+            }
+
+            // Filtra apenas dias que têm pelo menos um período válido (com início e fim)
+            const horariosParaEnviar = dias
+                .map(dia => ({
+                    dia_semana: dia.id,
+                    periodos: dia.periodos
+                        .filter(p => p.inicio && p.fim && p.inicio.trim() !== '' && p.fim.trim() !== '')
+                        .map(p => ({
+                            periodo: p.periodo || null,
+                            inicio: p.inicio.trim(),
+                            fim: p.fim.trim(),
+                        }))
+                }))
+                .filter(dia => dia.periodos.length > 0); // Remove dias sem períodos válidos
+
+            console.log("Enviando horários para o backend:", JSON.stringify(horariosParaEnviar, null, 2));
+            
+            // Verifica se há algum problema com os horários antes de enviar
+            horariosParaEnviar.forEach((dia, index) => {
+                dia.periodos.forEach((periodo, pIndex) => {
+                    console.log(`Dia ${dia.dia_semana}, Período ${pIndex}:`, {
+                        periodo: periodo.periodo,
+                        inicio: periodo.inicio,
+                        fim: periodo.fim
+                    });
+                });
+            });
+
+            const response = await fetch(`${url}/api/instituicoes/${idInst}/horarios`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({ horarios: horariosParaEnviar })
+            });
+
+            if (response.ok) {
+                await carregarConfiguracoes();
+                Alert.alert("Sucesso!", "Suas configurações de horário foram salvas.");
+            } else {
+                let errorMessage = "Não foi possível salvar as configurações.";
+                try {
+                    const errorData = await response.json();
+                    errorMessage = errorData.error || errorData.message || errorMessage;
+                    console.error("Erro do servidor:", errorData);
+                } catch (e) {
+                    console.error("Erro ao processar resposta:", e);
+                    const errorText = await response.text();
+                    console.error("Resposta do servidor:", errorText);
+                }
+                Alert.alert("Erro", errorMessage);
+            }
         } catch (error) {
             console.error("Erro ao salvar as configurações:", error);
-            Alert.alert("Erro", "Não foi possível salvar as configurações.");
+            Alert.alert("Erro", error.message || "Não foi possível salvar as configurações.");
         }
     };
 
     const cancelarAlteracoes = () => {
-        setDias(horariosOriginais);
+        setDias(JSON.parse(JSON.stringify(horariosOriginais)));
         Alert.alert("Cancelado", "As alterações foram descartadas.");
     };
 
     const onTimeChange = (event, selectedDate) => {
         setShowPicker(false);
-        if (event.type === 'set' && selectedDate) {
+        if (event.type === 'set' && selectedDate && currentDiaId !== null && currentPeriodoIndex !== null && currentTipo) {
+            // O DateTimePicker retorna uma data no timezone local
+            // Mas pode haver diferenças dependendo da plataforma
+            // Vamos usar getHours() e getMinutes() que retornam o horário local
             const selectedTime = selectedDate || time;
-            const hours = selectedTime.getHours().toString().padStart(2, '0');
-            const minutes = selectedTime.getMinutes().toString().padStart(2, '0');
-            const formattedTime = `${hours}:${minutes}`;
+            
+            // Pega horas e minutos locais
+            const hoursLocal = selectedTime.getHours();
+            const minutesLocal = selectedTime.getMinutes();
+            
+            // Também pega UTC para comparar (debug)
+            const hoursUTC = selectedTime.getUTCHours();
+            const minutesUTC = selectedTime.getUTCMinutes();
+            
+            console.log("Horário selecionado - Local:", hoursLocal, minutesLocal, "UTC:", hoursUTC, minutesUTC);
+            
+            // Usa o horário local (que é o que o usuário vê no picker)
+            const hoursFormatted = hoursLocal.toString().padStart(2, '0');
+            const minutesFormatted = minutesLocal.toString().padStart(2, '0');
+            const formattedTime = `${hoursFormatted}:${minutesFormatted}`;
+            
+            console.log("Horário formatado para salvar:", formattedTime);
+            
             setDias(diasAtuais =>
                 diasAtuais.map(dia => {
                     if (dia.id === currentDiaId) {
-                        return { ...dia, [currentTipo]: formattedTime };
+                        return {
+                            ...dia,
+                            periodos: dia.periodos.map((periodo, index) => {
+                                if (index === currentPeriodoIndex) {
+                                    return { ...periodo, [currentTipo]: formattedTime };
+                                }
+                                return periodo;
+                            })
+                        };
                     }
                     return dia;
                 })
@@ -108,11 +327,69 @@ export default function FuncionalidadesAlunoResponsavel({ navigation }) {
         }
     };
 
-    const showTimepicker = (diaId, tipo) => {
+    const showTimepicker = (diaId: number, periodoIndex: number, tipo: string) => {
         setCurrentDiaId(diaId);
+        setCurrentPeriodoIndex(periodoIndex);
         setCurrentTipo(tipo);
-        setTime(new Date());
+        
+        // Encontra o período atual para pegar o horário salvo
+        const diaAtual = dias.find(d => d.id === diaId);
+        if (diaAtual && diaAtual.periodos[periodoIndex]) {
+            const periodoAtual = diaAtual.periodos[periodoIndex];
+            let horarioSalvo = periodoAtual[tipo === 'inicio' ? 'inicio' : 'fim'];
+            
+            // Garante que o horário está no formato HH:mm
+            horarioSalvo = formatarHorario(horarioSalvo);
+            
+            if (horarioSalvo && horarioSalvo !== '--:--') {
+                try {
+                    // Converte o horário salvo (formato HH:mm) para um objeto Date
+                    const [hours, minutes] = horarioSalvo.split(':').map(Number);
+                    if (!isNaN(hours) && !isNaN(minutes) && hours >= 0 && hours < 24 && minutes >= 0 && minutes < 60) {
+                        // Cria uma nova data com a data de hoje e o horário especificado
+                        // Usa setHours() que trabalha com timezone local
+                        const hoje = new Date();
+                        const dataComHorario = new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate(), hours, minutes, 0, 0);
+                        
+                        console.log("Criando data para picker:", {
+                            horarioSalvo: horarioSalvo,
+                            hours: hours,
+                            minutes: minutes,
+                            dataComHorario: dataComHorario.toISOString(),
+                            horasLocais: dataComHorario.getHours(),
+                            minutosLocais: dataComHorario.getMinutes(),
+                            horasUTC: dataComHorario.getUTCHours(),
+                            minutosUTC: dataComHorario.getUTCMinutes()
+                        });
+                        
+                        setTime(dataComHorario);
+                    } else {
+                        console.log("Horário inválido, usando hora atual");
+                        setTime(new Date());
+                    }
+                } catch (e) {
+                    console.error("Erro ao converter horário:", e);
+                    setTime(new Date());
+                }
+            } else {
+                console.log("Nenhum horário salvo, usando hora atual");
+                setTime(new Date());
+            }
+        } else {
+            setTime(new Date());
+        }
+        
         setShowPicker(true);
+    };
+
+    const getNomePeriodo = (periodo: string | undefined): string => {
+        if (!periodo) return 'Período';
+        const periodos: { [key: string]: string } = {
+            'manha': 'MANHÃ',
+            'tarde': 'TARDE',
+            'noite': 'NOITE',
+        };
+        return periodos[periodo] || periodo.toUpperCase();
     };
 
     if (!fontsLoaded) {
@@ -124,45 +401,75 @@ export default function FuncionalidadesAlunoResponsavel({ navigation }) {
     }
 
     return (
-        <SafeAreaProvider style={theme == "light"? styles.safeArea : styles.safeAreaDark}>
+        <SafeAreaProvider style={theme == "light" ? styles.safeArea : styles.safeAreaDark}>
             <HeaderComLogout/>
 
             <ScrollView contentContainerStyle={styles.scrollViewContainer}>
-                <View style={theme == "light"? styles.containerPrincipal : styles.containerPrincipalDark}>
+                <View style={theme == "light" ? styles.containerPrincipal : styles.containerPrincipalDark}>
                     <Text style={theme == "light" ? styles.tituloAba : styles.tituloAbaDark}>Horários</Text>
                     {dias.map(dia => (
                         <View key={dia.id} style={styles.cardDia}>
                             <View style={theme == "light" ? styles.headerDia : styles.headerDiaDark}>
                                 <Text style={theme == "light" ? styles.textoDia : styles.textoDiaDark}>{dia.nome}</Text>
-                            </View>    
-                            <View style={styles.secaoHorarios}>
-                                <View style={styles.blocoHorario}>
-                                    <Text style={theme == "light" ? styles.labelHorario : styles.labelHorarioDark}>Início</Text>
-                                    <View style={styles.circuloHorario}>
-                                        <Text style={styles.textoTempo}>{dia.inicio || '--:--'}</Text>
-                                    </View>
-                                    <TouchableOpacity 
-                                        style={styles.botaoAdicionar}
-                                        onPress={() => showTimepicker(dia.id, 'inicio')}
-                                    >
-                                        <Text style={styles.textoBotao}>{dia.inicio ? 'alterar' : 'adicionar'}</Text>
-                                    </TouchableOpacity>
-                                </View>
-                                <View style={styles.blocoHorario}>
-                                    <Text style={theme == "light" ? styles.labelHorario : styles.labelHorarioDark}>Fim</Text>
-                                    <View style={styles.circuloHorario}>
-                                        <Text style={styles.textoTempo}>{dia.fim || '--:--'}</Text>
-                                    </View>
-                                    <TouchableOpacity 
-                                        style={styles.botaoAdicionar}
-                                        onPress={() => showTimepicker(dia.id, 'fim')}
-                                    >
-                                        <Text style={styles.textoBotao}>{dia.fim ? 'alterar' : 'adicionar'}</Text>
-                                    </TouchableOpacity>
-                                </View>
                             </View>
+                            
+                            {dia.periodos.map((periodo, periodoIndex) => (
+                                <View key={periodoIndex} style={styles.periodoContainer}>
+                                    <View style={styles.periodoHeader}>
+                                        <Text style={theme == "light" ? styles.textoPeriodo : styles.textoPeriodoDark}>
+                                            {getNomePeriodo(periodo.periodo)}
+                                        </Text>
+                                        {dia.periodos.length > 1 && (
+                                            <TouchableOpacity
+                                                onPress={() => removerPeriodo(dia.id, periodoIndex)}
+                                                style={styles.botaoRemover}
+                                            >
+                                                <Ionicons name="close-circle" size={24} color="#ff4444" />
+                                            </TouchableOpacity>
+                                        )}
+                                    </View>
+                                    
+                                    <View style={styles.secaoHorarios}>
+                                        <View style={styles.blocoHorario}>
+                                            <Text style={theme == "light" ? styles.labelHorario : styles.labelHorarioDark}>Início</Text>
+                                            <View style={styles.circuloHorario}>
+                                                <Text style={styles.textoTempo}>{formatarHorario(periodo.inicio)}</Text>
+                                            </View>
+                                            <TouchableOpacity 
+                                                style={styles.botaoAdicionar}
+                                                onPress={() => showTimepicker(dia.id, periodoIndex, 'inicio')}
+                                            >
+                                                <Text style={styles.textoBotao}>{periodo.inicio ? 'alterar' : 'adicionar'}</Text>
+                                            </TouchableOpacity>
+                                        </View>
+                                        <View style={styles.blocoHorario}>
+                                            <Text style={theme == "light" ? styles.labelHorario : styles.labelHorarioDark}>Fim</Text>
+                                            <View style={styles.circuloHorario}>
+                                                <Text style={styles.textoTempo}>{formatarHorario(periodo.fim)}</Text>
+                                            </View>
+                                            <TouchableOpacity 
+                                                style={styles.botaoAdicionar}
+                                                onPress={() => showTimepicker(dia.id, periodoIndex, 'fim')}
+                                            >
+                                                <Text style={styles.textoBotao}>{periodo.fim ? 'alterar' : 'adicionar'}</Text>
+                                            </TouchableOpacity>
+                                        </View>
+                                    </View>
+                                </View>
+                            ))}
+                            
+                            <TouchableOpacity
+                                style={styles.botaoAdicionarPeriodo}
+                                onPress={() => adicionarPeriodo(dia.id)}
+                            >
+                                <Ionicons name="add-circle-outline" size={24} color={theme == "light" ? "#522a91" : "#fff"} />
+                                <Text style={[styles.textoBotaoAdicionar, theme == "light" ? styles.textoBotaoAdicionarLight : styles.textoBotaoAdicionarDark]}>
+                                    Adicionar Período
+                                </Text>
+                            </TouchableOpacity>
                         </View>
                     ))}
+                    
                     <View style={styles.botoesAcaoContainer}>
                         <TouchableOpacity style={[styles.botaoAcao, styles.botaoCancelar]} onPress={cancelarAlteracoes}>
                             <Text style={styles.textoBotaoAcao}>Cancelar</Text>
@@ -233,21 +540,24 @@ const styles = StyleSheet.create({
         marginBottom: 20,
     },
     cardDia: {
-        marginBottom: 15,
+        marginBottom: 20,
+        padding: 10,
+        backgroundColor: '#fff',
+        borderRadius: 15,
     },
     headerDia: {
         backgroundColor: '#EAEAEA',
         paddingVertical: 10,
         borderRadius: 15,
         alignItems: 'center',
-        marginBottom: 10,
+        marginBottom: 15,
     },
     headerDiaDark: {
         backgroundColor: '#5b5b5b',
         paddingVertical: 10,
         borderRadius: 15,
         alignItems: 'center',
-        marginBottom: 10,
+        marginBottom: 15,
     },
     textoDia: {
         fontFamily: 'PoppinsBold',
@@ -258,6 +568,33 @@ const styles = StyleSheet.create({
         fontFamily: 'PoppinsBold',
         fontSize: 16,
         color: '#fff',
+    },
+    periodoContainer: {
+        marginBottom: 15,
+        padding: 10,
+        backgroundColor: '#f9f9f9',
+        borderRadius: 10,
+        borderWidth: 1,
+        borderColor: '#e0e0e0',
+    },
+    periodoHeader: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: 10,
+    },
+    textoPeriodo: {
+        fontFamily: 'PoppinsBold',
+        fontSize: 14,
+        color: '#333',
+    },
+    textoPeriodoDark: {
+        fontFamily: 'PoppinsBold',
+        fontSize: 14,
+        color: '#fff',
+    },
+    botaoRemover: {
+        padding: 5,
     },
     secaoHorarios: {
         flexDirection: 'row',
@@ -305,6 +642,24 @@ const styles = StyleSheet.create({
         fontFamily: 'PoppinsRegular',
         fontSize: 14,
         color: '#000',
+    },
+    botaoAdicionarPeriodo: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingVertical: 10,
+        marginTop: 10,
+    },
+    textoBotaoAdicionar: {
+        fontFamily: 'PoppinsRegular',
+        fontSize: 14,
+        marginLeft: 5,
+    },
+    textoBotaoAdicionarLight: {
+        color: '#522a91',
+    },
+    textoBotaoAdicionarDark: {
+        color: '#fff',
     },
     botoesAcaoContainer: {
         flexDirection: 'row',

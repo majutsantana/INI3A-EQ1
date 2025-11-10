@@ -222,15 +222,48 @@ export default function CadastroAluno({ navigation }) {
             });
             console.log("Status:", response.status);
 
+            // Verificar se a resposta tem conteúdo antes de tentar parsear JSON
+            const responseText = await response.text();
+            
             if (response.ok) {
-                const data = await response.json();
-                console.log("Resposta JSON:", data);
-                Alert.alert('Sucesso', 'Aluno cadastrado com sucesso!');
-                navigation.navigate('Login');
+                // Tentar parsear JSON apenas se houver conteúdo
+                let data = null;
+                if (responseText && responseText.trim()) {
+                    try {
+                        data = JSON.parse(responseText);
+                        console.log("Resposta JSON:", data);
+                    } catch (e) {
+                        console.warn("Resposta não é JSON válido, mas status é OK:", responseText);
+                    }
+                }
+                
+                // Sempre redirecionar para login após sucesso
+                Alert.alert(
+                    'Sucesso', 
+                    data?.warning || 'Aluno cadastrado com sucesso!',
+                    [
+                        {
+                            text: 'OK',
+                            onPress: () => {
+                                navigation.navigate('Login');
+                            }
+                        }
+                    ]
+                );
             } else {
-                const errorText = await response.text();
-                console.error("Erro na resposta do servidor:", errorText);
-                Alert.alert('Erro', `Falha ao cadastrar. Resposta do servidor: ${response.status} ${response.statusText}`);
+                // Tentar parsear erro JSON
+                let errorMessage = `Falha ao cadastrar. Resposta do servidor: ${response.status}`;
+                if (responseText && responseText.trim()) {
+                    try {
+                        const errorData = JSON.parse(responseText);
+                        errorMessage = errorData.error || errorData.message || errorMessage;
+                        console.error("Erro na resposta do servidor:", errorData);
+                    } catch (e) {
+                        console.error("Erro na resposta do servidor (texto):", responseText);
+                        errorMessage = responseText.substring(0, 200) || errorMessage;
+                    }
+                }
+                Alert.alert('Erro', errorMessage);
             }
         } catch (error) {
             console.error('Erro ao cadastrar aluno:', error);

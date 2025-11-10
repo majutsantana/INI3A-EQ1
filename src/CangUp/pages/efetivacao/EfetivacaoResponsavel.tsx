@@ -30,7 +30,7 @@ type _inst = {
     nome: string,
 }
 
-export default function EfetivacaoAluno({ navigation }) { //Navigation não é erro
+export default function EfetivacaoResponsavel({ navigation }) { //Navigation não é erro
     
     const [fontsLoaded, setFontsLoaded] = useState(false);
     const [errors, setErrors] = useState<errorType>({CPF:undefined, instituicao:undefined, nome:undefined});
@@ -45,7 +45,7 @@ export default function EfetivacaoAluno({ navigation }) { //Navigation não é e
      let newErrors : errorType = {CPF:undefined, instituicao:undefined, nome:undefined};
      let isValid = true;
  
-      if (!instituicao.trim()) {
+      if (!instituicao) {
         newErrors.instituicao = 'Instituição é obrigatória.';
         isValid = false;
       }

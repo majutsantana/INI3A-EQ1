@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import {
-    SafeAreaView,
     StyleSheet,
     Text,
     View,
@@ -10,14 +9,14 @@ import {
     Alert,
     Switch,
 } from 'react-native';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import * as Font from 'expo-font';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import HeaderComLogout from '../../components/HeaderComLogout';
 import FooterComIcones from '../../components/FooterComIcones';
 import { useTheme } from '../../context/ThemeContext';
-
-const STORAGE_KEY = '@horarios_config';
+import useApi from '../../hooks/useApi';
 
 const initialStateDias = [
     { id: 1, nome: 'SEGUNDA', entrada: null, saida: null, entradaHabilitada: true, saidaHabilitada: true },
@@ -29,6 +28,7 @@ const initialStateDias = [
 ];
 
 export default function HorariosAlunoResponsavel({ navigation }) {
+    const { url } = useApi();
     const [fontsLoaded, setFontsLoaded] = useState(false);
     const [dias, setDias] = useState(initialStateDias);
     const [horariosOriginais, setHorariosOriginais] = useState(initialStateDias);
@@ -36,7 +36,56 @@ export default function HorariosAlunoResponsavel({ navigation }) {
     const [currentDiaId, setCurrentDiaId] = useState(null);
     const [currentTipo, setCurrentTipo] = useState(null);
     const [time, setTime] = useState(new Date());
+    const [perfil, setPerfil] = useState('');
+    const [idUsuario, setIdUsuario] = useState('');
+    const [isEditando, setIsEditando] = useState(false);
+    const [temHorariosSalvos, setTemHorariosSalvos] = useState(false);
     const { theme } = useTheme();
+
+    const formatarHorario = (horario: string | undefined | null): string => {
+        if (!horario || horario === '--:--' || horario.trim() === '') {
+            return '--:--';
+        }
+        
+        const horarioLimpo = horario.trim();
+        
+        // Se já está no formato HH:mm, retorna direto
+        if (/^\d{2}:\d{2}$/.test(horarioLimpo)) {
+            return horarioLimpo;
+        }
+        
+        // Se está no formato HH:mm:ss, remove os segundos
+        if (/^\d{2}:\d{2}:\d{2}$/.test(horarioLimpo)) {
+            return horarioLimpo.substring(0, 5);
+        }
+        
+        // Se é um timestamp ISO (UTC), extrai apenas a hora
+        if (horarioLimpo.includes('T')) {
+            try {
+                // Tenta extrair diretamente do formato ISO: 2025-11-06T07:15:00.000Z
+                const timeMatch = horarioLimpo.match(/T(\d{2}):(\d{2})/);
+                if (timeMatch) {
+                    return `${timeMatch[1]}:${timeMatch[2]}`;
+                }
+                // Se não conseguir, usa Date (mas pode ter problemas de timezone)
+                const date = new Date(horarioLimpo);
+                const hours = date.getUTCHours().toString().padStart(2, '0');
+                const minutes = date.getUTCMinutes().toString().padStart(2, '0');
+                return `${hours}:${minutes}`;
+            } catch (e) {
+                console.error("Erro ao formatar timestamp:", e);
+                return '--:--';
+            }
+        }
+        
+        // Tenta extrair HH:mm de qualquer formato
+        const match = horarioLimpo.match(/^(\d{2}):(\d{2})/);
+        if (match) {
+            return match[0];
+        }
+        
+        return '--:--';
+    };
 
     const loadFonts = async () => {
         try {
@@ -51,22 +100,61 @@ export default function HorariosAlunoResponsavel({ navigation }) {
 
     const carregarConfiguracoes = async () => {
         try {
-            const configsSalvas = await AsyncStorage.getItem(STORAGE_KEY);
-            if (configsSalvas !== null) {
-                const parsedConfigs = JSON.parse(configsSalvas);
-                const configsComNovasProps = parsedConfigs.map(dia => ({
-                    ...dia,
-                    entradaHabilitada: dia.hasOwnProperty('entradaHabilitada') ? dia.entradaHabilitada : true,
-                    saidaHabilitada: dia.hasOwnProperty('saidaHabilitada') ? dia.saidaHabilitada : true,
+            const token = await AsyncStorage.getItem('jwt');
+            const perfilUsuario = await AsyncStorage.getItem('perfil');
+            const idAluno = await AsyncStorage.getItem('id_aluno');
+            const idResponsavel = await AsyncStorage.getItem('id_responsavel');
+            
+            if (!token || !perfilUsuario) {
+                Alert.alert("Erro", "Você precisa estar logado.");
+                return;
+            }
+
+            setPerfil(perfilUsuario);
+            const id = perfilUsuario === 'alun' ? idAluno : idResponsavel;
+            setIdUsuario(id || '');
+
+            if (!id) {
+                Alert.alert("Erro", "ID não encontrado.");
+                return;
+            }
+
+            const endpoint = perfilUsuario === 'alun' 
+                ? `${url}/api/alunos/${id}/horarios`
+                : `${url}/api/responsaveis/${id}/horarios`;
+
+            const response = await fetch(endpoint, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Accept': 'application/json'
+                }
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                const nomesDias = ['', 'SEGUNDA', 'TERÇA', 'QUARTA', 'QUINTA', 'SEXTA', 'SÁBADO'];
+                const horariosFormatados = data.map((h: any) => ({
+                    id: h.dia_semana,
+                    nome: nomesDias[h.dia_semana],
+                    entrada: h.entrada ? formatarHorario(h.entrada) : null,
+                    saida: h.saida ? formatarHorario(h.saida) : null,
+                    entradaHabilitada: h.entradaHabilitada !== false,
+                    saidaHabilitada: h.saidaHabilitada !== false,
                 }));
-                setDias(configsComNovasProps);
-                setHorariosOriginais(JSON.parse(JSON.stringify(configsComNovasProps)));
+                setDias(horariosFormatados);
+                setHorariosOriginais(JSON.parse(JSON.stringify(horariosFormatados)));
+                // Verifica se há algum horário salvo
+                const temHorarios = horariosFormatados.some((d: any) => d.entrada || d.saida);
+                setTemHorariosSalvos(temHorarios);
             } else {
                 setHorariosOriginais(JSON.parse(JSON.stringify(initialStateDias)));
+                setTemHorariosSalvos(false);
             }
         } catch (error) {
             console.error("Erro ao carregar as configurações:", error);
             Alert.alert("Erro", "Não foi possível carregar as configurações salvas.");
+            setHorariosOriginais(JSON.parse(JSON.stringify(initialStateDias)));
+            setTemHorariosSalvos(false);
         }
     };
 
@@ -81,19 +169,59 @@ export default function HorariosAlunoResponsavel({ navigation }) {
 
     const salvarConfiguracoes = async () => {
         try {
-            const jsonValue = JSON.stringify(dias);
-            await AsyncStorage.setItem(STORAGE_KEY, jsonValue);
-            setHorariosOriginais(JSON.parse(JSON.stringify(dias)));
-            Alert.alert("Sucesso!", "Suas configurações de horário foram salvas.");
+            const token = await AsyncStorage.getItem('jwt');
+            
+            if (!token || !perfil || !idUsuario) {
+                Alert.alert("Erro", "Você precisa estar logado.");
+                return;
+            }
+
+            const horariosParaEnviar = dias.map(dia => ({
+                dia_semana: dia.id,
+                entrada: (dia.entrada && dia.entrada !== '--:--' && dia.entrada.trim() !== '') ? dia.entrada : null,
+                saida: (dia.saida && dia.saida !== '--:--' && dia.saida.trim() !== '') ? dia.saida : null,
+                entradaHabilitada: dia.entradaHabilitada,
+                saidaHabilitada: dia.saidaHabilitada,
+            }));
+
+            const endpoint = perfil === 'alun'
+                ? `${url}/api/alunos/${idUsuario}/horarios`
+                : `${url}/api/responsaveis/${idUsuario}/horarios`;
+
+            const response = await fetch(endpoint, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({ horarios: horariosParaEnviar })
+            });
+
+            if (response.ok) {
+                setHorariosOriginais(JSON.parse(JSON.stringify(dias)));
+                setIsEditando(false);
+                setTemHorariosSalvos(true);
+                Alert.alert("Sucesso!", "Suas configurações de horário foram salvas.");
+            } else {
+                const errorData = await response.json().catch(() => ({ error: "Erro desconhecido" }));
+                console.error("Erro do servidor:", errorData);
+                Alert.alert("Erro", errorData.error || errorData.message || "Não foi possível salvar as configurações.");
+            }
         } catch (error) {
             console.error("Erro ao salvar as configurações:", error);
-            Alert.alert("Erro", "Não foi possível salvar as configurações.");
+            Alert.alert("Erro", error.message || "Não foi possível salvar as configurações.");
         }
     };
 
     const cancelarAlteracoes = () => {
         setDias(horariosOriginais);
+        setIsEditando(false);
         Alert.alert("Cancelado", "As alterações foram descartadas.");
+    };
+
+    const entrarModoEdicao = () => {
+        setIsEditando(true);
     };
 
     const onTimeChange = (event, selectedDate) => {
@@ -121,7 +249,33 @@ export default function HorariosAlunoResponsavel({ navigation }) {
         if (habilitado) {
             setCurrentDiaId(diaId);
             setCurrentTipo(tipo);
-            setTime(new Date());
+            
+            // Pega o horário salvo do dia
+            let horarioSalvo = tipo === 'entrada' ? diaAtual.entrada : diaAtual.saida;
+            
+            // Garante que o horário está no formato HH:mm
+            horarioSalvo = formatarHorario(horarioSalvo);
+            
+            if (horarioSalvo && horarioSalvo !== '--:--') {
+                try {
+                    // Converte o horário salvo (formato HH:mm) para um objeto Date
+                    const [hours, minutes] = horarioSalvo.split(':').map(Number);
+                    if (!isNaN(hours) && !isNaN(minutes) && hours >= 0 && hours < 24 && minutes >= 0 && minutes < 60) {
+                        // Cria uma nova data com a data de hoje e o horário especificado
+                        const hoje = new Date();
+                        const dataComHorario = new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate(), hours, minutes, 0, 0);
+                        setTime(dataComHorario);
+                    } else {
+                        setTime(new Date());
+                    }
+                } catch (e) {
+                    console.error("Erro ao converter horário:", e);
+                    setTime(new Date());
+                }
+            } else {
+                setTime(new Date());
+            }
+            
             setShowPicker(true);
         } else {
             Alert.alert("Horário Desabilitado", "Carona desabilitada para este horário. Habilite o interruptor para adicionar/alterar.");
@@ -159,7 +313,7 @@ export default function HorariosAlunoResponsavel({ navigation }) {
     }
 
     return (
-        <SafeAreaView style={theme == "light" ? styles.safeArea : styles.safeAreaDark}>
+        <SafeAreaProvider style={theme == "light" ? styles.safeArea : styles.safeAreaDark}>
             <HeaderComLogout />
 
             <ScrollView contentContainerStyle={styles.scrollViewContainer}>
@@ -176,7 +330,7 @@ export default function HorariosAlunoResponsavel({ navigation }) {
                                     <View style={[styles.circuloHorario, !dia.entradaHabilitada && styles.circuloDesabilitado]}>
                                         {dia.entradaHabilitada ? (
                                             <Text style={styles.textoTempo}>
-                                                {dia.entrada || '--:--'}
+                                                {formatarHorario(dia.entrada)}
                                             </Text>
                                         ) : (
                                             <>
@@ -216,7 +370,7 @@ export default function HorariosAlunoResponsavel({ navigation }) {
                                     <View style={[styles.circuloHorario, !dia.saidaHabilitada && styles.circuloDesabilitado]}>
                                         {dia.saidaHabilitada ? (
                                             <Text style={styles.textoTempo}>
-                                                {dia.saida || '--:--'}
+                                                {formatarHorario(dia.saida)}
                                             </Text>
                                         ) : (
                                             <>
@@ -253,14 +407,27 @@ export default function HorariosAlunoResponsavel({ navigation }) {
                             </View>
                         </View>
                     ))}
-                    <View style={styles.botoesAcaoContainer}>
-                        <TouchableOpacity style={[styles.botaoAcao, styles.botaoCancelar]} onPress={cancelarAlteracoes}>
-                            <Text style={styles.textoBotaoAcao}>Cancelar</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity style={[styles.botaoAcao, styles.botaoSalvar]} onPress={salvarConfiguracoes}>
+                    {!isEditando && !temHorariosSalvos ? (
+                        // Estado inicial: só botão Salvar
+                        <TouchableOpacity style={[styles.botaoAcao, styles.botaoSalvar, styles.botaoUnico]} onPress={salvarConfiguracoes}>
                             <Text style={styles.textoBotaoAcao}>Salvar</Text>
                         </TouchableOpacity>
-                    </View>
+                    ) : !isEditando && temHorariosSalvos ? (
+                        // Após salvar: só botão Editar
+                        <TouchableOpacity style={[styles.botaoAcao, styles.botaoEditar, styles.botaoUnico]} onPress={entrarModoEdicao}>
+                            <Text style={styles.textoBotaoAcao}>Editar</Text>
+                        </TouchableOpacity>
+                    ) : (
+                        // Modo de edição: Salvar e Cancelar
+                        <View style={styles.botoesAcaoContainer}>
+                            <TouchableOpacity style={[styles.botaoAcao, styles.botaoCancelar]} onPress={cancelarAlteracoes}>
+                                <Text style={styles.textoBotaoAcao}>Cancelar</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity style={[styles.botaoAcao, styles.botaoSalvar]} onPress={salvarConfiguracoes}>
+                                <Text style={styles.textoBotaoAcao}>Salvar</Text>
+                            </TouchableOpacity>
+                        </View>
+                    )}
                 </View>
             </ScrollView>
             <FooterComIcones nav={navigation} />
@@ -274,7 +441,7 @@ export default function HorariosAlunoResponsavel({ navigation }) {
                     onChange={onTimeChange}
                 />
             )}
-        </SafeAreaView>
+        </SafeAreaProvider>
     );
 }
 
@@ -450,8 +617,16 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginHorizontal: 5,
     },
+    botaoUnico: {
+        marginHorizontal: 'auto',
+        width: '60%',
+        flex: 0,
+    },
     botaoSalvar: {
         backgroundColor: '#522a91',
+    },
+    botaoEditar: {
+        backgroundColor: '#FFBE31',
     },
     botaoCancelar: {
         backgroundColor: '#FFBE31',

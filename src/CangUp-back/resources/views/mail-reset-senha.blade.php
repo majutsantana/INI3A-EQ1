@@ -36,7 +36,23 @@
                             <h2 class="mt-6 text-xl font-semibold text-gray-900 dark:text-white">Olá, {{ $nome }}</h2>
 
                             <p class="mt-4 text-gray-500 dark:text-gray-400 text-sm leading-relaxed">
-                                Utilize o seguinte link para atualizar sua senha: <a href="http://localhost:8081/RedefinirSenha/">Clque aqui</a>
+                                Você solicitou a recuperação de senha. Clique no link abaixo para redefinir sua senha:
+                            </p>
+                            
+                            <p class="mt-4">
+                                <a href="{{ env('FRONTEND_URL', 'http://localhost:8081') }}/RedefinirSenha?email={{ urlencode($email) }}&token={{ $token }}" 
+                                   class="inline-flex items-center px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors">
+                                    Redefinir Senha
+                                </a>
+                            </p>
+                            
+                            <p class="mt-2 text-gray-500 dark:text-gray-400 text-xs">
+                                Ou copie e cole este link no seu navegador:<br>
+                                <code style="font-size: 10px; word-break: break-all;">{{ env('FRONTEND_URL', 'http://localhost:8081') }}/RedefinirSenha?email={{ urlencode($email) }}&token={{ $token }}</code>
+                            </p>
+                            
+                            <p class="mt-4 text-gray-500 dark:text-gray-400 text-xs leading-relaxed">
+                                Se você não solicitou esta recuperação, ignore este email. Este link expira em 1 hora.
                             </p>
                         </div>
                     </div>

@@ -46,8 +46,8 @@ const FooterComIcones = (props) => {
             <TouchableOpacity onPress={() => props.nav.navigate(`HorariosAlunoResponsavel`)}> 
               <Ionicons name="time-outline" size={30} color="#fff" />
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => props.nav.navigate(`PerfilAluno`)}> 
-              <Ionicons name="car-outline" size={35} color="#fff" />
+            <TouchableOpacity onPress={() => props.nav.navigate(`SolicitarCarona`)}> 
+              <Ionicons name="cart-outline" size={35} color="#fff" />
             </TouchableOpacity>
           </>);
       break;
@@ -57,14 +57,14 @@ const FooterComIcones = (props) => {
              <TouchableOpacity onPress={() => props.nav.navigate(`PerfilResponsavel`)}>
               <Ionicons name="person-circle-outline" size={35} color="#fff"/>
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => props.nav.navigate(`PerfilAluno`)}>
+            <TouchableOpacity onPress={() => props.nav.navigate(`PerfilResponsavel`)}>
               <Ionicons name="home-outline" size={30} color="#fff" />
             </TouchableOpacity>
             <TouchableOpacity onPress={() => props.nav.navigate(`HorariosAlunoResponsavel`)}> 
               <Ionicons name="time-outline" size={30} color="#fff" />
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => props.nav.navigate(`PerfilAluno`)}> 
-              <Ionicons name="car-outline" size={35} color="#fff" />
+            <TouchableOpacity onPress={() => props.nav.navigate(`SolicitacoesCarona`)}> 
+              <Ionicons name="cart-outline" size={35} color="#fff" />
             </TouchableOpacity>
           </>
         );

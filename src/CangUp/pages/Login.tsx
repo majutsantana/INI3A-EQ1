@@ -114,13 +114,35 @@ export default function Login({ navigation }) {
   };
 
   useEffect(() => {
-    let { url } = useApi();
     loadFonts();
-    fetch(url + "/api/perfis", {
-      method: 'GET'
-    }).then(r => r.json())
-      .then(r => setPerfis(r))
+    carregarPerfis();
   }, []);
+
+  const carregarPerfis = async () => {
+    try {
+      const response = await fetch(`${url}/api/perfis`, {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        }
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error(`Erro ao carregar perfis: ${response.status} - ${errorText.substring(0, 200)}`);
+        Alert.alert('Erro', `Não foi possível carregar os perfis. Status: ${response.status}`);
+        return;
+      }
+
+      const data = await response.json();
+      console.log("Perfis vindas da API:", data);
+      setPerfis(data);
+    } catch (error) {
+      console.error("Erro no fetch de perfis:", error);
+      Alert.alert('Erro de Conexão', 'Não foi possível conectar ao servidor. Verifique sua conexão e se o servidor está online.');
+    }
+  };
 
   function getDados() {
     setModalVisible(true);
@@ -130,16 +152,6 @@ export default function Login({ navigation }) {
     return perfis.map(p =>
       <Picker.Item key={p.id} label={p.nome} value={p.rotulo} />)
   }
-  useEffect(() => {
-    loadFonts();
-    fetch(`${url}/api/perfis`)
-      .then(r => r.json())
-      .then(r => {
-        console.log("Perfis vindas da API:", r);
-        setPerfis(r);
-      })
-      .catch(err => console.error("Erro no fetch:", err));
-  }, []);
 
   if (!fontsLoaded) {
     return (
@@ -276,11 +288,40 @@ export default function Login({ navigation }) {
                 alignItems: 'center',
                 marginBottom: 10,
               }}
-              onPress={() => {
-                fetch("eq1.ini3a.projetoscti.com.br/api/recuperar-senha", { method: "post", body: emailRecuperacao });
-                Alert.alert("Solicitação enviada", "Se o e-mail existir, você receberá instruções.");
-                setModalVisible(false);
-                setEmailRecuperacao('');
+              onPress={async () => {
+                try {
+                  const { url } = useApi();
+                  const response = await fetch(`${url}/api/recuperar-senha`, {
+                    method: 'POST',
+                    headers: {
+                      'Content-Type': 'application/json',
+                      'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({ email: emailRecuperacao })
+                  });
+
+                  const responseText = await response.text();
+                  let data = null;
+                  if (responseText && responseText.trim()) {
+                    try {
+                      data = JSON.parse(responseText);
+                    } catch (e) {
+                      console.warn("Resposta não é JSON válido:", responseText);
+                    }
+                  }
+
+                  if (response.ok) {
+                    Alert.alert("Solicitação enviada", data?.message || "Se o e-mail existir, você receberá instruções.");
+                  } else {
+                    Alert.alert("Erro", data?.detail || data?.error || "Não foi possível enviar o email. Tente novamente.");
+                  }
+                } catch (error) {
+                  console.error("Erro ao solicitar recuperação de senha:", error);
+                  Alert.alert("Erro", "Não foi possível conectar ao servidor. Verifique sua conexão.");
+                } finally {
+                  setModalVisible(false);
+                  setEmailRecuperacao('');
+                }
               }}
             >
               <Text style={{ fontFamily: 'PoppinsBold', color: colors.text }}>Enviar</Text>

@@ -1,3 +1,4 @@
+import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Login from './pages/Login';
@@ -16,8 +17,8 @@ import EfetivacaoResponsavel from './pages/efetivacao/EfetivacaoResponsavel';
 import HorariosAlunoResponsavel from './pages/funcionalidades/HorariosAlunoResponsavel';
 import HorariosInstituicao from './pages/funcionalidades/HorariosInstituicao';
 import Mapa from './pages/Mapa';
-//import CaronasAluno from './pages/caronas/CaronasAluno';
-//import CaronasResponsavel from './pages/caronas/CaronasResponsavel';
+import SolicitarCarona from './pages/caronas/SolicitarCarona';
+import SolicitacoesCarona from './pages/caronas/SolicitacoesCarona';
 import ListaUsuarios from './pages/funcionalidades/ListaUsuarios';
 import ListaInstituicoes from './pages/funcionalidades/ListaInstituicoes';
 import CadastroVeiculo from './pages/cadastro/CadastroVeiculo';
@@ -50,6 +51,8 @@ const AppStack = () => {
     if (userProfile === "inst") return "ListaUsuarios";
     if (userProfile === "alun") return "PerfilAluno";
     if (userProfile === "resp") return "PerfilResponsavel";
+    // Fallback para evitar undefined
+    return "PerfilAluno";
   };
 
   return (
@@ -61,6 +64,8 @@ const AppStack = () => {
       <Stack.Screen name="PreCadastroResponsavel" component={PreCadastroResponsavel} options={{ headerShown: false }} />
       <Stack.Screen name="HorariosAlunoResponsavel" component={HorariosAlunoResponsavel} options={{ headerShown: false }} />
       <Stack.Screen name="HorariosInstituicao" component={HorariosInstituicao} options={{ headerShown: false }} />
+      <Stack.Screen name="SolicitarCarona" component={SolicitarCarona} options={{ headerShown: false }} />
+      <Stack.Screen name="SolicitacoesCarona" component={SolicitacoesCarona} options={{ headerShown: false }} />
       <Stack.Screen name="CadastroVeiculo" component={CadastroVeiculo} options={{ headerShown: false }} />
       <Stack.Screen name="ListaUsuarios" component={ListaUsuarios} options={{ headerShown: false }} />
       <Stack.Screen name="ListaInstituicoes" component={ListaInstituicoes} options={{ headerShown: false }} />

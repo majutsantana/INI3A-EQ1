@@ -13,8 +13,9 @@ import {
   import { useContext, useEffect, useState } from 'react';
   import { useNavigation } from '@react-navigation/native';
   import { MaterialIcons } from '@expo/vector-icons';
+  import { SafeAreaProvider } from 'react-native-safe-area-context';
   import Header from '../../components/Header';
-  import FooterComIcones from '../../components/FooterSemIcones';
+  import FooterComIcones from '../../components/FooterComIcones';
   import useApi from '../../hooks/useApi';
   import { TextInputMask } from 'react-native-masked-text';
   import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -226,6 +227,7 @@ import {
               contentContainerStyle={styles.scrollContent}
               keyboardShouldPersistTaps="handled"
               showsVerticalScrollIndicator={false}
+              style={styles.scrollView}
             >
               
               <View style={styles.inputGroup}>
@@ -275,7 +277,12 @@ import {
                   placeholder="Digite a quantidade de assentos:"
                   placeholderTextColor="#5b5b5b"
                   value={qtde_assentos}
-                  onChangeText={setQtdeAssentos}
+                  onChangeText={(text) => {
+                    // Permite apenas números
+                    const numericValue = text.replace(/[^0-9]/g, '');
+                    setQtdeAssentos(numericValue);
+                  }}
+                  keyboardType="numeric"
                 /> 
               </View>
               {errors.qtde_assentos && <Text style={styles.errorText}>{errors.qtde_assentos}</Text>}
@@ -288,7 +295,7 @@ import {
           </TouchableOpacity>
         </View>
   
-        <FooterComIcones /*nav={navigation}*/ /> 
+        <FooterComIcones nav={navigation} /> 
       </SafeAreaProvider>
     );
   }
@@ -307,7 +314,7 @@ import {
       flex: 1,
       paddingHorizontal: '5%',
       paddingTop: '10%',
-      paddingBottom: '10%',
+      paddingBottom: 100, // Espaço extra para o botão não ficar escondido
       justifyContent: 'space-between',
       alignItems: 'center',
     },
@@ -317,6 +324,7 @@ import {
       borderRadius: 30,
       padding: '5%',
       width: '90%',
+      maxHeight: '70%', // Limita a altura para não esconder o botão
       shadowColor: '#000',
       shadowOffset: { width: 2, height: 6 },
       shadowOpacity: 0.15,
@@ -329,6 +337,7 @@ import {
       borderRadius: 30,
       padding: '5%',
       width: '90%',
+      maxHeight: '70%', // Limita a altura para não esconder o botão
       shadowColor: '#000',
       shadowOffset: { width: 2, height: 6 },
       shadowOpacity: 0.15,
@@ -341,9 +350,12 @@ import {
     iconBackDark:{
       color:'#fff'
     },
+    scrollView: {
+      flex: 1,
+    },
     scrollContent: {
       flexGrow: 1,
-      paddingBottom: '2%',
+      paddingBottom: 20,
       margin: '5%',
     },
     inputGroup: {
@@ -418,7 +430,8 @@ import {
       width: '60%',
       borderRadius: 20,
       alignItems: 'center',
-      marginTop: '10%',
+      marginTop: 20,
+      marginBottom: 10,
       shadowColor: '#000',
       shadowOffset: {
         width: 0,

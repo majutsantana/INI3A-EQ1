@@ -1,13 +1,26 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { useTheme } from '../context/ThemeContext';
+import { useRoute } from '@react-navigation/native';
 import useApi from '../hooks/useApi';
 
-export default function RedefinirSenha({ navigation }) { //Navigation não está dando erro, é bug
+export default function RedefinirSenha({ navigation }: any) { //Navigation não está dando erro, é bug
+  const route = useRoute();
   const [email, setEmail] = useState('');
   const [token, setToken] = useState('');
   const [senha, setSenha] = useState('');
   const [confirmarSenha, setConfirmarSenha] = useState('');
+
+  // Ler parâmetros da URL quando a tela é aberta
+  useEffect(() => {
+    const params = route.params as any;
+    if (params?.email) {
+      setEmail(params.email);
+    }
+    if (params?.token) {
+      setToken(params.token);
+    }
+  }, [route.params]);
   
 
   const handleRedefinirSenha = async () => {
@@ -36,15 +49,24 @@ export default function RedefinirSenha({ navigation }) { //Navigation não está
         })
       });
 
-      const data = await response.json();
+      // Verificar se a resposta tem conteúdo antes de tentar parsear JSON
+      const responseText = await response.text();
+      let data = null;
+      if (responseText && responseText.trim()) {
+        try {
+          data = JSON.parse(responseText);
+        } catch (e) {
+          console.warn("Resposta não é JSON válido:", responseText);
+        }
+      }
 
       if (!response.ok) {
-        Alert.alert('Erro', data.detail || 'Erro ao redefinir a senha.');
+        Alert.alert('Erro', data?.detail || data?.error || 'Erro ao redefinir a senha.');
         return;
       }
 
       Alert.alert('Sucesso', 'Senha redefinida com sucesso!');
-      navigation.navigate('Login'); //componente Login, se der erro é pra alterar o nome
+      navigation.navigate('Login');
     } catch (error) {
       console.error(error);
       Alert.alert('Erro', 'Não foi possível redefinir a senha.');

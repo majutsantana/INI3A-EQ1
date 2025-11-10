@@ -11,6 +11,7 @@ import {
     Keyboard,
 } from 'react-native';
 import MapView, { Marker, Polyline } from 'react-native-maps';
+
 import {
     requestForegroundPermissionsAsync,
     getCurrentPositionAsync,
@@ -21,14 +22,28 @@ import {
 import { FontAwesome } from '@expo/vector-icons'; // Importando ícones
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
-export default function Mapa({ navigation }) {
-    const [location, setLocation] = useState < LocationObject | null > (null);
-    const [destination, setDestination] = useState(null);
+interface MapaProps {
+    navigation: any;
+}
+
+interface Destination {
+    latitude: number;
+    longitude: number;
+}
+
+interface Coordinate {
+    latitude: number;
+    longitude: number;
+}
+
+export default function Mapa({ navigation }: MapaProps) {
+    const [location, setLocation] = useState<LocationObject | null>(null);
+    const [destination, setDestination] = useState<Destination | null>(null);
     const [address, setAddress] = useState('');
-    const [routeCoordinates, setRouteCoordinates] = useState([]);
+    const [routeCoordinates, setRouteCoordinates] = useState<Coordinate[]>([]);
     const [loading, setLoading] = useState(false);
 
-    const mapRef = useRef < MapView | null > (null);
+    const mapRef = useRef<MapView | null>(null);
 
     // Chave da sua API do OpenRouteService - IMPORTANTE: Substitua pela sua chave
     const OPENROUTESERVICE_API_KEY = 'eyJvcmciOiI1YjNjZTM1OTc4NTExMTAwMDFjZjYyNDgiLCJpZCI6IjA4MWMzZjMzMGZmNzQ3MTk5Y2U2ZWNhNjI3MWUzNmYyIiwiaCI6Im11cm11cjY0In0=';
@@ -54,17 +69,24 @@ export default function Mapa({ navigation }) {
 
     // Efeito para acompanhar a mudança de localização do usuário
     useEffect(() => {
-        const subscription = watchPositionAsync({
+        let isMounted = true;
+        
+        const subscriptionPromise = watchPositionAsync({
             accuracy: LocationAccuracy.Highest,
             timeInterval: 1000,
             distanceInterval: 1
         }, (response) => {
-            setLocation(response);
-            // Opcional: descomente a linha abaixo para sempre centralizar no usuário
-            // mapRef.current?.animateCamera({ center: response.coords });
+            if (isMounted) {
+                setLocation(response);
+                // Opcional: descomente a linha abaixo para sempre centralizar no usuário
+                // mapRef.current?.animateCamera({ center: response.coords });
+            }
         });
 
-        return () => subscription.then(sub => sub.remove());
+        return () => {
+            isMounted = false;
+            subscriptionPromise.then(sub => sub.remove()).catch(() => {});
+        };
     }, []);
 
 
@@ -108,9 +130,9 @@ export default function Mapa({ navigation }) {
     /**
      * Busca a rota entre a localização atual do usuário e o destino
      * usando a API de direções do OpenRouteService.
-     * @param {object} destCoords - As coordenadas do destino {latitude, longitude}.
+     * @param destCoords - As coordenadas do destino {latitude, longitude}.
      */
-    const getRoute = async (destCoords) => {
+    const getRoute = async (destCoords: Destination) => {
         if (!location) return;
 
         try {
@@ -121,7 +143,7 @@ export default function Mapa({ navigation }) {
             const json = await response.json();
 
             if (json.features && json.features.length > 0) {
-                const coordinates = json.features[0].geometry.coordinates.map(coord => ({
+                const coordinates: Coordinate[] = json.features[0].geometry.coordinates.map((coord: [number, number]) => ({
                     latitude: coord[1],
                     longitude: coord[0]
                 }));

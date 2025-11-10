@@ -1,5 +1,6 @@
 {
     "require": {
-        "tymon/jwt-auth": "^2.2"
+        "tymon/jwt-auth": "^2.2",
+        "laravel/framework": "10.48"
     }
 }
